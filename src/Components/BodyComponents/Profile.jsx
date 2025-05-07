@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { updateUserDetails } from "../../Service/api";
 import { jwtDecode } from "jwt-decode";
-// import { useNavigate } from "react-router-dom";
 
 export const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -14,14 +13,25 @@ export const Profile = () => {
     pincode: "",
     state: "",
   });
-  // const navigate = useNavigate();
+  const [hasToken, setHasToken] = useState(false);
 
-  // useEffect(() => {
-  //   const token = localStorage.getItem("aftoAuthToken");
-  //   if (!token) {
-  //     navigate("/login");
-  //   }
-  // }, [navigate]);
+  // Populate form data from token if available
+  useEffect(() => {
+    const token = localStorage.getItem("aftoAuthToken");
+    if (token) {
+      setHasToken(true);
+      try {
+        const decodedToken = jwtDecode(token);
+        setFormData((prev) => ({
+          ...prev,
+          name: decodedToken.name || prev.name,
+          email: decodedToken.email || prev.email,
+        }));
+      } catch (error) {
+        console.error("Error decoding token:", error);
+      }
+    }
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -34,29 +44,18 @@ export const Profile = () => {
 
   const handleSave = async () => {
     const token = localStorage.getItem("aftoAuthToken");
-    // if (!token) {
-    //   navigate("/login");
-    //   return;
-    // }
-
     try {
       const decodedToken = jwtDecode(token);
       console.log("Decoded aftoAuthToken:", decodedToken);
 
-      
-
-      await updateUserDetails(formData, token);
-      console.log("Saved User Details:", formData);
-
       const payload = {
-        email: decodedToken.email || formData.email, // Fallback to formData.email if decodedToken.email is undefined
+        email: decodedToken.email || formData.email,
         businessAccountId: localStorage.getItem("aftoAuthBusinessId"),
-        addressDetails: { ...formData }, // Include full formData in addressDetails
+        addressDetails: { ...formData },
       };
 
-      const response  = await updateUserDetails(payload)
-
-      console.log(response, "updateData")
+      const response = await updateUserDetails(payload, token);
+      console.log("Update response:", response);
       setIsEditing(false);
     } catch (error) {
       console.error("Error decoding token or saving details:", error);
@@ -207,6 +206,7 @@ export const Profile = () => {
                 onChange={handleInputChange}
                 placeholder="Enter your email"
                 className="bg-[#2D303E] text-white rounded px-2 py-1"
+                disabled={hasToken}
               />
             ) : (
               <p className="text-white">{formData.email}</p>

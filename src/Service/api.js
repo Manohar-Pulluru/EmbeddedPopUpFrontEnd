@@ -96,3 +96,15 @@ export const getUserAddress = async (payload) => {
     throw error;
   }
 };
+
+export const searchItems = async (businessId, query) => {
+  const endpoint = "/embedded/searchTemplates/" + businessId + "?q=" + query;
+
+  try {
+    const response = await getRequest(endpoint);
+    return response.data;
+  } catch (error) {
+    console.error("Error while searching items", error);
+    throw error;
+  }
+};

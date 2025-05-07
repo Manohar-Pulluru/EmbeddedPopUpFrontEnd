@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { getTemplateData, getTemplates } from "../../../Service/api";
+import {
+  getTemplateData,
+  getTemplates,
+  searchItems,
+} from "../../../Service/api";
 import { HomeHeader } from "./HomeBodyComponents/HomeHeader";
 import { TemplateTabs } from "./HomeBodyComponents/TemplateTabs";
 import { Section } from "./HomeBodyComponents/Section";
@@ -20,10 +24,50 @@ export const HomeBody = ({ showPayment, toggleChangeCart }) => {
   const [popupMessage, setPopupMessage] = useState("");
   const [showLoginPage, setLoginPage] = useState(false);
   const [businessData, setBusinessData] = useState(null);
+  const [debouncedQuery, setDebouncedQuery] = useState("");
   const [businessId, setBusinessId] = useState(() => {
-    // Initialize businessId from localStorage if available
     return localStorage.getItem("businessId") || null;
   });
+  const [searchedItems, setSearchedItems] = useState(null);
+
+  // Debounce search query
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+    }, 300);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchQuery]);
+
+  // Fetch search results
+  useEffect(() => {
+    const fetchResults = async () => {
+      if (debouncedQuery.trim() && businessId) {
+        try {
+          console.log("Sending search query to API:", debouncedQuery);
+          const response = await searchItems(businessId, debouncedQuery);
+          if (response && response.data && response.data.items) {
+            setSearchedItems(response.data.items);
+            console.log("Search results:", response.data.items);
+          } else {
+            setSearchedItems([]);
+            console.log("No items found for query:", debouncedQuery);
+          }
+        } catch (error) {
+          console.error("Search error:", error);
+          setSearchedItems([]);
+          setPopupMessage("Failed to fetch search results. Please try again.");
+          setShowPopup(true);
+        }
+      } else {
+        setSearchedItems(null); // Clear search results if query is empty
+      }
+    };
+
+    fetchResults();
+  }, [debouncedQuery, businessId]);
 
   // Listen for postMessage from parent window
   useEffect(() => {
@@ -33,15 +77,16 @@ export const HomeBody = ({ showPayment, toggleChangeCart }) => {
       if (event.data.businessId) {
         console.log("Received businessId:", event.data.businessId);
         setBusinessId(event.data.businessId);
-        // Store businessId in localStorage
         localStorage.setItem("businessId", event.data.businessId);
       }
     };
 
     window.addEventListener("message", handleMessage);
 
-    // Request businessId from parent window on mount
-    window.parent.postMessage({ action: "requestBusinessId" }, "http://127.0.0.1:5500");
+    window.parent.postMessage(
+      { action: "requestBusinessId" },
+      "http://127.0.0.1:5500"
+    );
 
     return () => window.removeEventListener("message", handleMessage);
   }, []);
@@ -188,6 +233,18 @@ export const HomeBody = ({ showPayment, toggleChangeCart }) => {
         <div className="w-full mt-8 h-[90%] px-8 overflow-y-scroll scrollbar-hide">
           {loading ? (
             <Loader />
+          ) : searchedItems && searchedItems.length > 0 ? (
+            <Section
+              section={{ title: "Search Results", items: searchedItems }}
+              showPayment={showPayment}
+              handleAddToCart={handleAddToCart}
+              itemLoading={itemLoading}
+              itemAdded={itemAdded}
+            />
+          ) : searchedItems && searchedItems.length === 0 ? (
+            <div className="w-full text-center text-xl text-[#ffffffaf]">
+              No items found for "{debouncedQuery}"
+            </div>
           ) : sections.length > 0 ? (
             sections.map((section, index) => (
               <Section

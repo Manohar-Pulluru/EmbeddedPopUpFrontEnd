@@ -150,10 +150,12 @@ export const Orders = ({
   };
 
   const handleNext = () => {
+
     if (activeTab === "Cart") {
       setActiveTab("Details");
     } else if (activeTab === "Details") {
       setCustomerName(name);
+      console.log("Cart To Detaols")
       setCustomerWhatsappNumber(phone);
       setShowPayment(true);
     }

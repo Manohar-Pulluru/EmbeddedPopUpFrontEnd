@@ -13,6 +13,8 @@ export const Payment = ({
   setChangeCart,
   changeCart,
 }) => {
+
+  console.log(orderData, "orderData__")
   const [paymentMethod, setPaymentMethod] = useState("Credit Card");
   const [cardholderName, setCardholderName] = useState("Levi Ackerman");
   const [cardNumber, setCardNumber] = useState("2564 1421 0987 1244");
