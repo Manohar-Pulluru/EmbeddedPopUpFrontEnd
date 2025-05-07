@@ -65,7 +65,7 @@ export const Home = () => {
   const orderData = {
     customerName: customerName || "John Doe",
     customerWhatsappNumber: customerWhatsappNumber || "+1234567890",
-    businessAccountId: businessId || "defaultBusinessId",
+    businessAccountId: businessId || "91182be9-9446-4e29-9ade-b0312b238668",
     items: items.map((item, index) => ({
       id: item.id,
       sectionTitle: "Rice", // Hardcoded for now, adjust as needed
