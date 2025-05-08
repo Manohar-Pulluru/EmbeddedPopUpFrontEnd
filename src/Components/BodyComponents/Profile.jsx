@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { updateUserDetails } from "../../Service/api";
+import { updateUserDetails, getUserAddress } from "../../Service/api";
 import { jwtDecode } from "jwt-decode";
 
 export const Profile = () => {
@@ -15,7 +15,7 @@ export const Profile = () => {
   });
   const [hasToken, setHasToken] = useState(false);
 
-  // Populate form data from token if available
+  // Populate form data from token and fetch address if token exists
   useEffect(() => {
     const token = localStorage.getItem("aftoAuthToken");
     if (token) {
@@ -27,6 +27,49 @@ export const Profile = () => {
           name: decodedToken.name || prev.name,
           email: decodedToken.email || prev.email,
         }));
+
+        // Fetch address details
+        const fetchAddress = async () => {
+          try {
+            const email = decodedToken.email;
+            const businessAccountId = localStorage.getItem("aftoAuthBusinessId");
+
+            if (!email || !businessAccountId) {
+              console.log("Email or businessAccountId missing");
+              return;
+            }
+
+            const payload = {
+              email,
+              businessAccountId,
+            };
+
+            console.log("Fetching address with payload:", payload);
+            const response = await getUserAddress(payload);
+
+            if (response?.embeddedUser?.otherDetails) {
+              const { name, email, phone, address, city, pincode, state } =
+                response.embeddedUser.otherDetails;
+              setFormData((prev) => ({
+                ...prev,
+                name: name || prev.name,
+                email: email || prev.email,
+                phone: phone || "",
+                address: address || "",
+                city: city || "",
+                pincode: pincode || "",
+                state: state || "",
+              }));
+              console.log("Address data set:", response.embeddedUser.otherDetails);
+            } else {
+              console.log("No address data in response");
+            }
+          } catch (error) {
+            console.error("Error fetching address:", error);
+          }
+        };
+
+        fetchAddress();
       } catch (error) {
         console.error("Error decoding token:", error);
       }
@@ -57,6 +100,49 @@ export const Profile = () => {
       const response = await updateUserDetails(payload, token);
       console.log("Update response:", response);
       setIsEditing(false);
+
+      // Refetch address after save to ensure UI is up-to-date
+      const fetchAddress = async () => {
+        try {
+          const email = decodedToken.email;
+          const businessAccountId = localStorage.getItem("aftoAuthBusinessId");
+
+          if (!email || !businessAccountId) {
+            console.log("Email or businessAccountId missing");
+            return;
+          }
+
+          const payload = {
+            email,
+            businessAccountId,
+          };
+
+          console.log("Fetching address with payload:", payload);
+          const response = await getUserAddress(payload);
+
+          if (response?.embeddedUser?.otherDetails) {
+            const { name, email, phone, address, city, pincode, state } =
+              response.embeddedUser.otherDetails;
+            setFormData((prev) => ({
+              ...prev,
+              name: name || prev.name,
+              email: email || prev.email,
+              phone: phone || "",
+              address: address || "",
+              city: city || "",
+              pincode: pincode || "",
+              state: state || "",
+            }));
+            console.log("Address data set:", response.embeddedUser.otherDetails);
+          } else {
+            console.log("No address data in response");
+          }
+        } catch (error) {
+          console.error("Error fetching address:", error);
+        }
+      };
+
+      fetchAddress();
     } catch (error) {
       console.error("Error decoding token or saving details:", error);
     }
