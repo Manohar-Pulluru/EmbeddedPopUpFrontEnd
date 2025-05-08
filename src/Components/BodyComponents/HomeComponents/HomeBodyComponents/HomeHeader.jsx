@@ -10,7 +10,7 @@ export const HomeHeader = ({
     <div className="w-full h-[13%] flex justify-between items-center">
       <div className="flex-1 h-full flex flex-col gap-4 pt-4">
         <div className="text-4xl font-semibold">
-          {businessData.name}
+          {businessData?.name}
         </div>
         {/* <div className="text-lg text-[#ffffff9c]">Tuesday, 2 Feb 2021</div> */}
         <div className="text-lg text-[#ffffff9c]">
