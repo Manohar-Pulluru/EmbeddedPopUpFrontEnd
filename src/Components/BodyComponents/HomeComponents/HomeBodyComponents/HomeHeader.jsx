@@ -9,7 +9,9 @@ export const HomeHeader = ({
   return (
     <div className="w-full h-[13%] flex justify-between items-center">
       <div className="flex-1 h-full flex flex-col gap-4 pt-4">
-        <div className="text-4xl font-semibold">Namaste Indian Super Market Mississauga</div>
+        <div className="text-4xl font-semibold">
+          {businessData.name}
+        </div>
         {/* <div className="text-lg text-[#ffffff9c]">Tuesday, 2 Feb 2021</div> */}
         <div className="text-lg text-[#ffffff9c]">
           {/* show current date and day */}
