@@ -22,22 +22,22 @@ export const Payment = ({
   const [cvv, setCvv] = useState("***");
   const [email, setEmail] = useState("levi@example.com");
   const [amount, setAmount] = useState("140");
-  const [businessId, setBusinessId] = useState(null);
+  const [businessId, setBusinessId] = useState("80b6fc97-aa38-46b1-bee8-a106d9b7cd96");
 
-  useEffect(() => {
-    const handleMessage = (event) => {
-      // Ensure it's from the expected origin (change port if needed)
-      if (event.origin !== "http://127.0.0.1:5500") return;
+  // useEffect(() => {
+  //   const handleMessage = (event) => {
+  //     // Ensure it's from the expected origin (change port if needed)
+  //     if (event.origin !== "http://127.0.0.1:5500") return;
 
-      if (event.data.businessId) {
-        console.log("Received businessId:", event.data.businessId);
-        setBusinessId(event.data.businessId);
-      }
-    };
+  //     if (event.data.businessId) {
+  //       console.log("Received businessId:", event.data.businessId);
+  //       setBusinessId(event.data.businessId);
+  //     }
+  //   };
 
-    window.addEventListener("message", handleMessage);
-    return () => window.removeEventListener("message", handleMessage);
-  }, []);
+  //   window.addEventListener("message", handleMessage);
+  //   return () => window.removeEventListener("message", handleMessage);
+  // }, []);
 
   const handleConfirmPayment = async () => {
     const payload = {

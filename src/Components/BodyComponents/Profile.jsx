@@ -32,7 +32,8 @@ export const Profile = () => {
         const fetchAddress = async () => {
           try {
             const email = decodedToken.email;
-            const businessAccountId = localStorage.getItem("aftoAuthBusinessId");
+            const businessAccountId =
+              localStorage.getItem("aftoAuthBusinessId");
 
             if (!email || !businessAccountId) {
               console.log("Email or businessAccountId missing");
@@ -60,7 +61,10 @@ export const Profile = () => {
                 pincode: pincode || "",
                 state: state || "",
               }));
-              console.log("Address data set:", response.embeddedUser.otherDetails);
+              console.log(
+                "Address data set:",
+                response.embeddedUser.otherDetails
+              );
             } else {
               console.log("No address data in response");
             }
@@ -133,7 +137,10 @@ export const Profile = () => {
               pincode: pincode || "",
               state: state || "",
             }));
-            console.log("Address data set:", response.embeddedUser.otherDetails);
+            console.log(
+              "Address data set:",
+              response.embeddedUser.otherDetails
+            );
           } else {
             console.log("No address data in response");
           }
@@ -161,7 +168,9 @@ export const Profile = () => {
               className="w-20 h-20 rounded-full object-cover"
             />
             <div className="ml-3">
-              <p className="text-base font-semibold text-white">{formData.name}</p>
+              <p className="text-base font-semibold text-white">
+                {formData.name}
+              </p>
               <p className="text-xs text-white">{formData.email}</p>
             </div>
           </div>
@@ -283,7 +292,9 @@ export const Profile = () => {
 
           {/* Email */}
           <div className="flex w-full justify-between py-3 text-md border-b border-[#3a2f2f]">
-            <label className="block font-medium text-white">Email account</label>
+            <label className="block font-medium text-white">
+              Email account
+            </label>
             {isEditing ? (
               <input
                 type="email"
