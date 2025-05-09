@@ -6,7 +6,14 @@ export const useAppStates = () => {
 
   const login = (userData) => setUser(userData);
   const logout = () => setUser(null);
-  const toggleTheme = () => setTheme((prev) => (prev === "light" ? "dark" : "light"));
+  const toggleTheme = () =>
+    setTheme((prev) => (prev === "light" ? "dark" : "light"));
+
+  const [isCartChanged, setIsCartChanged] = useState(false);
+
+  const toggleCart = () => {
+    setIsCartChanged(!isCartChanged);
+  };
 
   return {
     user,
@@ -14,5 +21,7 @@ export const useAppStates = () => {
     logout,
     theme,
     toggleTheme,
+    toggleCart,
+    isCartChanged
   };
 };

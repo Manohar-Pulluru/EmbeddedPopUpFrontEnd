@@ -9,7 +9,15 @@ export const HomeHeader = ({
   return (
     <div className="w-full h-[13%] flex justify-between items-center">
       <div className="flex-1 h-full flex flex-col gap-4 pt-4">
-        <div className="text-4xl font-semibold">
+        <div
+          className="text-4xl font-semibold"
+          style={{
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            maxWidth: "100%", // Adjust as needed, e.g., "300px" for a fixed width
+          }}
+        >
           {businessData?.name}
         </div>
         {/* <div className="text-lg text-[#ffffff9c]">Tuesday, 2 Feb 2021</div> */}

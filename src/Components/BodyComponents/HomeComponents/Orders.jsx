@@ -5,6 +5,7 @@ import { DetailsView } from "./OrderFlowComponents/DetailsView";
 import { OrderSummary } from "./OrderFlowComponents/OrderSummary";
 import { getUserAddress } from "../../../Service/api";
 import { jwtDecode } from "jwt-decode";
+import { useAppContext } from "../../../Service/Context/AppContext";
 
 export const Orders = ({
   setShowPayment,
@@ -23,6 +24,7 @@ export const Orders = ({
   const [city, setCity] = useState("");
   const [pincode, setPincode] = useState("");
   const [state, setState] = useState("");
+  const { toggleCart } = useAppContext();
   const tabs = ["Cart", "Details"];
   const [discount] = useState(0);
   const [subtotal, setSubtotal] = useState(0);
@@ -132,6 +134,7 @@ export const Orders = ({
   };
 
   const handleDelete = (id) => {
+    toggleCart()
     const updatedItems = items.filter((item) => item.id !== id);
     setItems(updatedItems);
     setSubtotal(calculateSubtotal(updatedItems));
@@ -150,12 +153,11 @@ export const Orders = ({
   };
 
   const handleNext = () => {
-
     if (activeTab === "Cart") {
       setActiveTab("Details");
     } else if (activeTab === "Details") {
       setCustomerName(name);
-      console.log("Cart To Detaols")
+      console.log("Cart To Detaols");
       setCustomerWhatsappNumber(phone);
       setShowPayment(true);
     }

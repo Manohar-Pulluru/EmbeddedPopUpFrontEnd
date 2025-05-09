@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { ItemPopup } from "./ItemPopup";
 import Icon from "../../../../assets/Icon";
 import icons from "../../../../assets/icons.json";
+import { useAppContext } from "../../../../Service/Context/AppContext";
 
 export const ItemCard = ({
   item,
@@ -12,13 +13,45 @@ export const ItemCard = ({
 }) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isInCart, setIsInCart] = useState(false);
+  const { isCartChanged} = useAppContext(); // Access context
 
-  // Check if the item exists in the cart on mount and when itemAdded changes
-  useEffect(() => {
+  useEffect(()=>{
+    console.log("Cart Items Changed Reset by Checing the Add to Buttion")
+  },[isCartChanged])
+
+
+  // Function to check if item exists in cart
+  const checkItemInCart = () => {
     const cartItems = JSON.parse(localStorage.getItem("cartItems") || "[]");
     const itemExists = cartItems.some((cartItem) => cartItem.id === item.id);
     setIsInCart(itemExists);
-  }, [item.id, itemAdded]);
+  };
+
+  // Run on mount and when itemAdded changes
+  useEffect(() => {
+    checkItemInCart();
+  }, [item.id, itemAdded, isCartChanged]);
+
+  // Listen for cart update events
+  useEffect(() => {
+    const handleCartUpdate = () => {
+      checkItemInCart();
+    };
+
+    // Listen for custom cart update event
+    window.addEventListener("cartUpdated", handleCartUpdate);
+    // Also listen for storage event for cross-tab updates
+    window.addEventListener("storage", (e) => {
+      if (e.key === "cartItems") {
+        checkItemInCart();
+      }
+    });
+
+    return () => {
+      window.removeEventListener("cartUpdated", handleCartUpdate);
+      window.removeEventListener("storage", handleCartUpdate);
+    };
+  }, [item.id]);
 
   return (
     <>
@@ -26,7 +59,7 @@ export const ItemCard = ({
         className={`${
           showPayment ? "w-[45%] h-[250px]" : "w-[30%] h-[300px]"
         } mt-[150px] bg-[#1F1D2B] hover:bg-[#23212e] cursor-pointer relative rounded-4xl flex flex-col justify-end p-4`}
-        onClick={() => setIsPopupOpen(true)} // Open popup on card click
+        onClick={() => setIsPopupOpen(true)}
       >
         <div className="w-[70%] absolute top-[-50%] left-[50%] translate-x-[-50%] translate-y-[20%] mx-auto overflow-hidden aspect-square p-0.5 bg-white rounded-full border">
           <img
@@ -46,7 +79,7 @@ export const ItemCard = ({
           </div>
           <div
             onClick={(e) => {
-              e.stopPropagation(); // Prevent card click from opening popup when clicking the button
+              e.stopPropagation();
               if (!isInCart && !itemLoading[item.id]) {
                 handleAddToCart(item);
               }
@@ -74,14 +107,13 @@ export const ItemCard = ({
         </div>
       </div>
 
-      {/* Render Popup if open */}
       {isPopupOpen && (
         <ItemPopup
           item={item}
           onClose={() => setIsPopupOpen(false)}
           handleAddToCart={handleAddToCart}
-          itemLoading={itemLoading}
           itemAdded={itemAdded}
+          itemLoading={itemLoading}
         />
       )}
     </>
