@@ -8,14 +8,14 @@ import { Profile } from "./BodyComponents/Profile";
 //   return <div className="h-full w-full">Profile Component</div>;
 // };
 
-export const Body = ({ activeIndex }) => {
+export const Body = ({ activeIndex, businessId }) => {
   console.log(activeIndex, "activeIndex");
 
   // Function to render the appropriate component based on activeIndex
   function renderComponent() {
     switch (activeIndex) {
       case 0:
-        return <Home />;
+        return <Home businessId={businessId} />;
       case 1:
         return <Orders />;
       case 2:

@@ -6,15 +6,15 @@ import { CreditCardForm } from "./PaymentComponents/CreditCardForm";
 import { PaypalForm } from "./PaymentComponents/PaypalForm";
 import { CashForm } from "./PaymentComponents/CashForm";
 import { PaymentFooter } from "./PaymentComponents/PaymentFooter";
-
+import { useAppContext } from "../../../Service/Context/AppContext";
 export const Payment = ({
   setShowPayment,
   orderData,
   setChangeCart,
   changeCart,
+  businessId,
 }) => {
-
-  console.log(orderData, "orderData__")
+  console.log(orderData, "orderData__");
   const [paymentMethod, setPaymentMethod] = useState("Credit Card");
   const [cardholderName, setCardholderName] = useState("Levi Ackerman");
   const [cardNumber, setCardNumber] = useState("2564 1421 0987 1244");
@@ -22,12 +22,15 @@ export const Payment = ({
   const [cvv, setCvv] = useState("***");
   const [email, setEmail] = useState("levi@example.com");
   const [amount, setAmount] = useState("140");
-  const [businessId, setBusinessId] = useState("80b6fc97-aa38-46b1-bee8-a106d9b7cd96");
+  const { toggleCart } = useAppContext();
+  const [isLoading, setIsLoading] = useState(false);
+
+  // const [businessId, setBusinessId] = useState(null);
 
   // useEffect(() => {
   //   const handleMessage = (event) => {
   //     // Ensure it's from the expected origin (change port if needed)
-  //     if (event.origin !== "http://127.0.0.1:5500") return;
+  //     if (event.origin !== "http://localhost:4200") return;
 
   //     if (event.data.businessId) {
   //       console.log("Received businessId:", event.data.businessId);
@@ -40,11 +43,11 @@ export const Payment = ({
   // }, []);
 
   const handleConfirmPayment = async () => {
+    setIsLoading(true);
     const payload = {
       customerName: orderData.customerName || "John Doe",
       customerWhatsappNumber: orderData.customerWhatsappNumber || "+1234567890",
-      businessAccountId:
-        orderData.businessAccountId || businessId,
+      businessAccountId: orderData.businessAccountId || businessId,
       items: orderData.items.map((item, index) => ({
         id: item.id,
         sectionTitle: item.sectionTitle || "Rice",
@@ -81,8 +84,11 @@ export const Payment = ({
       localStorage.setItem("cartItems", JSON.stringify([]));
       setChangeCart(!changeCart);
       setShowPayment(false);
+      toggleCart();
     } catch (error) {
       console.error("Failed to place order:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -130,6 +136,7 @@ export const Payment = ({
       <PaymentFooter
         onCancel={() => setShowPayment(false)}
         onConfirm={handleConfirmPayment}
+        isLoading={isLoading}
       />
     </div>
   );

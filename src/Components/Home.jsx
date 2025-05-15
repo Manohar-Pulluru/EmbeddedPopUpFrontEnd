@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { NavBar } from "./NavBar";
 import { Body } from "./Body";
 
-export const Home = () => {
+export const Home = ({businessId}) => {
   const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
@@ -24,7 +24,7 @@ export const Home = () => {
         <NavBar setActiveIndex={setActiveIndex} activeIndex={activeIndex} />
       </div>
       <div className="flex-1 bg-w text-white">
-        <Body activeIndex={activeIndex} />
+        <Body businessId={businessId} activeIndex={activeIndex} />
       </div>
     </div>
   );

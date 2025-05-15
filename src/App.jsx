@@ -35,7 +35,7 @@ import React from "react";
 import { Home } from "./Components/Home";
 
 const App = () => {
-  const businessId = "80b6fc97-aa38-46b1-bee8-a106d9b7cd96";
+  const businessId = "91182be9-9446-4e29-9ade-b0312b238668";
 
   return (
     <div className="w-screen h-screen flex items-center justify-center bg-[#252836]">

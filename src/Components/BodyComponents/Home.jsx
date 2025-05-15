@@ -3,13 +3,12 @@ import { Orders } from "./HomeComponents/Orders";
 import { HomeBody } from "./HomeComponents/HomeBody";
 import { Payment } from "./HomeComponents/Payment";
 
-export const Home = () => {
+export const Home = ({ businessId }) => {
   const [showPayment, setShowPayment] = useState(false);
   const [changeCart, setChangeCart] = useState(false);
   const [items, setItems] = useState([]);
   const [customerName, setCustomerName] = useState("");
   const [customerWhatsappNumber, setCustomerWhatsappNumber] = useState("");
-  const [businessId, setBusinessId] = useState("80b6fc97-aa38-46b1-bee8-a106d9b7cd96");
 
   const toggleChangeCart = () => {
     setChangeCart(!changeCart);
@@ -46,26 +45,26 @@ export const Home = () => {
     setItems(cartItems);
   }, [changeCart]);
 
-    // useEffect(() => {
-    //   const handleMessage = (event) => {
-    //     // Ensure it's from the expected origin (change port if needed)
-    //     if (event.origin !== "http://127.0.0.1:5500") return;
-  
-    //     if (event.data.businessId) {
-    //       console.log("Received businessId:", event.data.businessId);
-    //       setBusinessId(event.data.businessId);
-    //     }
-    //   };
-  
-    //   window.addEventListener("message", handleMessage);
-    //   return () => window.removeEventListener("message", handleMessage);
-    // }, []);
+  // useEffect(() => {
+  //   const handleMessage = (event) => {
+  //     // Ensure it's from the expected origin (change port if needed)
+  //     if (event.origin !== "http://127.0.0.1:5500") return;
+
+  //     if (event.data.businessId) {
+  //       console.log("Received businessId:", event.data.businessId);
+  //       setBusinessId(event.data.businessId);
+  //     }
+  //   };
+
+  //   window.addEventListener("message", handleMessage);
+  //   return () => window.removeEventListener("message", handleMessage);
+  // }, []);
 
   // Prepare orderData for Payment component
   const orderData = {
     customerName: customerName || "John Doe",
     customerWhatsappNumber: customerWhatsappNumber || "+1234567890",
-    businessAccountId: businessId || "80b6fc97-aa38-46b1-bee8-a106d9b7cd96",
+    businessAccountId: businessId,
     items: items.map((item, index) => ({
       id: item.id,
       sectionTitle: "Rice", // Hardcoded for now, adjust as needed
@@ -96,6 +95,7 @@ export const Home = () => {
           changeCart={changeCart}
           showPayment={showPayment}
           setShowPayment={setShowPayment}
+          businessId={businessId}
         />
       </div>
       <div className="w-[30%] h-full">

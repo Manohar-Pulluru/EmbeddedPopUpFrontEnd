@@ -10,7 +10,7 @@ import { Section } from "./HomeBodyComponents/Section";
 import { Popup } from "./HomeBodyComponents/Popup";
 import { LoginPage } from "./HomeBodyComponents/LoginPage";
 
-export const HomeBody = ({ showPayment, toggleChangeCart }) => {
+export const HomeBody = ({ showPayment, toggleChangeCart, businessId }) => {
   const [templates, setTemplates] = useState([]);
   const [sections, setSections] = useState([]);
   const [activeTemplateId, setActiveTemplateId] = useState("");
@@ -25,7 +25,6 @@ export const HomeBody = ({ showPayment, toggleChangeCart }) => {
   const [showLoginPage, setLoginPage] = useState(false);
   const [businessData, setBusinessData] = useState(null);
   const [debouncedQuery, setDebouncedQuery] = useState("");
-  const [businessId, setBusinessId] = useState("80b6fc97-aa38-46b1-bee8-a106d9b7cd96")
   const [searchedItems, setSearchedItems] = useState(null);
 
   // Debounce search query
