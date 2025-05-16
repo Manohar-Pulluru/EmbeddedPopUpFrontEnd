@@ -3,7 +3,7 @@ import React from "react";
 export const TemplateTabs = ({ templates, activeTemplateId, setActiveTemplateId }) => {
   return (
     <div className="w-full min-h-[5%] border-b border-[#5a5858] flex gap-4 overflow-scroll scrollbar-hide">
-      {templates.map((template) => (
+      {templates?.map((template) => (
         <div
           key={template.id}
           className={`flex px-4 h-full items-center cursor-pointer ${

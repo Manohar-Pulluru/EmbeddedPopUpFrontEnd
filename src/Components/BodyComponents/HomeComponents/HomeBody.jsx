@@ -98,7 +98,7 @@ export const HomeBody = ({ showPayment, toggleChangeCart, businessId }) => {
         const result = await getTemplates(businessId);
         setTemplates(result.templates);
         setBusinessData(result.businessData);
-        if (result.templates.length > 0) {
+        if (result.templates?.length > 0) {
           setActiveTemplateId(result.templates[0].id);
         }
       } catch (err) {
@@ -230,7 +230,7 @@ export const HomeBody = ({ showPayment, toggleChangeCart, businessId }) => {
         <div className="w-full mt-8 h-[90%] px-8 overflow-y-scroll scrollbar-hide">
           {loading ? (
             <Loader />
-          ) : searchedItems && searchedItems.length > 0 ? (
+          ) : searchedItems && searchedItems?.length > 0 ? (
             <Section
               section={{ title: "Search Results", items: searchedItems }}
               showPayment={showPayment}
@@ -238,11 +238,11 @@ export const HomeBody = ({ showPayment, toggleChangeCart, businessId }) => {
               itemLoading={itemLoading}
               itemAdded={itemAdded}
             />
-          ) : searchedItems && searchedItems.length === 0 ? (
+          ) : searchedItems && searchedItems?.length === 0 ? (
             <div className="w-full text-center text-xl text-[#ffffffaf]">
               No items found for "{debouncedQuery}"
             </div>
-          ) : sections.length > 0 ? (
+          ) : sections?.length > 0 ? (
             sections.map((section, index) => (
               <Section
                 key={index}
