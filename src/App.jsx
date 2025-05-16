@@ -7,7 +7,7 @@ const App = () => {
 
   useEffect(() => {
     const handleMessage = (event) => {
-      if (event.origin !== import.meta.env.VITE_BASE_URL ) return;
+      if (event.origin !== import.meta.env.VITE_AFTO_FRONTEND_URL ) return;
 
       if (event.data.businessId) {
         console.log("Received businessId:", event.data.businessId);
