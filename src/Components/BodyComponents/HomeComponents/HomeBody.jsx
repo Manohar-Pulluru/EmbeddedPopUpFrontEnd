@@ -90,27 +90,35 @@ export const HomeBody = ({ showPayment, toggleChangeCart, businessId }) => {
 
   // Fetch templates when businessId is available
   useEffect(() => {
+    if (!businessId) return;
+
     const fetchTemplates = async () => {
-      if (!businessId) return;
-      setLoading(true);
       try {
         console.log(businessId, "businessId__1");
         const result = await getTemplates(businessId);
         setTemplates(result.templates);
         setBusinessData(result.businessData);
-        if (result.templates?.length > 0) {
+        if (result.templates?.length > 0 && !activeTemplateId) {
           setActiveTemplateId(result.templates[0].id);
         }
       } catch (err) {
         console.error("Failed to fetch templates:", err);
         setPopupMessage("Failed to load templates. Please try again.");
         setShowPopup(true);
-      } finally {
-        setLoading(false);
       }
     };
 
-    fetchTemplates();
+    // Initial fetch with loading state
+    setLoading(true);
+    fetchTemplates().finally(() => setLoading(false));
+
+    // Periodic fetch every 5 seconds without loading state
+    const intervalId = setInterval(() => {
+      fetchTemplates();
+    }, 5000);
+
+    // Cleanup interval on component unmount or businessId change
+    return () => clearInterval(intervalId);
   }, [businessId]);
 
   // Fetch template data when activeTemplateId changes
