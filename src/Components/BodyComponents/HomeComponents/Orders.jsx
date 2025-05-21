@@ -3,18 +3,22 @@ import { OrderTabs } from "./OrderFlowComponents/OrderTabs";
 import { CartView } from "./OrderFlowComponents/CartView";
 import { DetailsView } from "./OrderFlowComponents/DetailsView";
 import { OrderSummary } from "./OrderFlowComponents/OrderSummary";
-import { getUserAddress } from "../../../Service/api";
+import { getUserAddress, placeOrder } from "../../../Service/api"; // Add placeOrder import
 import { jwtDecode } from "jwt-decode";
 import { useAppContext } from "../../../Service/Context/AppContext";
 
 export const Orders = ({
   setShowPayment,
+  setPaymentDetails,
+  paymentDetails,
   showPayment,
   changeCart,
   items,
+  businessAccountId,
   setItems,
   setCustomerName,
   setCustomerWhatsappNumber,
+  setOrderData,
 }) => {
   const [activeTab, setActiveTab] = useState("Cart");
   const [name, setName] = useState("");
@@ -28,6 +32,7 @@ export const Orders = ({
   const tabs = ["Cart", "Details"];
   const [discount] = useState(0);
   const [subtotal, setSubtotal] = useState(0);
+  const [isLoading, setIsLoading] = useState(false); // Add isLoading state for order submission
 
   const calculateSubtotal = (items) => {
     return items.reduce((sum, item) => sum + (item.totalPrice || 0), 0);
@@ -134,7 +139,7 @@ export const Orders = ({
   };
 
   const handleDelete = (id) => {
-    toggleCart()
+    toggleCart();
     const updatedItems = items.filter((item) => item.id !== id);
     setItems(updatedItems);
     setSubtotal(calculateSubtotal(updatedItems));
@@ -152,14 +157,64 @@ export const Orders = ({
     localStorage.setItem("cartItems", JSON.stringify(itemsForStorage));
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (activeTab === "Cart") {
       setActiveTab("Details");
     } else if (activeTab === "Details") {
+      // Update customer details
       setCustomerName(name);
-      console.log("Cart To Detaols");
       setCustomerWhatsappNumber(phone);
-      setShowPayment(true);
+
+      // Update orderData with the latest customer details and items
+      const updatedOrderData = {
+        customerName: name || "John Doe",
+        customerWhatsappNumber: phone || "+1234567890",
+        businessAccountId: businessAccountId,
+        items: items.map((item, index) => ({
+          id: item.id,
+          sectionTitle: "Rice", // Hardcoded for now, adjust as needed
+          itemId: item.itemId,
+          itemName: item.itemName,
+          itemDescription: `${item.itemName}.`, // Simple description based on name
+          regPrice: item.regPrice.toString(),
+          salePrice: "0", // Hardcoded, adjust if salePrice is available
+          imageURL: item.imageURL,
+          serial_number: index + 1,
+          productTemplateSectionId: "20903f70-bc7a-48f0-89fc-07bbede56cf1", // Hardcoded, adjust as needed
+          isHSTApplied: false,
+          HSTPercentage: "13.00",
+          inventoryId: null,
+          inventoryName: null,
+          isSyncToInventory: false,
+          createdAt: "2025-04-18T14:23:31.222Z",
+          updatedAt: "2025-04-18T14:23:31.222Z",
+          quantity: item.quantity,
+        })),
+      };
+
+      setOrderData(updatedOrderData);
+      console.log("Updated orderData:", updatedOrderData);
+
+      // Place the order
+      setIsLoading(true);
+      try {
+        const response = await placeOrder(updatedOrderData);
+        let orderHistory = JSON.parse(localStorage.getItem("orderHistory") || "[]");
+        orderHistory.push(response.data);
+        localStorage.setItem("orderHistory", JSON.stringify(orderHistory));
+        localStorage.setItem("cartItems", JSON.stringify([]));
+        setItems([]); // Clear items in state
+        // setChangeCart(!changeCart);
+        // setPaymentDetails(response.data.paymentIntent)
+        setShowPayment(true); // Show payment view (optional, see note below)
+        setPaymentDetails(response.data.paymentIntent);
+        console.log(showPayment, "showPayment", response.data.paymentIntent);
+        toggleCart();
+      } catch (error) {
+        console.error("Failed to place order:", error);
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -202,6 +257,7 @@ export const Orders = ({
             discount={discount}
             subtotal={subtotal}
             handleNext={handleNext}
+            isLoading={isLoading} // Pass isLoading to OrderSummary for UI feedback
           />
         </>
       ) : activeTab === "Details" ? (
@@ -226,6 +282,7 @@ export const Orders = ({
             discount={discount}
             subtotal={subtotal}
             handleNext={handleNext}
+            isLoading={isLoading} // Pass isLoading to OrderSummary for UI feedback
           />
         </>
       ) : null}

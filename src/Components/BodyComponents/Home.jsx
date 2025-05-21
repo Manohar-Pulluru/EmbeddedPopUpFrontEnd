@@ -9,6 +9,8 @@ export const Home = ({ businessId }) => {
   const [items, setItems] = useState([]);
   const [customerName, setCustomerName] = useState("");
   const [customerWhatsappNumber, setCustomerWhatsappNumber] = useState("");
+  const [orderData, setOrderData] = useState({}); // Initialize as empty
+  const [paymentDetails, setPaymentDetails] = useState(null);
 
   const toggleChangeCart = () => {
     setChangeCart(!changeCart);
@@ -45,47 +47,36 @@ export const Home = ({ businessId }) => {
     setItems(cartItems);
   }, [changeCart]);
 
-  // useEffect(() => {
-  //   const handleMessage = (event) => {
-  //     // Ensure it's from the expected origin (change port if needed)
-  //     if (event.origin !== "http://127.0.0.1:5500") return;
+  // Update orderData whenever customerName, customerWhatsappNumber, or items change
+  useEffect(() => {
+    setOrderData({
+      customerName: customerName || "John Doe",
+      customerWhatsappNumber: customerWhatsappNumber || "+1234567890",
+      businessAccountId: businessId,
+      items: items.map((item, index) => ({
+        id: item.id,
+        sectionTitle: "Rice", // Hardcoded for now, adjust as needed
+        itemId: item.itemId,
+        itemName: item.itemName,
+        itemDescription: `${item.itemName}.`, // Simple description based on name
+        regPrice: item.regPrice.toString(),
+        salePrice: "0", // Hardcoded, adjust if salePrice is available
+        imageURL: item.imageURL,
+        serial_number: index + 1,
+        productTemplateSectionId: "20903f70-bc7a-48f0-89fc-07bbede56cf1", // Hardcoded, adjust as needed
+        isHSTApplied: false,
+        HSTPercentage: "13.00",
+        inventoryId: null,
+        inventoryName: null,
+        isSyncToInventory: false,
+        createdAt: "2025-04-18T14:23:31.222Z",
+        updatedAt: "2025-04-18T14:23:31.222Z",
+        quantity: item.quantity,
+      })),
+    });
+  }, [customerName, customerWhatsappNumber, items, businessId]);
 
-  //     if (event.data.businessId) {
-  //       console.log("Received businessId:", event.data.businessId);
-  //       setBusinessId(event.data.businessId);
-  //     }
-  //   };
-
-  //   window.addEventListener("message", handleMessage);
-  //   return () => window.removeEventListener("message", handleMessage);
-  // }, []);
-
-  // Prepare orderData for Payment component
-  const orderData = {
-    customerName: customerName || "John Doe",
-    customerWhatsappNumber: customerWhatsappNumber || "+1234567890",
-    businessAccountId: businessId,
-    items: items.map((item, index) => ({
-      id: item.id,
-      sectionTitle: "Rice", // Hardcoded for now, adjust as needed
-      itemId: item.itemId,
-      itemName: item.itemName,
-      itemDescription: `${item.itemName}.`, // Simple description based on name
-      regPrice: item.regPrice.toString(),
-      salePrice: "0", // Hardcoded, adjust if salePrice is available
-      imageURL: item.imageURL,
-      serial_number: index + 1,
-      productTemplateSectionId: "20903f70-bc7a-48f0-89fc-07bbede56cf1", // Hardcoded, adjust as needed
-      isHSTApplied: false,
-      HSTPercentage: "13.00",
-      inventoryId: null,
-      inventoryName: null,
-      isSyncToInventory: false,
-      createdAt: "2025-04-18T14:23:31.222Z",
-      updatedAt: "2025-04-18T14:23:31.222Z",
-      quantity: item.quantity,
-    })),
-  };
+  console.log("orderData__", orderData);
 
   return (
     <div className="h-full w-full flex">
@@ -104,9 +95,13 @@ export const Home = ({ businessId }) => {
           changeCart={changeCart}
           setShowPayment={setShowPayment}
           items={items}
+          setPaymentDetails={setPaymentDetails}
+          paymentDetails={paymentDetails}
           setItems={setItems}
           setCustomerName={setCustomerName}
           setCustomerWhatsappNumber={setCustomerWhatsappNumber}
+          setOrderData={setOrderData} // Pass setOrderData to Orders
+          businessAccountId={businessId}
         />
       </div>
       {showPayment && (
@@ -117,6 +112,8 @@ export const Home = ({ businessId }) => {
             orderData={orderData}
             setChangeCart={setChangeCart}
             changeCart={changeCart}
+            setPaymentDetails={setPaymentDetails}
+            paymentDetails={paymentDetails}
           />
         </div>
       )}

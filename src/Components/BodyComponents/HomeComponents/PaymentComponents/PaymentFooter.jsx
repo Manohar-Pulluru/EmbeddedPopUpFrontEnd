@@ -9,7 +9,7 @@ export const PaymentFooter = ({ onCancel, onConfirm, isLoading }) => {
       >
         Cancel
       </button>
-      <button
+      {/* <button
         onClick={onConfirm}
         className="px-6 cursor-pointer py-4 bg-[#EA7C69] rounded-2xl text-xl flex items-center justify-center hover:bg-[#d68475] font-medium"
       >
@@ -33,7 +33,7 @@ export const PaymentFooter = ({ onCancel, onConfirm, isLoading }) => {
         ) : (
           "Confirm Payment"
         )}
-      </button>
+      </button> */}
     </div>
   );
 };
