@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Orders } from "./HomeComponents/Orders";
 import { HomeBody } from "./HomeComponents/HomeBody";
-import { Payment } from "./HomeComponents/Payment";
+// import { Payment } from "./HomeComponents/Payment";
+import Payment from "./HomeComponents/Payment";
 
 export const Home = ({ businessId }) => {
   const [showPayment, setShowPayment] = useState(false);
