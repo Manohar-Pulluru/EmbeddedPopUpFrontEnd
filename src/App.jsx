@@ -5,6 +5,8 @@ import { useState, useEffect } from "react";
 const App = () => {
   const [businessId, setBusinessId] = useState(null);
 
+  console.log("businessId:", businessId);
+
   useEffect(() => {
     const handleMessage = (event) => {
       if (event.origin !== import.meta.env.VITE_AFTO_FRONTEND_URL ) return;
