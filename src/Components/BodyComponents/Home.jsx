@@ -12,6 +12,7 @@ export const Home = ({ businessId }) => {
   const [customerWhatsappNumber, setCustomerWhatsappNumber] = useState("");
   const [orderData, setOrderData] = useState({}); // Initialize as empty
   const [paymentDetails, setPaymentDetails] = useState(null);
+  const [subtotal, setSubtotal] = useState(0);
 
   const toggleChangeCart = () => {
     setChangeCart(!changeCart);
@@ -103,6 +104,8 @@ export const Home = ({ businessId }) => {
           setCustomerWhatsappNumber={setCustomerWhatsappNumber}
           setOrderData={setOrderData} // Pass setOrderData to Orders
           businessAccountId={businessId}
+          setSubtotal={setSubtotal}
+          subtotal={subtotal}
         />
       </div>
       {showPayment && (
@@ -115,6 +118,9 @@ export const Home = ({ businessId }) => {
             changeCart={changeCart}
             setPaymentDetails={setPaymentDetails}
             paymentDetails={paymentDetails}
+            setOrderData={setOrderData}
+            setSubtotal={setSubtotal}
+            subtotal={subtotal}
           />
         </div>
       )}

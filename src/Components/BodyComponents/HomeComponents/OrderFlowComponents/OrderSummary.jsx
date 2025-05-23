@@ -1,6 +1,8 @@
 import React from "react";
 
-export const OrderSummary = ({ discount, subtotal, handleNext }) => {
+export const OrderSummary = ({ discount, subtotal, handleNext, items, isLoading, isFormValid }) => {
+  const isDisabled = items?.length === 0 || (isFormValid === false); // Disable if cart is empty or form is invalid
+
   return (
     <div className="h-[25%] w-full flex-col flex">
       <div className="h-[70%] w-full flex flex-col font-medium justify-evenly">
@@ -14,12 +16,17 @@ export const OrderSummary = ({ discount, subtotal, handleNext }) => {
         </div>
       </div>
       <div className="h-[30%] w-full">
-        <div
+        <button
+          disabled={isDisabled || isLoading} // Also disable if loading
           onClick={handleNext}
-          className="h-full w-full bg-[#EA7C69] rounded-2xl text-xl flex items-center justify-center hover:bg-[#d68475] font-medium cursor-pointer"
+          className={`h-full w-full rounded-2xl text-xl flex items-center justify-center font-medium transition-all duration-200 ${
+            isDisabled || isLoading
+              ? "bg-[#EA7C69] opacity-70 text-white cursor-not-allowed"
+              : "bg-[#EA7C69] hover:bg-[#d68475] text-white cursor-pointer"
+          }`}
         >
-          Next
-        </div>
+          {isLoading ? "Processing..." : "Next"}
+        </button>
       </div>
     </div>
   );

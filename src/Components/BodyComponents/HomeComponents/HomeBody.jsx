@@ -15,7 +15,8 @@ export const HomeBody = ({ showPayment, toggleChangeCart, businessId }) => {
   const [sections, setSections] = useState([]);
   const [activeTemplateId, setActiveTemplateId] = useState("");
   const [templateData, setTemplateData] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); // For getTemplates
+  const [templateLoading, setTemplateLoading] = useState(false); // For getTemplateData
   const [searchQuery, setSearchQuery] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [itemLoading, setItemLoading] = useState({});
@@ -66,28 +67,6 @@ export const HomeBody = ({ showPayment, toggleChangeCart, businessId }) => {
     fetchResults();
   }, [debouncedQuery, businessId]);
 
-  // Listen for postMessage from parent window
-  // useEffect(() => {
-  //   const handleMessage = (event) => {
-  //     if (event.origin !== "http://127.0.0.1:5500") return;
-
-  //     if (event.data.businessId) {
-  //       console.log("Received businessId:", event.data.businessId);
-  //       setBusinessId(event.data.businessId);
-  //       localStorage.setItem("businessId", event.data.businessId);
-  //     }
-  //   };
-
-  //   window.addEventListener("message", handleMessage);
-
-  //   window.parent.postMessage(
-  //     { action: "requestBusinessId" },
-  //     "http://127.0.0.1:5500"
-  //   );
-
-  //   return () => window.removeEventListener("message", handleMessage);
-  // }, []);
-
   // Fetch templates when businessId is available
   useEffect(() => {
     if (!businessId) return;
@@ -98,19 +77,27 @@ export const HomeBody = ({ showPayment, toggleChangeCart, businessId }) => {
         const result = await getTemplates(businessId);
         setTemplates(result.templates);
         setBusinessData(result.businessData);
-        if (result.templates?.length > 0 && !activeTemplateId) {
-          setActiveTemplateId(result.templates[0].id);
+        // Only set activeTemplateId on initial load or if current ID is invalid
+        if (result.templates?.length > 0) {
+          const isValidTemplate = result.templates.some(
+            (template) => template.id === activeTemplateId
+          );
+          if (!activeTemplateId || !isValidTemplate) {
+            setActiveTemplateId(result.templates[0].id);
+          }
         }
       } catch (err) {
         console.error("Failed to fetch templates:", err);
         setPopupMessage("Failed to load templates. Please try again.");
         setShowPopup(true);
+      } finally {
+        setLoading(false);
       }
     };
 
     // Initial fetch with loading state
     setLoading(true);
-    fetchTemplates().finally(() => setLoading(false));
+    fetchTemplates();
 
     // Periodic fetch every 5 seconds without loading state
     const intervalId = setInterval(() => {
@@ -119,13 +106,13 @@ export const HomeBody = ({ showPayment, toggleChangeCart, businessId }) => {
 
     // Cleanup interval on component unmount or businessId change
     return () => clearInterval(intervalId);
-  }, [businessId]);
+  }, [businessId, activeTemplateId]);
 
   // Fetch template data when activeTemplateId changes
   useEffect(() => {
     if (activeTemplateId) {
       const fetchData = async () => {
-        setLoading(true);
+        setTemplateLoading(true);
         try {
           const result = await getTemplateData(activeTemplateId);
           const data = result.data;
@@ -136,7 +123,7 @@ export const HomeBody = ({ showPayment, toggleChangeCart, businessId }) => {
           setPopupMessage("Failed to load template data. Please try again.");
           setShowPopup(true);
         } finally {
-          setLoading(false);
+          setTemplateLoading(false);
         }
       };
 
@@ -236,7 +223,7 @@ export const HomeBody = ({ showPayment, toggleChangeCart, businessId }) => {
         />
 
         <div className="w-full mt-8 h-[90%] px-8 overflow-y-scroll scrollbar-hide">
-          {loading ? (
+          {loading || templateLoading ? (
             <Loader />
           ) : searchedItems && searchedItems?.length > 0 ? (
             <Section
@@ -250,7 +237,7 @@ export const HomeBody = ({ showPayment, toggleChangeCart, businessId }) => {
             <div className="w-full text-center text-xl text-[#ffffffaf]">
               No items found for "{debouncedQuery}"
             </div>
-          ) : sections?.length > 0 ? (
+          ) : templates?.length > 0 && sections?.length > 0 ? (
             sections.map((section, index) => (
               <Section
                 key={index}
@@ -261,9 +248,13 @@ export const HomeBody = ({ showPayment, toggleChangeCart, businessId }) => {
                 itemAdded={itemAdded}
               />
             ))
+          ) : templates?.length === 0 ? (
+            <div className="w-full text-center text-xl text-[#ffffffaf]">
+              No template available
+            </div>
           ) : (
             <div className="w-full text-center text-xl text-[#ffffffaf]">
-              No sections available
+              No items available for this template
             </div>
           )}
         </div>

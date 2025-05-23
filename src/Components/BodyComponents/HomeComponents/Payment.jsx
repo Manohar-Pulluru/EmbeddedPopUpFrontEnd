@@ -11,9 +11,17 @@ import { PaymentMethodSelector } from "./PaymentComponents/PaymentMethodSelector
 import { PaypalForm } from "./PaymentComponents/PaypalForm";
 import { CashForm } from "./PaymentComponents/CashForm";
 import { PaymentFooter } from "./PaymentComponents/PaymentFooter";
+import { useAppContext } from "../../../Service/Context/AppContext";
 
 // Payment component
-const Payment = ({ orderData, paymentDetails, setShowPayment }) => {
+const Payment = ({
+  orderData,
+  paymentDetails,
+  setShowPayment,
+  setSubtotal,
+}) => {
+  const { toggleCart } = useAppContext();
+
   // Initialize stripePromise inside Payment
   const stripePromise = loadStripe(
     import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY,
@@ -29,11 +37,13 @@ const Payment = ({ orderData, paymentDetails, setShowPayment }) => {
   // Log paymentDetails and stripePromise status
   useEffect(() => {
     console.log("Payment Details in Payment Component:", paymentDetails);
-    stripePromise.then((stripe) => {
-      console.log("Stripe SDK initialized:", !!stripe);
-    }).catch((error) => {
-      console.error("Failed to initialize Stripe SDK:", error);
-    });
+    stripePromise
+      .then((stripe) => {
+        console.log("Stripe SDK initialized:", !!stripe);
+      })
+      .catch((error) => {
+        console.error("Failed to initialize Stripe SDK:", error);
+      });
   }, [paymentDetails]);
 
   // Payment form logic
@@ -91,10 +101,14 @@ const Payment = ({ orderData, paymentDetails, setShowPayment }) => {
           setError(result.error.message);
           setIsProcessing(false);
         } else if (result.paymentIntent.status === "succeeded") {
-          setPaymentSucceeded(true);
+          setPaymentSucceeded(true); // Trigger success message
           console.log("Payment succeeded with ID:", result.paymentIntent.id);
-          // Optionally close the payment screen after a delay
-          setTimeout(() => setShowPayment(false), 4000);
+          // Perform cart and state updates
+          localStorage.setItem("cartItems", JSON.stringify([]));
+          setSubtotal(0); // Reset subtotal in state
+          toggleCart();
+          // Close the payment screen after a delay to show success message
+          // setTimeout(() => setShowPayment(false), 4000);
         }
       } catch (error) {
         console.error("Error confirming payment:", error);
@@ -189,6 +203,16 @@ const Payment = ({ orderData, paymentDetails, setShowPayment }) => {
                 `Pay ${formatAmount(paymentDetails.amount)}`
               )}
             </button>
+            {paymentSucceeded && (
+              <div className="font-bold h-fit py-4 gap-4 flex-col flex items-center">
+                <p className="w-full">Payment Succesful ✓</p>
+                <p className=""></p>
+                <p className="text-[#ffffff]">
+                  Thank you for your payment. A receipt has been sent to your
+                  email.
+                </p>
+              </div>
+            )}
           </form>
         ) : (
           <div className="text-center">

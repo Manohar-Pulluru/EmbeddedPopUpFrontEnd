@@ -3,7 +3,7 @@ import { OrderTabs } from "./OrderFlowComponents/OrderTabs";
 import { CartView } from "./OrderFlowComponents/CartView";
 import { DetailsView } from "./OrderFlowComponents/DetailsView";
 import { OrderSummary } from "./OrderFlowComponents/OrderSummary";
-import { getUserAddress, placeOrder } from "../../../Service/api"; // Add placeOrder import
+import { getUserAddress, placeOrder } from "../../../Service/api";
 import { jwtDecode } from "jwt-decode";
 import { useAppContext } from "../../../Service/Context/AppContext";
 
@@ -19,6 +19,8 @@ export const Orders = ({
   setCustomerName,
   setCustomerWhatsappNumber,
   setOrderData,
+  setSubtotal,
+  subtotal
 }) => {
   const [activeTab, setActiveTab] = useState("Cart");
   const [name, setName] = useState("");
@@ -28,11 +30,11 @@ export const Orders = ({
   const [city, setCity] = useState("");
   const [pincode, setPincode] = useState("");
   const [state, setState] = useState("");
+  const [isFormValid, setIsFormValid] = useState(false); // New state for form validity
   const { toggleCart } = useAppContext();
   const tabs = ["Cart", "Details"];
   const [discount] = useState(0);
-  const [subtotal, setSubtotal] = useState(0);
-  const [isLoading, setIsLoading] = useState(false); // Add isLoading state for order submission
+  const [isLoading, setIsLoading] = useState(false);
 
   const calculateSubtotal = (items) => {
     return items.reduce((sum, item) => sum + (item.totalPrice || 0), 0);
@@ -160,27 +162,27 @@ export const Orders = ({
   const handleNext = async () => {
     if (activeTab === "Cart") {
       setActiveTab("Details");
-    } else if (activeTab === "Details") {
+    } else if (activeTab === "Details" && isFormValid) { // Only proceed if form is valid
       // Update customer details
       setCustomerName(name);
       setCustomerWhatsappNumber(phone);
 
-      // Update orderData with the latest customer details and items
+      // Construct orderData with user-provided values only
       const updatedOrderData = {
-        customerName: name || "John Doe",
-        customerWhatsappNumber: phone || "+1234567890",
+        customerName: name,
+        customerWhatsappNumber: phone,
         businessAccountId: businessAccountId,
         items: items.map((item, index) => ({
           id: item.id,
-          sectionTitle: "Rice", // Hardcoded for now, adjust as needed
+          sectionTitle: "Rice", // Adjust as needed
           itemId: item.itemId,
           itemName: item.itemName,
-          itemDescription: `${item.itemName}.`, // Simple description based on name
+          itemDescription: `${item.itemName}.`,
           regPrice: item.regPrice.toString(),
-          salePrice: "0", // Hardcoded, adjust if salePrice is available
+          salePrice: "0",
           imageURL: item.imageURL,
           serial_number: index + 1,
-          productTemplateSectionId: "20903f70-bc7a-48f0-89fc-07bbede56cf1", // Hardcoded, adjust as needed
+          productTemplateSectionId: "20903f70-bc7a-48f0-89fc-07bbede56cf1",
           isHSTApplied: false,
           HSTPercentage: "13.00",
           inventoryId: null,
@@ -202,11 +204,9 @@ export const Orders = ({
         let orderHistory = JSON.parse(localStorage.getItem("orderHistory") || "[]");
         orderHistory.push(response.data);
         localStorage.setItem("orderHistory", JSON.stringify(orderHistory));
-        localStorage.setItem("cartItems", JSON.stringify([]));
-        setItems([]); // Clear items in state
-        // setChangeCart(!changeCart);
-        // setPaymentDetails(response.data.paymentIntent)
-        setShowPayment(true); // Show payment view (optional, see note below)
+        // localStorage.setItem("cartItems", JSON.stringify([]));
+        // setItems([]); // Clear items in state
+        setShowPayment(true);
         setPaymentDetails(response.data.paymentIntent);
         console.log(showPayment, "showPayment", response.data.paymentIntent);
         toggleCart();
@@ -257,7 +257,8 @@ export const Orders = ({
             discount={discount}
             subtotal={subtotal}
             handleNext={handleNext}
-            isLoading={isLoading} // Pass isLoading to OrderSummary for UI feedback
+            isLoading={isLoading}
+            items={items}
           />
         </>
       ) : activeTab === "Details" ? (
@@ -277,12 +278,15 @@ export const Orders = ({
             setPincode={setPincode}
             state={state}
             setState={setState}
+            setIsFormValid={setIsFormValid} // Pass setIsFormValid to DetailsView
           />
           <OrderSummary
             discount={discount}
             subtotal={subtotal}
             handleNext={handleNext}
-            isLoading={isLoading} // Pass isLoading to OrderSummary for UI feedback
+            isLoading={isLoading}
+            items={items}
+            isFormValid={isFormValid} // Pass isFormValid to OrderSummary
           />
         </>
       ) : null}
