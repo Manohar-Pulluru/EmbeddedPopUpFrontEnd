@@ -33,6 +33,7 @@ const Payment = ({
   const [paymentMethod, setPaymentMethod] = useState("Credit Card");
   const [email, setEmail] = useState("levi@example.com");
   const [amount, setAmount] = useState(paymentDetails.amount || "140");
+  const [paymentSucceeded, setPaymentSucceeded] = useState(false); // Moved state to Payment component
 
   // Log paymentDetails and stripePromise status
   useEffect(() => {
@@ -47,12 +48,11 @@ const Payment = ({
   }, [paymentDetails]);
 
   // Payment form logic
-  const PaymentForm = () => {
+  const PaymentForm = ({ setPaymentSucceeded }) => {
     const stripe = useStripe();
     const elements = useElements();
     const [error, setError] = useState(null);
     const [isProcessing, setIsProcessing] = useState(false);
-    const [paymentSucceeded, setPaymentSucceeded] = useState(false);
 
     // Log initialization and paymentDetails
     useEffect(() => {
@@ -101,14 +101,8 @@ const Payment = ({
           setError(result.error.message);
           setIsProcessing(false);
         } else if (result.paymentIntent.status === "succeeded") {
-          setPaymentSucceeded(true); // Trigger success message
+          setPaymentSucceeded(true); // Update parent state
           console.log("Payment succeeded with ID:", result.paymentIntent.id);
-          // Perform cart and state updates
-          localStorage.setItem("cartItems", JSON.stringify([]));
-          setSubtotal(0); // Reset subtotal in state
-          toggleCart();
-          // Close the payment screen after a delay to show success message
-          // setTimeout(() => setShowPayment(false), 4000);
         }
       } catch (error) {
         console.error("Error confirming payment:", error);
@@ -203,16 +197,6 @@ const Payment = ({
                 `Pay ${formatAmount(paymentDetails.amount)}`
               )}
             </button>
-            {paymentSucceeded && (
-              <div className="font-bold h-fit py-4 gap-4 flex-col flex items-center">
-                <p className="w-full">Payment Succesful ✓</p>
-                <p className=""></p>
-                <p className="text-[#ffffff]">
-                  Thank you for your payment. A receipt has been sent to your
-                  email.
-                </p>
-              </div>
-            )}
           </form>
         ) : (
           <div className="text-center">
@@ -220,9 +204,19 @@ const Payment = ({
             <h2 className="text-xl font-semibold text-[#ffffff] mb-2">
               Payment successful!
             </h2>
-            <p className="text-[#ffffff]">
+            <p className="text-[#ffffff] mb-4">
               Thank you for your payment. A receipt has been sent to your email.
             </p>
+            <button
+              onClick={() => {
+                setSubtotal(0);
+                localStorage.setItem("cartItems", JSON.stringify([]));
+                window.location.reload();
+              }}
+              className="bg-[#ea7c69] hover:bg-[#db8070] text-white py-2 px-4 rounded-md"
+            >
+              Close
+            </button>
           </div>
         )}
       </div>
@@ -232,7 +226,18 @@ const Payment = ({
   // Main render
   return (
     <div className="bg-[#1F1D2B] flex flex-col justify-between text-white px-6 py-8 border-l border-[#ea7c6965] h-full w-full relative">
-      <CloseButton onClose={() => setShowPayment(false)} />
+      <CloseButton
+        onClose={() => {
+          console.log(paymentSucceeded, "Payment succeeded status");
+          if (paymentSucceeded) {
+            setSubtotal(0);
+            localStorage.setItem("cartItems", JSON.stringify([]));
+            // toggleCart();
+            window.location.reload();
+          }
+          setShowPayment(false);
+        }}
+      />
       <div>
         <h2 className="text-2xl font-semibold mb-2">Payment</h2>
         <p className="text-gray-400 text-sm mb-12">
@@ -252,7 +257,7 @@ const Payment = ({
               stripeAccount: paymentDetails.stripeAccountId,
             }}
           >
-            <PaymentForm />
+            <PaymentForm setPaymentSucceeded={setPaymentSucceeded} />
           </Elements>
         )}
 
