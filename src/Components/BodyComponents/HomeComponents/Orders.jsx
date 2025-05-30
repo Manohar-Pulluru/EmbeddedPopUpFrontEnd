@@ -171,6 +171,7 @@ export const Orders = ({
       const updatedOrderData = {
         customerName: name,
         customerWhatsappNumber: phone,
+        customerEmail: email,
         businessAccountId: businessAccountId,
         items: items.map((item, index) => ({
           id: item.id,
