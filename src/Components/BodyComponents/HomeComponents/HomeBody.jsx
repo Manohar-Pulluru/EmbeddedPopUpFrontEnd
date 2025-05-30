@@ -2,21 +2,23 @@ import React, { useEffect, useState } from "react";
 import {
   getTemplateData,
   getTemplates,
-  searchItems,
+  searchProductsElastic,
 } from "../../../Service/api";
 import { HomeHeader } from "./HomeBodyComponents/HomeHeader";
 import { TemplateTabs } from "./HomeBodyComponents/TemplateTabs";
 import { Section } from "./HomeBodyComponents/Section";
 import { Popup } from "./HomeBodyComponents/Popup";
 import { LoginPage } from "./HomeBodyComponents/LoginPage";
+import itemImage from "../../../assets/default.jpg";
 
 export const HomeBody = ({ showPayment, toggleChangeCart, businessId }) => {
   const [templates, setTemplates] = useState([]);
   const [sections, setSections] = useState([]);
   const [activeTemplateId, setActiveTemplateId] = useState("");
   const [templateData, setTemplateData] = useState(null);
-  const [loading, setLoading] = useState(false); // For getTemplates
-  const [templateLoading, setTemplateLoading] = useState(false); // For getTemplateData
+  const [loading, setLoading] = useState(false);
+  const [templateLoading, setTemplateLoading] = useState(false);
+  const [searchLoading, setSearchLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [itemLoading, setItemLoading] = useState({});
@@ -27,6 +29,19 @@ export const HomeBody = ({ showPayment, toggleChangeCart, businessId }) => {
   const [businessData, setBusinessData] = useState(null);
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [searchedItems, setSearchedItems] = useState(null);
+
+  // Define static Search section
+  const staticSearchSection = {
+    sectionTitle: "Search",
+    items: [
+      {
+        id: "static-item-1",
+        itemName: "Sample Search Product",
+        regPrice: 29.99,
+        imageURL: "https://via.placeholder.com/150",
+      },
+    ],
+  };
 
   // Debounce search query
   useEffect(() => {
@@ -43,12 +58,21 @@ export const HomeBody = ({ showPayment, toggleChangeCart, businessId }) => {
   useEffect(() => {
     const fetchResults = async () => {
       if (debouncedQuery.trim() && businessId) {
+        setSearchLoading(true);
         try {
           console.log("Sending search query to API:", debouncedQuery);
-          const response = await searchItems(businessId, debouncedQuery);
+          const response = await searchProductsElastic(
+            businessId,
+            debouncedQuery
+          );
+          console.log(response.data, "Elastic Search Response");
           if (response && response.data && response.data.items) {
-            setSearchedItems(response.data.items);
-            console.log("Search results:", response.data.items);
+            const mappedItems = response.data.items.map((item) => ({
+              ...item,
+              imageURL: item.imageURL || itemImage,
+            }));
+            setSearchedItems(mappedItems);
+            console.log("Mapped search results:", mappedItems);
           } else {
             setSearchedItems([]);
             console.log("No items found for query:", debouncedQuery);
@@ -58,9 +82,12 @@ export const HomeBody = ({ showPayment, toggleChangeCart, businessId }) => {
           setSearchedItems([]);
           setPopupMessage("Failed to fetch search results. Please try again.");
           setShowPopup(true);
+        } finally {
+          setSearchLoading(false);
         }
       } else {
-        setSearchedItems(null); // Clear search results if query is empty
+        setSearchedItems(null);
+        setSearchLoading(false);
       }
     };
 
@@ -77,7 +104,6 @@ export const HomeBody = ({ showPayment, toggleChangeCart, businessId }) => {
         const result = await getTemplates(businessId);
         setTemplates(result.templates);
         setBusinessData(result.businessData);
-        // Only set activeTemplateId on initial load or if current ID is invalid
         if (result.templates?.length > 0) {
           const isValidTemplate = result.templates.some(
             (template) => template.id === activeTemplateId
@@ -95,16 +121,13 @@ export const HomeBody = ({ showPayment, toggleChangeCart, businessId }) => {
       }
     };
 
-    // Initial fetch with loading state
     setLoading(true);
     fetchTemplates();
 
-    // Periodic fetch every 5 seconds without loading state
     const intervalId = setInterval(() => {
       fetchTemplates();
     }, 5000);
 
-    // Cleanup interval on component unmount or businessId change
     return () => clearInterval(intervalId);
   }, [businessId, activeTemplateId]);
 
@@ -136,10 +159,13 @@ export const HomeBody = ({ showPayment, toggleChangeCart, businessId }) => {
     setSearchQuery(e.target.value);
   };
 
-  // Loader component
+  // Loader component (modern dual-ring spinner)
   const Loader = () => (
     <div className="w-full h-full flex items-center justify-center">
-      <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#EA7C69]"></div>
+      <div className="relative w-16 h-16" role="status" aria-label="Loading">
+        <div className="absolute w-full h-full border-4 border-t-[#EA7C69] border-b-[#EA7C69] border-l-transparent border-r-transparent rounded-full animate-spin"></div>
+        <div className="absolute w-full h-full border-4 border-t-transparent border-b-transparent border-l-[#EA7C69] border-r-[#EA7C69] rounded-full animate-spin-slow"></div>
+      </div>
     </div>
   );
 
@@ -208,54 +234,75 @@ export const HomeBody = ({ showPayment, toggleChangeCart, businessId }) => {
       />
 
       {/* Template Tabs */}
-      <TemplateTabs
-        templates={templates}
-        activeTemplateId={activeTemplateId}
-        setActiveTemplateId={setActiveTemplateId}
-      />
+
+      {!searchQuery.length && (
+        <TemplateTabs
+          templates={templates}
+          activeTemplateId={activeTemplateId}
+          setActiveTemplateId={setActiveTemplateId}
+        />
+      )}
 
       {/* Body Content */}
-      <div className="w-full h-[82%] overflow-hidden relative">
+      <div className="w-full mt-8 h-[82%] overflow-hidden relative">
         <Popup
           showPopup={showPopup}
           popupMessage={popupMessage}
           closePopup={closePopup}
         />
 
-        <div className="w-full mt-8 h-[90%] px-8 overflow-y-scroll scrollbar-hide">
-          {loading || templateLoading ? (
+        <div className="w-full h-[90%] px-8 overflow-y-scroll scrollbar-hide">
+          {loading || templateLoading || searchLoading ? (
             <Loader />
-          ) : searchedItems && searchedItems?.length > 0 ? (
-            <Section
-              section={{ title: "Search Results", items: searchedItems }}
-              showPayment={showPayment}
-              handleAddToCart={handleAddToCart}
-              itemLoading={itemLoading}
-              itemAdded={itemAdded}
-            />
-          ) : searchedItems && searchedItems?.length === 0 ? (
-            <div className="w-full text-center text-xl text-[#ffffffaf]">
-              No items found for "{debouncedQuery}"
-            </div>
-          ) : templates?.length > 0 && sections?.length > 0 ? (
-            sections.map((section, index) => (
+          ) : debouncedQuery.trim() ? (
+            searchedItems?.length === 0 ? (
+              <div className="w-full text-center text-xl text-[#ffffffaf]">
+                No items found for "{debouncedQuery}"
+              </div>
+            ) : (
               <Section
-                key={index}
-                section={section}
+                section={{
+                  sectionTitle: "Search Results",
+                  items: searchedItems,
+                }}
                 showPayment={showPayment}
                 handleAddToCart={handleAddToCart}
                 itemLoading={itemLoading}
                 itemAdded={itemAdded}
               />
-            ))
-          ) : templates?.length === 0 ? (
-            <div className="w-full text-center text-xl text-[#ffffffaf]">
-              No template available
-            </div>
+            )
           ) : (
-            <div className="w-full text-center text-xl text-[#ffffffaf]">
-              No items available for this template
-            </div>
+            <>
+              {templates?.length > 0 && sections?.length > 0 ? (
+                sections.map((section, index) => (
+                  <Section
+                    key={index}
+                    section={section}
+                    showPayment={showPayment}
+                    handleAddToCart={handleAddToCart}
+                    itemLoading={itemLoading}
+                    itemAdded={itemAdded}
+                  />
+                ))
+              ) : templates?.length === 0 ? (
+                <div className="w-full text-center text-xl text-[#ffffffaf]">
+                  No template available
+                </div>
+              ) : (
+                <div className="w-full text-center text-xl text-[#ffffffaf]">
+                  No items available for this template
+                </div>
+              )}
+
+              {/* Static Search Section */}
+              <Section
+                section={staticSearchSection}
+                showPayment={showPayment}
+                handleAddToCart={handleAddToCart}
+                itemLoading={itemLoading}
+                itemAdded={itemAdded}
+              />
+            </>
           )}
         </div>
       </div>

@@ -108,3 +108,18 @@ export const searchItems = async (businessId, query) => {
     throw error;
   }
 };
+
+// curl --location 'http://localhost:5000/embedded/user/search-products-elastic?index=91182be9-9446-4e29-9ade-b0312b238668&search=mi' \
+// --header 'embedded-static-token: mw7f8Ch2MSC300bHKEthp9CGZEIJL8A17d7fuYzT1PcROuHNPEVmEFYUyfmDrIFvpHglqusu4OwvUjAKpZM9ptRbAD7UihMOX2u6bZAdIkjLb7iDRqUIozYCi94HlIvoJO2IyX6AWBhacbHiVQE349ruLWwhfPlNXtoUg8xWweWtuHuaZDZD'
+
+export const searchProductsElastic = async (businessId, query) => {
+  const endpoint = `/embedded/user/search-products-elastic?index=${businessId}&search=${query}`;
+
+  try {
+    const response = await getRequest(endpoint);
+    return response.data;
+  } catch (error) {
+    console.error("Error while searching products", error);
+    throw error;
+  }
+};

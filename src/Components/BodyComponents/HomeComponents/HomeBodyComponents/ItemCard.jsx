@@ -64,7 +64,7 @@ export const ItemCard = ({
         <div className="w-[70%] absolute top-[-50%] left-[50%] translate-x-[-50%] translate-y-[20%] mx-auto overflow-hidden aspect-square p-0.5 bg-white rounded-full border">
           <img
             className="w-full h-full object-cover rounded-full"
-            src={item.imageURL}
+            src={ item.imageURL.length ? item.imageURL : "https://via.placeholder.com/150"}
             alt={item.itemName}
           />
         </div>
