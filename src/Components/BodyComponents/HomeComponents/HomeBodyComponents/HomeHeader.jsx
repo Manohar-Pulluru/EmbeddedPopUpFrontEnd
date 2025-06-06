@@ -23,15 +23,16 @@ export const HomeHeader = ({
         {/* <div className="text-lg text-[#ffffff9c]">Tuesday, 2 Feb 2021</div> */}
         <div className="text-lg text-[#ffffff9c]">
           {/* show current date and day */}
-          {new Date().toLocaleDateString("en-US", {
+          {/* {new Date().toLocaleDateString("en-US", {
             weekday: "long",
             year: "numeric",
             month: "long",
             day: "numeric",
-          })}
+          })} */}
+          {businessData?.address}
         </div>
       </div>
-      <div className="h-16 px-6 gap-4 bg-[#2D303E] flex rounded-2xl w-fit items-center justify-center">
+      <div className="h-16 w-1/2 min-w-fit px-6 bg-[#2D303E] flex items-center justify-center  rounded-2xl">
         <svg
           width="24"
           height="24"
@@ -52,8 +53,9 @@ export const HomeHeader = ({
           </defs>
         </svg>
         <input
-          placeholder="Search for food, coffee, etc..."
-          className="hover:outline-none focus:outline-none h-full w-full pb-1 bg-transparent text-white placeholder:text-[#ffffff9c]"
+          // placeholder="Search for food, coffee, etc..."
+          placeholder="Search items..."
+          className="hover:outline-none focus:outline-none h-full w-full bg-transparent text-white placeholder:text-[#ffffff9c] pl-1 pb-0.5"
           value={searchQuery}
           onChange={handleSearch}
         />

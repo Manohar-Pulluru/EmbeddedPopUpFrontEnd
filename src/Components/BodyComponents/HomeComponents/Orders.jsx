@@ -3,7 +3,13 @@ import { OrderTabs } from "./OrderFlowComponents/OrderTabs";
 import { CartView } from "./OrderFlowComponents/CartView";
 import { DetailsView } from "./OrderFlowComponents/DetailsView";
 import { OrderSummary } from "./OrderFlowComponents/OrderSummary";
-import { getUserAddress, placeOrder } from "../../../Service/api";
+import Delivery from "./OrderFlowComponents/Delivery";
+import {
+  getUserAddress,
+  placeOrder,
+  getTemplates,
+  calculateDeliveryCharge
+} from "../../../Service/api";
 import { jwtDecode } from "jwt-decode";
 import { useAppContext } from "../../../Service/Context/AppContext";
 
@@ -20,7 +26,7 @@ export const Orders = ({
   setCustomerWhatsappNumber,
   setOrderData,
   setSubtotal,
-  subtotal
+  subtotal,
 }) => {
   const [activeTab, setActiveTab] = useState("Cart");
   const [name, setName] = useState("");
@@ -32,12 +38,16 @@ export const Orders = ({
   const [state, setState] = useState("");
   const [isFormValid, setIsFormValid] = useState(false); // New state for form validity
   const { toggleCart } = useAppContext();
-  const tabs = ["Cart", "Details"];
+  const tabs = ["Cart", "Details", "Delivery"];
   const [discount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [deliveryResult, setDeliveryResult] = useState(null);
+  const [deliveryCharge, setDeliveryCharge] = useState(0);
+  // const [result, setResult] = useState(null);
+  const [restrauntAddress, setRestrauntAddress] = useState(null);
 
-  const calculateSubtotal = (items) => {
-    return items.reduce((sum, item) => sum + (item.totalPrice || 0), 0);
+  const calculateSubtotal = (items, deliveryCharge = 0) => {
+    return items.reduce((sum, item) => sum + (item.totalPrice || 0), 0) + deliveryCharge;
   };
 
   useEffect(() => {
@@ -86,11 +96,18 @@ export const Orders = ({
     };
 
     fetchAddress();
+
+    getTemplates(businessAccountId).then((response) => {
+      // console.log("Templates fetched successfully:", response);
+      // console.log(response.businessData.address)
+      setRestrauntAddress(response.businessData.address);
+      // setRestrauntAddress("5744 Tayside Cres");
+    });
   }, []);
 
   useEffect(() => {
-    setSubtotal(calculateSubtotal(items));
-  }, [items]);
+    setSubtotal(calculateSubtotal(items, deliveryCharge));
+  }, [items, deliveryCharge]);
 
   const handleQuantityChange = (id, value) => {
     const updatedItems = items.map((item) => {
@@ -106,7 +123,7 @@ export const Orders = ({
       return item;
     });
     setItems(updatedItems);
-    setSubtotal(calculateSubtotal(updatedItems));
+    setSubtotal(calculateSubtotal(updatedItems, deliveryCharge));
 
     const itemsForStorage = updatedItems.map((item) => ({
       id: item.id,
@@ -144,7 +161,7 @@ export const Orders = ({
     toggleCart();
     const updatedItems = items.filter((item) => item.id !== id);
     setItems(updatedItems);
-    setSubtotal(calculateSubtotal(updatedItems));
+    setSubtotal(calculateSubtotal(updatedItems, deliveryCharge));
 
     const itemsForStorage = updatedItems.map((item) => ({
       id: item.id,
@@ -162,7 +179,19 @@ export const Orders = ({
   const handleNext = async () => {
     if (activeTab === "Cart") {
       setActiveTab("Details");
-    } else if (activeTab === "Details" && isFormValid) { // Only proceed if form is valid
+    } else if (activeTab === "Details" && isFormValid) {
+      // fetchDeliveryDetails();
+
+      console.log("Restaurant Address:", restrauntAddress);
+      console.log("Customer Address:", address, city, pincode, state);
+      // const res = await calculateDeliveryCharge(restrauntAddress, address + " " + city + " " + pincode + " " + state);
+      const res = await calculateDeliveryCharge(restrauntAddress, address);
+      setDeliveryResult(res);
+      setDeliveryCharge(res.delivery_charge || 0);
+      // console.log("Delivery Result:", res);
+      setActiveTab("Delivery");
+    } else if (activeTab === "Delivery" && isFormValid) {
+      // Only proceed if form is valid
       // Update customer details
       setCustomerName(name);
       setCustomerWhatsappNumber(phone);
@@ -202,7 +231,9 @@ export const Orders = ({
       setIsLoading(true);
       try {
         const response = await placeOrder(updatedOrderData);
-        let orderHistory = JSON.parse(localStorage.getItem("orderHistory") || "[]");
+        let orderHistory = JSON.parse(
+          localStorage.getItem("orderHistory") || "[]"
+        );
         orderHistory.push(response.data);
         localStorage.setItem("orderHistory", JSON.stringify(orderHistory));
         // localStorage.setItem("cartItems", JSON.stringify([]));
@@ -229,13 +260,24 @@ export const Orders = ({
   return (
     <div className="h-full w-full flex flex-col bg-[#1F1D2B] p-8">
       {/* Header Section */}
-      <div className="h-[15%] w-full flex flex-col gap-8">
-        <div className="text-2xl font-semibold">
-          {activeTab === "Cart"
-            ? `Your Cart (${items.length})`
-            : activeTab === "Details"
-            ? "Customer Details"
-            : "Payment"}
+      <div className="h-[15%] w-full flex flex-col gap-6">
+        <div className="flex justify-between items-center">
+          <div className="text-2xl font-semibold">
+            {activeTab === "Cart"
+              ? `Your Cart (${items.length})`
+              : activeTab === "Details"
+              ? "Customer Details"
+              : "Payment"}
+          </div>
+          <div className="text-lg text-[#ffffff9c]">
+            {/* show current date and day */}
+            {new Date().toLocaleDateString("en-US", {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </div>
         </div>
         <OrderTabs
           tabs={tabs}
@@ -284,6 +326,29 @@ export const Orders = ({
           <OrderSummary
             discount={discount}
             subtotal={subtotal}
+            handleNext={handleNext}
+            isLoading={isLoading}
+            items={items}
+            isFormValid={isFormValid} // Pass isFormValid to OrderSummary
+          />
+        </>
+      ) : activeTab === "Delivery" ? (
+        <>
+          <Delivery
+            handleNext={handleNext}
+            result={deliveryResult}
+            origin={restrauntAddress}
+            destination={`${address}, ${city}, ${pincode}, ${state}`}
+            calculateSubtotal={calculateSubtotal}
+            setSubtotal={setSubtotal}
+            items={items}
+            deliveryCharge={deliveryCharge}
+            setDeliveryCharge={setDeliveryCharge}
+          />
+          <OrderSummary
+            discount={discount}
+            subtotal={subtotal}
+            deliveryCharge={deliveryCharge}
             handleNext={handleNext}
             isLoading={isLoading}
             items={items}

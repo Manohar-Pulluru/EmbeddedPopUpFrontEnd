@@ -1,6 +1,6 @@
 import React from "react";
 
-export const OrderSummary = ({ discount, subtotal, handleNext, items, isLoading, isFormValid }) => {
+export const OrderSummary = ({ discount, subtotal, deliveryCharge, handleNext, items, isLoading, isFormValid }) => {
   const isDisabled = items?.length === 0 || (isFormValid === false); // Disable if cart is empty or form is invalid
 
   return (
@@ -11,9 +11,14 @@ export const OrderSummary = ({ discount, subtotal, handleNext, items, isLoading,
           <div>$ {discount.toFixed(2)}</div>
         </div>
         <div className="w-full text-xl flex justify-between">
+          <div className="text-[#ffffffb4]">Delivery Charge</div>
+          <div>$ {(deliveryCharge ?? 0).toFixed(2)}</div>
+        </div>
+        <div className="w-full text-xl flex justify-between">
           <div className="text-[#ffffffb4]">Sub Total</div>
           <div>$ {subtotal.toFixed(2)}</div>
         </div>
+
       </div>
       <div className="h-[30%] w-full">
         <button

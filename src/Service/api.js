@@ -25,6 +25,52 @@ export const getTemplates = async (businessId) => {
   }
 };
 
+export const calculateDeliveryCharge = async (
+    origin_address,
+    destination_address
+  ) => {
+  const endpoint = "/embedded/api/calculate-delivery-charge";
+  try {
+    const response = await postRequest(endpoint, {
+      origin_address,
+      destination_address,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error calculating delivery charge:", error);
+    throw error;
+  }
+  //   try {
+  //     const resp = await fetch(
+  //       "https://qa3.getafto.com/backend/embedded/api/calculate-delivery-charge",
+  //       {
+  //         method: "POST",
+  //         headers: {
+  //           "embedded-static-token":
+  //             "mw7f8Ch2MSC300bHKEthp9CGZEIJL8A17d7fuYzT1PcROuHNPEVmEFYUyfmDrIFvpHglqusu4OwvUjAKpZM9ptRbAD7UihMOX2u6bZAdIkjLb7iDRqUIozYCi94HlIvoJO2IyX6AWBhacbHiVQE349ruLWwhfPlNXtoUg8xWweWtuHuaZDZD",
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({
+  //           origin_address,
+  //           destination_address,
+  //         }),
+  //       }
+  //     );
+
+  //     if (!resp.ok) {
+  //       const errText = await resp.text();
+  //       throw new Error(`Error ${resp.status}: ${errText}`);
+  //     }
+
+  //     const data = await resp.json();
+  //     setResult(data);
+  //   } catch (err) {
+  //     console.error(err);
+  //   }
+  };
+
+
+
 export const placeOrder = async (payload) => {
   const endpoint = "/embedded/order/create";
 
