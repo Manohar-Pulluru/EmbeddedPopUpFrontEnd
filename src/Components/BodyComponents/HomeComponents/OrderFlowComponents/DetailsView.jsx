@@ -37,7 +37,7 @@ export const DetailsView = ({
 
   useEffect(() => {
     if (phone && phone.startsWith("+")) {
-      const match = phone.match(/^\+(\d{1,4})(\d*)$/);
+      const match = phone.match(/^\+(\d{1,1})(\d*)$/);
       if (match) {
         setCountryCode(`+${match[1]}`);
         setPhoneNumber(match[2]);
@@ -84,7 +84,7 @@ export const DetailsView = ({
         if (!value.trim()) error = "City is required.";
         break;
       case "pincode":
-        if (!/^\d{5}$/.test(value)) error = "Pincode must be 5 digits.";
+        if (!/^[A-Za-z]\d[A-Za-z] \d[A-Za-z]\d$/.test(value)) error = "Pincode must be in format A1A 1A1 (Canadian postal code).";
         break;
       case "state":
         if (!value.trim()) error = "Province is required.";

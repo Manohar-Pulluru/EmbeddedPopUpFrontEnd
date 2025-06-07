@@ -6,9 +6,13 @@ export const OrderSummary = ({ discount, subtotal, deliveryCharge, handleNext, i
   return (
     <div className="h-[25%] w-full flex-col flex">
       <div className="h-[70%] w-full flex flex-col font-medium justify-evenly">
-        <div className="w-full text-xl flex justify-between">
+        {/* <div className="w-full text-xl flex justify-between">
           <div className="text-[#ffffffb4]">Discount</div>
           <div>$ {discount.toFixed(2)}</div>
+        </div> */}
+        <div className="w-full text-xl flex justify-between">
+          <div className="text-[#ffffffb4]">Order Value</div>
+          <div>$ {subtotal.toFixed(2) - (deliveryCharge ?? 0).toFixed(2)}</div>
         </div>
         <div className="w-full text-xl flex justify-between">
           <div className="text-[#ffffffb4]">Delivery Charge</div>
