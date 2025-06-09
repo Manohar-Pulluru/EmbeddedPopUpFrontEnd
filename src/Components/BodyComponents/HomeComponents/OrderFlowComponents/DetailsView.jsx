@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
+
+const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_API_KEY || "";
 
 export const DetailsView = ({
   name,
@@ -28,50 +31,27 @@ export const DetailsView = ({
     state: false,
   });
 
-  // split initial phone (if any) into countryCode & phoneNumber
-  const [countryCode, setCountryCode] = useState("+1");
-  const [phoneNumber, setPhoneNumber] = useState("");
-
-  // list of provinces fetched from API
-  const [provinces, setProvinces] = useState([]);
-
-  useEffect(() => {
-    if (phone && phone.startsWith("+")) {
-      const match = phone.match(/^\+(\d{1,1})(\d*)$/);
-      if (match) {
-        setCountryCode(`+${match[1]}`);
-        setPhoneNumber(match[2]);
-      }
-    }
-  }, []); // run once on mount
-
-  useEffect(() => {
-    fetch("https://countriesnow.space/api/v0.1/countries/states", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ country: "Canada" }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.data && Array.isArray(data.data.states)) {
-          setProvinces(data.data.states.map((s) => s.name));
-        }
-      })
-      .catch(() => {
-        setProvinces([]);
-      });
-  }, []); // fetch provinces once
+  // split initial phone into countryCode & phoneNumber
+  const defaultCode =
+    phone && phone.startsWith("+")
+      ? (phone.match(/^\+\d{1,1}/) || ["+1"])[0]
+      : "+1";
+  const [countryCode, setCountryCode] = useState(defaultCode);
+  const [phoneNumber, setPhoneNumber] = useState(
+    phone && phone.startsWith("+")
+      ? phone.slice(defaultCode.length)
+      : phone || ""
+  );
 
   const validateField = (field, value) => {
     let error = "";
-
     switch (field) {
       case "name":
         if (!value.trim()) error = "Name is required.";
         break;
       case "phone":
-        if (!/^\+\d{1,1}\d{7,12}$/.test(value))
-          error = "Phone number must include country code (e.g., +14155552671).";
+        if (!/^\+\d{1,4}\d{7,12}$/.test(value))
+          error = "Phone must include country code (e.g. +14155552671).";
         break;
       case "email":
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
@@ -84,18 +64,59 @@ export const DetailsView = ({
         if (!value.trim()) error = "City is required.";
         break;
       case "pincode":
-        if (!/^[A-Za-z]\d[A-Za-z] \d[A-Za-z]\d$/.test(value)) error = "Pincode must be in format A1A 1A1 (Canadian postal code).";
+        if (!/^[A-Za-z]\d[A-Za-z] \d[A-Za-z]\d$/.test(value))
+          error = "Pincode must be in format A1A 1A1.";
         break;
       case "state":
         if (!value.trim()) error = "Province is required.";
         break;
       default:
-        break;
     }
-
     return error;
   };
 
+  const validateCanadaAddress = async (enteredAddress) => {
+    try {
+      const payload = {
+        address: { regionCode: "CA", addressLines: [enteredAddress] },
+      };
+      const { data } = await axios.post(
+        `https://addressvalidation.googleapis.com/v1:validateAddress?key=${GOOGLE_API_KEY}`,
+        payload
+      );
+      const pa = data?.result?.address?.postalAddress;
+      if (pa) {
+        setCity(pa.locality || "");
+        setState(pa.administrativeArea || "");
+        setPincode(pa.postalCode || "");
+        setTouched((t) => ({
+          ...t,
+          city: true,
+          state: true,
+          pincode: true,
+        }));
+        setErrors((prev) => ({
+          ...prev,
+          city: "",
+          state: "",
+          pincode: "",
+        }));
+      } else if (data?.result?.suggestions?.length) {
+        const suggestion = data.result.suggestions[0].address.formattedAddress;
+        setAddress(suggestion);
+        validateCanadaAddress(suggestion);
+      } else {
+        setErrors((prev) => ({
+          ...prev,
+          address: "Unable to validate address",
+        }));
+      }
+    } catch {
+      setErrors((prev) => ({ ...prev, address: "Validation error" }));
+    }
+  };
+
+  // overall form validity
   useEffect(() => {
     const fullPhone = countryCode + phoneNumber;
     const isValid =
@@ -106,70 +127,24 @@ export const DetailsView = ({
       !validateField("city", city) &&
       !validateField("pincode", pincode) &&
       !validateField("state", state);
-
     setIsFormValid(isValid);
     setPhone(fullPhone);
-  }, [
-    name,
-    countryCode,
-    phoneNumber,
-    email,
-    address,
-    city,
-    pincode,
-    state,
-    setIsFormValid,
-    setPhone,
-  ]);
+  }, [name, countryCode, phoneNumber, email, address, city, pincode, state]);
 
+  // Handlers for inputs
   const handleChange = (setter, field) => (e) => {
-    const value = e.target.value;
-    setter(value);
-
+    setter(e.target.value);
     if (touched[field]) {
-      const values = {
-        name,
-        phone: countryCode + phoneNumber,
-        email,
-        address,
-        city,
-        pincode,
-        state,
-      };
-      const error = validateField(field, values[field]);
-      setErrors((prev) => ({ ...prev, [field]: error }));
-    }
-  };
-
-  const handleCountryCodeChange = (e) => {
-    const value = e.target.value;
-    setCountryCode(value);
-    if (touched.phone) {
-      const combined = value + phoneNumber;
-      const error = validateField("phone", combined);
-      setErrors((prev) => ({ ...prev, phone: error }));
-      setPhone(combined);
-    } else {
-      setPhone(value + phoneNumber);
-    }
-  };
-
-  const handlePhoneNumberChange = (e) => {
-    const value = e.target.value;
-    setPhoneNumber(value);
-    if (touched.phone) {
-      const combined = countryCode + value;
-      const error = validateField("phone", combined);
-      setErrors((prev) => ({ ...prev, phone: error }));
-      setPhone(combined);
-    } else {
-      setPhone(countryCode + value);
+      setErrors((prev) => ({
+        ...prev,
+        [field]: validateField(field, e.target.value),
+      }));
     }
   };
 
   const handleBlur = (field) => () => {
     setTouched((prev) => ({ ...prev, [field]: true }));
-    const values = {
+    const vals = {
       name,
       phone: countryCode + phoneNumber,
       email,
@@ -178,8 +153,13 @@ export const DetailsView = ({
       pincode,
       state,
     };
-    const error = validateField(field, values[field]);
-    setErrors((prev) => ({ ...prev, [field]: error }));
+    setErrors((prev) => ({
+      ...prev,
+      [field]: validateField(field, vals[field]),
+    }));
+    if (field === "address" && !validateField("address", vals.address)) {
+      validateCanadaAddress(vals.address);
+    }
   };
 
   return (
@@ -190,7 +170,6 @@ export const DetailsView = ({
         <input
           type="text"
           value={name}
-          autoComplete="new-password"
           onChange={handleChange(setName, "name")}
           onBlur={handleBlur("name")}
           placeholder="Enter your name"
@@ -208,7 +187,7 @@ export const DetailsView = ({
           <input
             type="text"
             value={countryCode}
-            onChange={handleCountryCodeChange}
+            onChange={(e) => setCountryCode(e.target.value)}
             onBlur={handleBlur("phone")}
             placeholder="+1"
             className="w-1/4 py-4 px-4 rounded-2xl border border-[#393C49] text-lg bg-[#252836] focus:outline-none placeholder:text-white text-white"
@@ -216,7 +195,7 @@ export const DetailsView = ({
           <input
             type="tel"
             value={phoneNumber}
-            onChange={handlePhoneNumberChange}
+            onChange={(e) => setPhoneNumber(e.target.value)}
             onBlur={handleBlur("phone")}
             placeholder="Enter your phone number"
             className="w-3/4 py-4 px-4 rounded-2xl border border-[#393C49] text-lg bg-[#252836] focus:outline-none placeholder:text-white text-white"
@@ -233,7 +212,6 @@ export const DetailsView = ({
         <input
           type="email"
           value={email}
-          autoComplete="new-password"
           onChange={handleChange(setEmail, "email")}
           onBlur={handleBlur("email")}
           placeholder="Enter your email"
@@ -247,15 +225,33 @@ export const DetailsView = ({
       {/* Address */}
       <div>
         <label className="block text-sm font-medium mb-1">Address</label>
-        <input
-          type="text"
-          value={address}
-          autoComplete="new-password"
-          onChange={handleChange(setAddress, "address")}
-          onBlur={handleBlur("address")}
-          placeholder="Enter your address"
-          className="w-full py-4 px-4 rounded-2xl border border-[#393C49] text-lg bg-[#252836] focus:outline-none placeholder:text-white text-white"
-        />
+        <div className="relative">
+          <input
+            type="text"
+            value={address}
+            onChange={handleChange(setAddress, "address")}
+            onBlur={handleBlur("address")}
+            placeholder="Enter your address"
+            className="w-full py-4 px-4 pr-24 rounded-2xl border border-[#393C49] text-lg bg-[#252836] focus:outline-none placeholder:text-white text-white"
+          />
+          <button
+            type="button"
+            className="absolute right-2 top-1/2 transform -translate-y-1/2 py-1 px-3 rounded-lg bg-green-600 text-white text-xs font-medium hover:bg-green-700 transition"
+            onClick={() => {
+              setTouched((prev) => ({ ...prev, address: true }));
+              if (!validateField("address", address)) {
+                validateCanadaAddress(address);
+              } else {
+                setErrors((prev) => ({
+                  ...prev,
+                  address: validateField("address", address),
+                }));
+              }
+            }}
+          >
+            Validate
+          </button>
+        </div>
         {touched.address && errors.address && (
           <p className="text-red-500 text-sm mt-1">{errors.address}</p>
         )}
@@ -268,7 +264,6 @@ export const DetailsView = ({
           <input
             type="text"
             value={city}
-            autoComplete="new-password"
             onChange={handleChange(setCity, "city")}
             onBlur={handleBlur("city")}
             placeholder="Enter city"
@@ -283,7 +278,6 @@ export const DetailsView = ({
           <input
             type="text"
             value={pincode}
-            autoComplete="new-password"
             onChange={handleChange(setPincode, "pincode")}
             onBlur={handleBlur("pincode")}
             placeholder="Enter pincode"
@@ -295,22 +289,19 @@ export const DetailsView = ({
         </div>
       </div>
 
-      {/* State Dropdown */}
+      {/* Province/Territory */}
       <div>
-        <label className="block text-sm font-medium mb-1">Province/Territory</label>
-        <select
+        <label className="block text-sm font-medium mb-1">
+          Province/Territory
+        </label>
+        <input
+          type="text"
           value={state}
           onChange={handleChange(setState, "state")}
           onBlur={handleBlur("state")}
-          className="w-full py-4 px-4 rounded-2xl border border-[#393C49] text-lg bg-[#252836] focus:outline-none text-white"
-        >
-          <option value="">Select Province</option>
-          {provinces.map((prov) => (
-            <option key={prov} value={prov}>
-              {prov}
-            </option>
-          ))}
-        </select>
+          placeholder="Enter province"
+          className="w-full py-4 px-4 rounded-2xl border border-[#393C49] text-lg bg-[#252836] focus:outline-none placeholder:text-white text-white"
+        />
         {touched.state && errors.state && (
           <p className="text-red-500 text-sm mt-1">{errors.state}</p>
         )}

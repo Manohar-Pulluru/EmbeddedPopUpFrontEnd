@@ -13,6 +13,7 @@ export const Home = ({ businessId }) => {
   const [orderData, setOrderData] = useState({}); // Initialize as empty
   const [paymentDetails, setPaymentDetails] = useState(null);
   const [subtotal, setSubtotal] = useState(0);
+  const [deliveryCharge, setDeliveryCharge] = useState(0)
 
   const toggleChangeCart = () => {
     setChangeCart(!changeCart);
@@ -106,6 +107,8 @@ export const Home = ({ businessId }) => {
           businessAccountId={businessId}
           setSubtotal={setSubtotal}
           subtotal={subtotal}
+          deliveryCharge={deliveryCharge}
+          setDeliveryCharge={setDeliveryCharge}
         />
       </div>
       {showPayment && (
@@ -121,6 +124,7 @@ export const Home = ({ businessId }) => {
             setOrderData={setOrderData}
             setSubtotal={setSubtotal}
             subtotal={subtotal}
+            deliveryCharge={deliveryCharge}
           />
         </div>
       )}

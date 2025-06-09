@@ -26,7 +26,7 @@ export const Body = ({ activeIndex, businessId }) => {
   }
 
   return (
-    <div className="h-full sm:block hidden w-full fl">{renderComponent()}</div>
+    <div className="h-full sm:block  w-full fl">{renderComponent()}</div>
   );
 };
 

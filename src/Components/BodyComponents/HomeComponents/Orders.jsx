@@ -27,6 +27,8 @@ export const Orders = ({
   setOrderData,
   setSubtotal,
   subtotal,
+  deliveryCharge,
+  setDeliveryCharge,
 }) => {
   const [activeTab, setActiveTab] = useState("Cart");
   const [name, setName] = useState("");
@@ -42,7 +44,7 @@ export const Orders = ({
   const [discount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [deliveryResult, setDeliveryResult] = useState(null);
-  const [deliveryCharge, setDeliveryCharge] = useState(0);
+  // const [deliveryCharge, setDeliveryCharge] = useState(0);
   // const [result, setResult] = useState(null);
   const [restrauntAddress, setRestrauntAddress] = useState(null);
 
@@ -100,8 +102,8 @@ export const Orders = ({
     getTemplates(businessAccountId).then((response) => {
       // console.log("Templates fetched successfully:", response);
       // console.log(response.businessData.address)
-      setRestrauntAddress(response.businessData.address);
-      // setRestrauntAddress("5744 Tayside Cres");
+      // setRestrauntAddress(response.businessData.address);
+      setRestrauntAddress("2275 Britannia Rd W unit 15, Mississauga, ON L5M 2G6, Canada");
     });
   }, []);
 
@@ -184,8 +186,8 @@ export const Orders = ({
 
       console.log("Restaurant Address:", restrauntAddress);
       console.log("Customer Address:", address, city, pincode, state);
-      // const res = await calculateDeliveryCharge(restrauntAddress, address + " " + city + " " + pincode + " " + state);
-      const res = await calculateDeliveryCharge(restrauntAddress, address);
+      const res = await calculateDeliveryCharge(restrauntAddress, address + " " + city + " " + state + " " + pincode);
+      // const res = await calculateDeliveryCharge(restrauntAddress, address);
       setDeliveryResult(res);
       setDeliveryCharge(res.delivery_charge || 0);
       // console.log("Delivery Result:", res);

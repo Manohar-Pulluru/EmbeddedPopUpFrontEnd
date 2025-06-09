@@ -132,7 +132,7 @@ export const Delivery = ({ handleNext, result, origin, destination, calculateSub
                   <div className="text-center p-3 bg-gradient-to-br from-orange-500/10 to-red-500/20 rounded-lg border border-orange-500/30">
                     <Truck className="text-orange-400 mx-auto mb-1" size={18} />
                     <div className="text-xl font-bold text-orange-300">{result.delivery_charge}</div>
-                    <div className="text-xs font-medium text-orange-400">{result.currency}</div>
+                    <div className="text-xs font-medium text-orange-400">CAD</div>
                   </div>
                 </div>
               </div>

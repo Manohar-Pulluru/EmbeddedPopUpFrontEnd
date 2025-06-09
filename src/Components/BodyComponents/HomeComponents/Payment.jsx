@@ -19,6 +19,7 @@ const Payment = ({
   paymentDetails,
   setShowPayment,
   setSubtotal,
+  deliveryCharge
 }) => {
   const { toggleCart } = useAppContext();
 
@@ -136,6 +137,14 @@ const Payment = ({
             <span>
               {formatAmount(
                 paymentDetails.amount - paymentDetails.applicationFeeAmount
+              )}
+            </span>
+          </div>
+          <div className="flex justify-between mb-2 text-[#ffffff]">
+            <span>Delivery Charge</span>
+            <span>
+              {formatAmount(
+                deliveryCharge
               )}
             </span>
           </div>
