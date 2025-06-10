@@ -9,10 +9,16 @@ const App = () => {
 
   useEffect(() => {
     const handleMessage = (event) => {
-      if (event.origin !== import.meta.env.VITE_AFTO_FRONTEND_URL ) return;
-
       if (event.data.businessId) {
-        console.log("Received businessId:", event.data.businessId);
+        console.log(
+          "Received Details:",
+          event.data.businessId,
+          event.data.backendUrl
+        );
+        localStorage.setItem("backendUrl", event.data.backendUrl);
+
+        console.log("Local item set", localStorage.getItem("backendUrl"));
+
         setBusinessId(event.data.businessId);
       }
     };
