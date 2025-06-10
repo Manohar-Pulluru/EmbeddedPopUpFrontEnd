@@ -29,6 +29,8 @@ export const Orders = ({
   subtotal,
   deliveryCharge,
   setDeliveryCharge,
+  mode,
+  setMode
 }) => {
   const [activeTab, setActiveTab] = useState("Cart");
   const [name, setName] = useState("");
@@ -44,6 +46,7 @@ export const Orders = ({
   const [discount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [deliveryResult, setDeliveryResult] = useState(null);
+
   // const [deliveryCharge, setDeliveryCharge] = useState(0);
   // const [result, setResult] = useState(null);
   const [restrauntAddress, setRestrauntAddress] = useState(null);
@@ -204,6 +207,8 @@ export const Orders = ({
         customerWhatsappNumber: phone,
         customerEmail: email,
         businessAccountId: businessAccountId,
+        deliveryCharges: deliveryCharge,
+        deliveryType: "delivery",
         items: items.map((item, index) => ({
           id: item.id,
           sectionTitle: "Rice", // Adjust as needed
@@ -346,6 +351,8 @@ export const Orders = ({
             items={items}
             deliveryCharge={deliveryCharge}
             setDeliveryCharge={setDeliveryCharge}
+            mode={mode}
+            setMode={setMode}
           />
           <OrderSummary
             discount={discount}

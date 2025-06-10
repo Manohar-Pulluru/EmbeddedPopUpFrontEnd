@@ -14,6 +14,7 @@ export const Home = ({ businessId }) => {
   const [paymentDetails, setPaymentDetails] = useState(null);
   const [subtotal, setSubtotal] = useState(0);
   const [deliveryCharge, setDeliveryCharge] = useState(0)
+  const [mode, setMode] = useState("delivery");
 
   const toggleChangeCart = () => {
     setChangeCart(!changeCart);
@@ -56,6 +57,8 @@ export const Home = ({ businessId }) => {
       customerName: customerName || "John Doe",
       customerWhatsappNumber: customerWhatsappNumber || "+1234567890",
       businessAccountId: businessId,
+      deliveryCharge: deliveryCharge,
+      deliveryType: "delivery",
       items: items.map((item, index) => ({
         id: item.id,
         sectionTitle: "Rice", // Hardcoded for now, adjust as needed
@@ -82,8 +85,8 @@ export const Home = ({ businessId }) => {
   console.log("orderData__", orderData);
 
   return (
-    <div className="h-full w-full flex">
-      <div className={`${showPayment ? "w-[40%]" : "w-[70%]"} h-full`}>
+    <div className="h-full w-full flex flex-col sm:flex-row">
+      <div className={`${showPayment ? "sm:w-[40%] w-full" : "sm:w-[70%] w-full"} h-[60vh] sm:h-full`}>
         <HomeBody
           toggleChangeCart={toggleChangeCart}
           changeCart={changeCart}
@@ -92,7 +95,7 @@ export const Home = ({ businessId }) => {
           businessId={businessId}
         />
       </div>
-      <div className="w-[30%] h-full">
+      <div className="sm:w-[30%] w-full h-[40vh] sm:h-full">
         <Orders
           showPayment={showPayment}
           changeCart={changeCart}
@@ -109,10 +112,12 @@ export const Home = ({ businessId }) => {
           subtotal={subtotal}
           deliveryCharge={deliveryCharge}
           setDeliveryCharge={setDeliveryCharge}
+          mode={mode}
+          setMode={setMode}
         />
       </div>
       {showPayment && (
-        <div className="w-[30%] h-full">
+        <div className="sm:w-[30%] w-full h-[60vh] sm:h-full">
           <Payment
             showPayment={showPayment}
             setShowPayment={setShowPayment}

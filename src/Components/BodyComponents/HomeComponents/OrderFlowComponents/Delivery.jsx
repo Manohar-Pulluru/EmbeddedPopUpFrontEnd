@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { MapPin, Clock, Navigation, Truck, Package } from "lucide-react";
 
-export const Delivery = ({ handleNext, result, origin, destination, calculateSubtotal, setSubtotal, items, setDeliveryCharge}) => {
-  const [mode, setMode] = useState("Delivery");
+export const Delivery = ({ handleNext, result, origin, destination, calculateSubtotal, setSubtotal, items, setDeliveryCharge, mode, setMode}) => {
 
   useEffect(() => {
     if (result) {
