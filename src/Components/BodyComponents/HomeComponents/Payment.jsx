@@ -8,8 +8,8 @@ import {
 } from "@stripe/react-stripe-js";
 import { CloseButton } from "./PaymentComponents/CloseButton";
 import { PaymentMethodSelector } from "./PaymentComponents/PaymentMethodSelector";
-import { PaypalForm } from "./PaymentComponents/PaypalForm";
-import { CashForm } from "./PaymentComponents/CashForm";
+import { ApplePayForm } from "./PaymentComponents/ApplePayForm";
+import { GooglePayForm } from "./PaymentComponents/GooglePayForm";
 import { PaymentFooter } from "./PaymentComponents/PaymentFooter";
 import { useAppContext } from "../../../Service/Context/AppContext";
 
@@ -144,7 +144,8 @@ const Payment = ({
             <span>Delivery Charge</span>
             <span>
               {formatAmount(
-                deliveryCharge
+                // paymentDetails.deliveryCharges
+                deliveryCharge 
               )}
             </span>
           </div>
@@ -250,7 +251,7 @@ const Payment = ({
       <div>
         <h2 className="text-2xl font-semibold mb-2">Payment</h2>
         <p className="text-gray-400 text-sm mb-12">
-          2 payment method available
+          3 payment methods available
         </p>
 
         <PaymentMethodSelector
@@ -274,8 +275,8 @@ const Payment = ({
           <div className="text-gray-400">Loading payment details...</div>
         )}
 
-        {paymentMethod === "Paypal" && (
-          <PaypalForm
+        {paymentMethod === "Apple Pay" && (
+          <ApplePayForm
             email={email}
             setEmail={setEmail}
             amount={amount}
@@ -283,8 +284,11 @@ const Payment = ({
           />
         )}
 
-        {paymentMethod === "Cash" && (
-          <CashForm amount={amount} setAmount={setAmount} />
+        {paymentMethod === "Google Pay" && (
+          <GooglePayForm 
+            amount={amount} 
+            setAmount={setAmount} 
+          />
         )}
       </div>
 
