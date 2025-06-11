@@ -1,22 +1,38 @@
 import React from "react";
 import { Home } from "./Components/Home";
 import { useState, useEffect } from "react";
+import { useAppContext } from "./Service/Context/AppContext";
 
 const App = () => {
   const [businessId, setBusinessId] = useState(null);
+  const {
+    showFlyerTemplate,
+    setShowFlyerTemplate,
+    flyerTemplateId,
+    setFlyerTemplateId,
+  } = useAppContext();
 
   console.log("businessId:", businessId);
 
+  // Handle incoming messages
   useEffect(() => {
     const handleMessage = (event) => {
       if (event.data.businessId) {
         console.log(
           "Received Details:",
           event.data.businessId,
-          event.data.backendUrl
+          event.data.backendUrl,
+          event.data.showFlyer,
+          event.data.flyerId
         );
-        localStorage.setItem("backendUrl", event.data.backendUrl);
+        if (event.data.showFlyer) {
+          setShowFlyerTemplate(true);
+          setFlyerTemplateId(event.data.flyerId);
 
+          console.log(showFlyerTemplate, "showFlyerTemplate");
+        }
+
+        localStorage.setItem("backendUrl", event.data.backendUrl);
         console.log("Local item set", localStorage.getItem("backendUrl"));
 
         setBusinessId(event.data.businessId);
@@ -25,7 +41,16 @@ const App = () => {
 
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
-  }, []);
+  }, [setShowFlyerTemplate, setFlyerTemplateId]); // Add setShowFlyerTemplate to dependency array
+
+  // Log showFlyerTemplate when it changes
+  useEffect(() => {
+    console.log(
+      "showFlyerTemplate updated:",
+      showFlyerTemplate,
+      flyerTemplateId
+    );
+  }, [showFlyerTemplate, flyerTemplateId]);
 
   return (
     <div className="w-screen h-screen flex items-center justify-center bg-[#252836]">

@@ -10,6 +10,7 @@ import { Section } from "./HomeBodyComponents/Section";
 import { Popup } from "./HomeBodyComponents/Popup";
 import { LoginPage } from "./HomeBodyComponents/LoginPage";
 import itemImage from "../../../assets/default.jpg";
+import { useAppContext } from "../../../Service/Context/AppContext";
 
 export const HomeBody = ({ showPayment, toggleChangeCart, businessId }) => {
   const [templates, setTemplates] = useState([]);
@@ -29,6 +30,7 @@ export const HomeBody = ({ showPayment, toggleChangeCart, businessId }) => {
   const [businessData, setBusinessData] = useState(null);
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [searchedItems, setSearchedItems] = useState(null);
+  const { showFlyerTemplate, flyerTemplateId } = useAppContext();
 
   // Define static Search section
   const staticSearchSection = {
@@ -109,7 +111,11 @@ export const HomeBody = ({ showPayment, toggleChangeCart, businessId }) => {
             (template) => template.id === activeTemplateId
           );
           if (!activeTemplateId || !isValidTemplate) {
-            setActiveTemplateId(result.templates[0].id);
+            if (showFlyerTemplate) {
+              setActiveTemplateId(flyerTemplateId);
+            } else {
+              setActiveTemplateId(result.templates[0].id);
+            }
           }
         }
       } catch (err) {
