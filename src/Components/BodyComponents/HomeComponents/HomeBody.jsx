@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   getTemplateData,
   getTemplates,
@@ -10,25 +10,52 @@ import { Section } from "./HomeBodyComponents/Section";
 import { Popup } from "./HomeBodyComponents/Popup";
 import { LoginPage } from "./HomeBodyComponents/LoginPage";
 import itemImage from "../../../assets/default.jpg";
+import { AppContext } from "../../../Service/Context/AppContext";
 
-export const HomeBody = ({ showPayment, toggleChangeCart, businessId }) => {
-  const [templates, setTemplates] = useState([]);
-  const [sections, setSections] = useState([]);
-  const [activeTemplateId, setActiveTemplateId] = useState("");
-  const [templateData, setTemplateData] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [templateLoading, setTemplateLoading] = useState(false);
-  const [searchLoading, setSearchLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [quantity, setQuantity] = useState(1);
-  const [itemLoading, setItemLoading] = useState({});
-  const [itemAdded, setItemAdded] = useState({});
-  const [showPopup, setShowPopup] = useState(false);
-  const [popupMessage, setPopupMessage] = useState("");
-  const [showLoginPage, setLoginPage] = useState(false);
-  const [businessData, setBusinessData] = useState(null);
-  const [debouncedQuery, setDebouncedQuery] = useState("");
-  const [searchedItems, setSearchedItems] = useState(null);
+export const HomeBody = () => {
+  const {
+    businessId,
+    templates,
+    setTemplates,
+    sections,
+    setSections,
+    activeTemplateId,
+    setActiveTemplateId,
+    templateData,
+    setTemplateData,
+    loading,
+    setLoading,
+    templateLoading,
+    setTemplateLoading,
+    searchLoading,
+    setSearchLoading,
+    searchQuery,
+    setSearchQuery,
+    quantity,
+    setQuantity,
+    itemLoading,
+    setItemLoading,
+    itemAdded,
+    setItemAdded,
+    showPopup,
+    setShowPopup,
+    popupMessage,
+    setPopupMessage,
+    showLoginPage,
+    setLoginPage,
+    businessData,
+    setBusinessData,
+    debouncedQuery,
+    setDebouncedQuery,
+    searchedItems,
+    setSearchedItems,
+    fetchResults,
+    fetchTemplates,
+    fetchData,
+    handleAddToCart,
+    showPayment,
+    toggleChangeCart
+  } = useContext(AppContext);
 
   // Define static Search section
   const staticSearchSection = {
@@ -56,70 +83,12 @@ export const HomeBody = ({ showPayment, toggleChangeCart, businessId }) => {
 
   // Fetch search results
   useEffect(() => {
-    const fetchResults = async () => {
-      if (debouncedQuery.trim() && businessId) {
-        setSearchLoading(true);
-        try {
-          console.log("Sending search query to API:", debouncedQuery);
-          const response = await searchProductsElastic(
-            businessId,
-            debouncedQuery
-          );
-          console.log(response.data, "Elastic Search Response");
-          if (response && response.data && response.data.items) {
-            const mappedItems = response.data.items.map((item) => ({
-              ...item,
-              imageURL: item.imageURL || itemImage,
-            }));
-            setSearchedItems(mappedItems);
-            console.log("Mapped search results:", mappedItems);
-          } else {
-            setSearchedItems([]);
-            console.log("No items found for query:", debouncedQuery);
-          }
-        } catch (error) {
-          console.error("Search error:", error);
-          setSearchedItems([]);
-          setPopupMessage("Failed to fetch search results. Please try again.");
-          setShowPopup(true);
-        } finally {
-          setSearchLoading(false);
-        }
-      } else {
-        setSearchedItems(null);
-        setSearchLoading(false);
-      }
-    };
-
     fetchResults();
   }, [debouncedQuery, businessId]);
 
   // Fetch templates when businessId is available
   useEffect(() => {
     if (!businessId) return;
-
-    const fetchTemplates = async () => {
-      try {
-        console.log(businessId, "businessId__1");
-        const result = await getTemplates(businessId);
-        setTemplates(result.templates);
-        setBusinessData(result.businessData);
-        if (result.templates?.length > 0) {
-          const isValidTemplate = result.templates.some(
-            (template) => template.id === activeTemplateId
-          );
-          if (!activeTemplateId || !isValidTemplate) {
-            setActiveTemplateId(result.templates[0].id);
-          }
-        }
-      } catch (err) {
-        console.error("Failed to fetch templates:", err);
-        setPopupMessage("Failed to load templates. Please try again.");
-        setShowPopup(true);
-      } finally {
-        setLoading(false);
-      }
-    };
 
     setLoading(true);
     fetchTemplates();
@@ -134,21 +103,6 @@ export const HomeBody = ({ showPayment, toggleChangeCart, businessId }) => {
   // Fetch template data when activeTemplateId changes
   useEffect(() => {
     if (activeTemplateId) {
-      const fetchData = async () => {
-        setTemplateLoading(true);
-        try {
-          const result = await getTemplateData(activeTemplateId);
-          const data = result.data;
-          setTemplateData(data);
-          setSections(data.sections);
-        } catch (err) {
-          console.error("Failed to fetch template data:", err);
-          setPopupMessage("Failed to load template data. Please try again.");
-          setShowPopup(true);
-        } finally {
-          setTemplateLoading(false);
-        }
-      };
 
       fetchData();
     }
@@ -170,53 +124,6 @@ export const HomeBody = ({ showPayment, toggleChangeCart, businessId }) => {
   );
 
   // Handle adding item to cart
-  const handleAddToCart = (item) => {
-    setItemLoading((prev) => ({ ...prev, [item.id]: true }));
-    setShowPopup(false);
-
-    setTimeout(() => {
-      setItemLoading((prev) => ({ ...prev, [item.id]: false }));
-      setItemAdded((prev) => ({ ...prev, [item.id]: true }));
-      setQuantity(1);
-
-      let cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
-      const existingItemIndex = cartItems.findIndex(
-        (cartItem) => cartItem.id === item.id || cartItem.itemId === item.id
-      );
-
-      if (existingItemIndex !== -1) {
-        setPopupMessage(`Item "${item.itemName}" already in cart!`);
-        setShowPopup(true);
-      } else {
-        const newItem = {
-          id: item.id,
-          itemId: item.id,
-          itemName: item.itemName,
-          regPrice: item.regPrice,
-          imageURL: item.imageURL,
-          quantity: 1,
-        };
-        cartItems.push(newItem);
-        toggleChangeCart();
-      }
-
-      cartItems = cartItems.map((cartItem) => ({
-        ...cartItem,
-        totalPrice:
-          (parseFloat(cartItem.regPrice || 0) || 0) * cartItem.quantity,
-      }));
-
-      localStorage.setItem("cartItems", JSON.stringify(cartItems));
-
-      setTimeout(() => {
-        setItemAdded((prev) => ({ ...prev, [item.id]: false }));
-      }, 1000);
-
-      if (showPopup) {
-        setTimeout(() => setShowPopup(false), 3000);
-      }
-    }, 500);
-  };
 
   // Close popup manually
   const closePopup = () => {

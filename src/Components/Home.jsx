@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { NavBar } from "./NavBar";
 import { Body } from "./Body";
+import { AppContext } from "../Service/Context/AppContext";
 
 export const Home = ({businessId}) => {
-  const [activeIndex, setActiveIndex] = useState(0);
+  const { activeIndex, setActiveIndex } = useContext(AppContext);
 
   useEffect(() => {
     const setVH = () => {

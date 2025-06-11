@@ -1,12 +1,10 @@
-import React from "react";
+import React, { useContext } from "react";
 import { CartItem } from "./CartItem";
+import { AppContext } from "../../../../Service/Context/AppContext";
 
-export const CartView = ({
-  items,
-  handleQuantityChange,
-  handleNoteChange,
-  handleDelete,
-}) => {
+export const CartView = () => {
+  const { items, handleQuantityChange, handleNoteChange, handleDelete } =
+    useContext(AppContext);
   return (
     <div className="h-[65%] w-full flex flex-col">
       <div className="w-full h-16 pt-2 flex items-center font-semibold">

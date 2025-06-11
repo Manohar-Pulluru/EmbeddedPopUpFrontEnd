@@ -30,6 +30,10 @@ export const DetailsView = ({
     pincode: false,
     state: false,
   });
+  
+  // New states for validation button
+  const [isValidating, setIsValidating] = useState(false);
+  const [validationSuccess, setValidationSuccess] = useState(false);
 
   // split initial phone into countryCode & phoneNumber
   const defaultCode =
@@ -76,6 +80,9 @@ export const DetailsView = ({
   };
 
   const validateCanadaAddress = async (enteredAddress) => {
+    setIsValidating(true);
+    setValidationSuccess(false);
+    
     try {
       const payload = {
         address: { regionCode: "CA", addressLines: [enteredAddress] },
@@ -100,11 +107,16 @@ export const DetailsView = ({
           city: "",
           state: "",
           pincode: "",
+          address: "",
         }));
+        setValidationSuccess(true);
+        // Reset success state after 3 seconds
+        setTimeout(() => setValidationSuccess(false), 3000);
       } else if (data?.result?.suggestions?.length) {
         const suggestion = data.result.suggestions[0].address.formattedAddress;
         setAddress(suggestion);
         validateCanadaAddress(suggestion);
+        return; // Don't set loading to false yet, let the recursive call handle it
       } else {
         setErrors((prev) => ({
           ...prev,
@@ -113,8 +125,15 @@ export const DetailsView = ({
       }
     } catch {
       setErrors((prev) => ({ ...prev, address: "Validation error" }));
+    } finally {
+      setIsValidating(false);
     }
   };
+
+  // Reset validation states when address changes
+  useEffect(() => {
+    setValidationSuccess(false);
+  }, [address]);
 
   // overall form validity
   useEffect(() => {
@@ -160,6 +179,43 @@ export const DetailsView = ({
     if (field === "address" && !validateField("address", vals.address)) {
       validateCanadaAddress(vals.address);
     }
+  };
+
+  const handleValidateClick = () => {
+    setTouched((prev) => ({ ...prev, address: true }));
+    if (!validateField("address", address)) {
+      validateCanadaAddress(address);
+    } else {
+      setErrors((prev) => ({
+        ...prev,
+        address: validateField("address", address),
+      }));
+    }
+  };
+
+  // Render validate button content based on state
+  const renderValidateButtonContent = () => {
+    if (isValidating) {
+      return (
+        <div className="flex items-center gap-1">
+          <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin"></div>
+          <span className="text-xs">...</span>
+        </div>
+      );
+    }
+    
+    if (validationSuccess) {
+      return (
+        <div className="flex items-center gap-1">
+          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+          </svg>
+          <span className="text-xs">Done</span>
+        </div>
+      );
+    }
+    
+    return <span className="text-xs font-medium">Validate</span>;
   };
 
   return (
@@ -236,20 +292,17 @@ export const DetailsView = ({
           />
           <button
             type="button"
-            className="absolute right-2 top-1/2 transform -translate-y-1/2 py-1 px-3 rounded-lg bg-green-600 text-white text-xs font-medium hover:bg-green-700 transition"
-            onClick={() => {
-              setTouched((prev) => ({ ...prev, address: true }));
-              if (!validateField("address", address)) {
-                validateCanadaAddress(address);
-              } else {
-                setErrors((prev) => ({
-                  ...prev,
-                  address: validateField("address", address),
-                }));
-              }
-            }}
+            disabled={isValidating}
+            className={`absolute right-2 top-1/2 transform -translate-y-1/2 py-1 px-3 rounded-lg text-white text-xs transition ${
+              validationSuccess 
+                ? 'bg-green-600' 
+                : isValidating 
+                  ? 'bg-blue-600 cursor-not-allowed' 
+                  : 'bg-green-600 hover:bg-green-700'
+            }`}
+            onClick={handleValidateClick}
           >
-            Validate
+            {renderValidateButtonContent()}
           </button>
         </div>
         {touched.address && errors.address && (

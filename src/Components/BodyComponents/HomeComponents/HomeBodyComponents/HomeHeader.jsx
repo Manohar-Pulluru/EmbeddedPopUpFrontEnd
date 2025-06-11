@@ -7,69 +7,50 @@ export const HomeHeader = ({
   setLoginPage,
 }) => {
   return (
-    <div className="w-full h-[13%] flex justify-between items-center">
-      <div className="flex-1 h-full flex flex-col gap-4 pt-4">
-        <div
-          className="text-4xl font-semibold"
-          style={{
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            maxWidth: "100%", // Adjust as needed, e.g., "300px" for a fixed width
-          }}
-        >
-          {businessData?.name}
-        </div>
-        {/* <div className="text-lg text-[#ffffff9c]">Tuesday, 2 Feb 2021</div> */}
-        <div className="text-lg text-[#ffffff9c]">
-          {/* show current date and day */}
-          {/* {new Date().toLocaleDateString("en-US", {
-            weekday: "long",
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          })} */}
-          {businessData?.address}
-        </div>
+    <div className="w-full px-4 sm:px-6 py-4 sm:py-6">
+      {/* Business Info Section */}
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight mb-2 sm:mb-3">
+          <span className="block truncate">
+            {businessData?.name || "Business Name"}
+          </span>
+        </h1>
+        <p className="text-sm sm:text-base lg:text-lg text-gray-300 leading-relaxed">
+          {businessData?.address || "Business Address"}
+        </p>
       </div>
-      <div className="h-16 w-1/2 min-w-fit px-6 bg-[#2D303E] flex items-center justify-center  rounded-2xl">
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <g clipPath="url(#clip0_6_12270)">
-            <path
-              d="M15.5 14H14.71L14.43 13.73C15.41 12.59 16 11.11 16 9.5C16 5.91 13.09 3 9.5 3C5.91 3 3 5.91 3 9.5C3 13.09 5.91 16 9.5 16C11.11 16 12.59 15.41 13.73 14.43L14 14.71V15.5L19 20.49L20.49 19L15.5 14ZM9.5 14C7.01 14 5 11.99 5 9.5C5 7.01 7.01 5 9.5 5C11.99 5 14 7.01 14 9.5C14 11.99 11.99 14 9.5 14Z"
-              fill="#ffffff"
+
+      {/* Search and Login Section */}
+      <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-stretch sm:items-center">
+        {/* Search Bar */}
+        <div className="flex-1 relative">
+          <div className="bg-[#2D303E] rounded-xl sm:rounded-2xl flex items-center px-4 py-3 sm:py-4 shadow-lg hover:shadow-xl transition-shadow duration-200">
+            <svg
+              className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400 mr-3 flex-shrink-0"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path d="M15.5 14H14.71L14.43 13.73C15.41 12.59 16 11.11 16 9.5C16 5.91 13.09 3 9.5 3C5.91 3 3 5.91 3 9.5C3 13.09 5.91 16 9.5 16C11.11 16 12.59 15.41 13.73 14.43L14 14.71V15.5L19 20.49L20.49 19L15.5 14ZM9.5 14C7.01 14 5 11.99 5 9.5C5 7.01 7.01 5 9.5 5C11.99 5 14 7.01 14 9.5C14 11.99 11.99 14 9.5 14Z" />
+            </svg>
+            <input
+              placeholder="Search items..."
+              className="flex-1 bg-transparent text-white placeholder:text-gray-400 text-sm sm:text-base focus:outline-none"
+              value={searchQuery}
+              onChange={handleSearch}
             />
-          </g>
-          <defs>
-            <clipPath id="clip0_6_12270">
-              <rect width="24" height="24" fill="white" />
-            </clipPath>
-          </defs>
-        </svg>
-        <input
-          // placeholder="Search for food, coffee, etc..."
-          placeholder="Search items..."
-          className="hover:outline-none focus:outline-none h-full w-full bg-transparent text-white placeholder:text-[#ffffff9c] pl-1 pb-0.5"
-          value={searchQuery}
-          onChange={handleSearch}
-        />
+          </div>
+        </div>
+
+        {/* Login Button */}
+        {!localStorage.getItem("aftoAuthToken")?.length && (
+          <button
+            onClick={() => setLoginPage(true)}
+            className="bg-[#ea7c69] hover:bg-[#d96b57] active:bg-[#c75a47] text-white font-semibold px-6 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl text-sm sm:text-base whitespace-nowrap"
+          >
+            Login
+          </button>
+        )}
       </div>
-      {localStorage.getItem("aftoAuthToken")?.length ? (
-        <></>
-      ) : (
-        <button
-          onClick={() => setLoginPage(true)}
-          className="px-8 h-16 text-lg ml-8 rounded-2xl cursor-pointer font-semibold bg-[#ea7c69] hover:bg-[#c27f73]"
-        >
-          Login
-        </button>
-      )}
     </div>
   );
 };

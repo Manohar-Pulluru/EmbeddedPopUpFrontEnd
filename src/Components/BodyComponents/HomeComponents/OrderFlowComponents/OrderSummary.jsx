@@ -1,7 +1,25 @@
-import React from "react";
+import React, { useContext } from "react";
+import { AppContext } from "../../../../Service/Context/AppContext";
 
-export const OrderSummary = ({ discount, subtotal, deliveryCharge, handleNext, items, isLoading, isFormValid }) => {
-  const isDisabled = items?.length === 0 || (isFormValid === false); // Disable if cart is empty or form is invalid
+export const OrderSummary = ({
+    discount,
+    subtotal,
+    deliveryCharge,
+    handleNext,
+    items,
+    isLoading,
+    isFormValid,
+  }) => {
+  // const {
+  //   discount,
+  //   subtotal,
+  //   deliveryCharge,
+  //   handleNext,
+  //   items,
+  //   isLoading,
+  //   isFormValid,
+  // } = useContext(AppContext);
+  const isDisabled = items?.length === 0 || isFormValid === false; // Disable if cart is empty or form is invalid
 
   return (
     <div className="h-[25%] w-full flex-col flex">
@@ -18,11 +36,11 @@ export const OrderSummary = ({ discount, subtotal, deliveryCharge, handleNext, i
           <div className="text-[#ffffffb4]">Delivery Charge</div>
           <div>$ {(deliveryCharge ?? 0).toFixed(2)}</div>
         </div>
+        {/* <hr className="border-t border-white " /> */}
         <div className="w-full text-xl flex justify-between">
-          <div className="text-[#ffffffb4]">Sub Total</div>
+          <div className="text-[#ffffffb4]">Total</div>
           <div>$ {subtotal.toFixed(2)}</div>
         </div>
-
       </div>
       <div className="h-[30%] w-full">
         <button

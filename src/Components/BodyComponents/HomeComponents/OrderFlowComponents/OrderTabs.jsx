@@ -1,6 +1,9 @@
-import React from "react";
+import React, { useContext } from "react";
+import { AppContext } from "../../../../Service/Context/AppContext";
 
-export const OrderTabs = ({ tabs, activeTab, setActiveTab, isTabDisabled }) => {
+export const OrderTabs = () => {
+  const { tabs, activeTab, setActiveTab, isTabDisabled } =
+    useContext(AppContext);
   return (
     <div className="flex gap-4 font-medium text-md">
       {tabs.map((tab) => {

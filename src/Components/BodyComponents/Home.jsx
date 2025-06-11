@@ -1,24 +1,36 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Orders } from "./HomeComponents/Orders";
 import { HomeBody } from "./HomeComponents/HomeBody";
 // import { Payment } from "./HomeComponents/Payment";
 import Payment from "./HomeComponents/Payment";
+import App from "../../App";
+import { AppContext } from "../../Service/Context/AppContext";
 
-export const Home = ({ businessId }) => {
-  const [showPayment, setShowPayment] = useState(false);
-  const [changeCart, setChangeCart] = useState(false);
-  const [items, setItems] = useState([]);
-  const [customerName, setCustomerName] = useState("");
-  const [customerWhatsappNumber, setCustomerWhatsappNumber] = useState("");
-  const [orderData, setOrderData] = useState({}); // Initialize as empty
-  const [paymentDetails, setPaymentDetails] = useState(null);
-  const [subtotal, setSubtotal] = useState(0);
-  const [deliveryCharge, setDeliveryCharge] = useState(0)
-  const [mode, setMode] = useState("delivery");
-
-  const toggleChangeCart = () => {
-    setChangeCart(!changeCart);
-  };
+export const Home = () => {
+  const { 
+    businessId,
+    showPayment,
+    setShowPayment,
+    changeCart,
+    setChangeCart,
+    items,
+    setItems,
+    customerName,
+    setCustomerName,
+    customerWhatsappNumber,
+    setCustomerWhatsappNumber,
+    orderData,
+    setOrderData,
+    paymentDetails,
+    setPaymentDetails,
+    subtotal,
+    setSubtotal,
+    deliveryCharge,
+    setDeliveryCharge,
+    mode,
+    setMode,
+    toggleChangeCart
+  } = useContext(AppContext);
 
   // Fetch items from localStorage on mount or when changeCart changes
   useEffect(() => {
@@ -86,35 +98,13 @@ export const Home = ({ businessId }) => {
 
   return (
     <div className="h-full w-full flex flex-col sm:flex-row">
-      <div className={`${showPayment ? "sm:w-[40%] w-full" : "sm:w-[70%] w-full"} h-[60vh] sm:h-full`}>
-        <HomeBody
-          toggleChangeCart={toggleChangeCart}
-          changeCart={changeCart}
-          showPayment={showPayment}
-          setShowPayment={setShowPayment}
-          businessId={businessId}
-        />
+      <div className={`${showPayment ? "sm:w-[40%] w-full" : "sm:w-[70%] w-full"} h-[90vh] sm:h-full`}>
+      {/* <div className="w-full h-full"> */}
+        <HomeBody/>
       </div>
-      <div className="sm:w-[30%] w-full h-[40vh] sm:h-full">
-        <Orders
-          showPayment={showPayment}
-          changeCart={changeCart}
-          setShowPayment={setShowPayment}
-          items={items}
-          setPaymentDetails={setPaymentDetails}
-          paymentDetails={paymentDetails}
-          setItems={setItems}
-          setCustomerName={setCustomerName}
-          setCustomerWhatsappNumber={setCustomerWhatsappNumber}
-          setOrderData={setOrderData} // Pass setOrderData to Orders
-          businessAccountId={businessId}
-          setSubtotal={setSubtotal}
-          subtotal={subtotal}
-          deliveryCharge={deliveryCharge}
-          setDeliveryCharge={setDeliveryCharge}
-          mode={mode}
-          setMode={setMode}
-        />
+      {/* // the cart tab should come here */}
+      <div className="sm:w-[30%] w-full h-[40vh] sm:h-full relative right-0">
+        <Orders />
       </div>
       {showPayment && (
         <div className="sm:w-[30%] w-full h-[60vh] sm:h-full">
