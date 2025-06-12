@@ -12,6 +12,8 @@ import { jwtDecode } from "jwt-decode";
 export const useAppStates = () => {
   const [user, setUser] = useState(null);
   const [theme, setTheme] = useState("light");
+  const [showFlyerTemplate, setShowFlyerTemplate] = useState(false);
+  const [flyerTemplateId, setFlyerTemplateId] = useState(null)
 
   const login = (userData) => setUser(userData);
   const logout = () => setUser(null);
@@ -550,5 +552,9 @@ export const useAppStates = () => {
     closePopup,
     isCartOpen,
     setIsCartOpen,
+    showFlyerTemplate,
+    setShowFlyerTemplate,
+    flyerTemplateId,
+    setFlyerTemplateId
   };
 };
