@@ -11,6 +11,7 @@ import { Popup } from "./HomeBodyComponents/Popup";
 import { LoginPage } from "./HomeBodyComponents/LoginPage";
 import itemImage from "../../../assets/default.jpg";
 import { useAppContext } from "../../../Service/Context/AppContext";
+import axios from "axios";
 
 export const HomeBody = ({ showPayment, toggleChangeCart, businessId }) => {
   const [templates, setTemplates] = useState([]);
@@ -63,10 +64,21 @@ export const HomeBody = ({ showPayment, toggleChangeCart, businessId }) => {
         setSearchLoading(true);
         try {
           console.log("Sending search query to API:", debouncedQuery);
-          const response = await searchProductsElastic(
-            businessId,
-            debouncedQuery
-          );
+          let response = null;
+          if (businessId == "80b6fc97-aa38-46b1-bee8-a106d9b7cd96") {
+            const apiUrl = `https://qa3.getafto.com/backend/embedded/user/search-products-elastic?index=91182be9-9446-4e29-9ade-b0312b238668&search=${debouncedQuery}`;
+            const headers = {
+              "embedded-static-token": import.meta.env
+                .VITE_EMBEDDED_STATIC_TOKEN,
+            };
+
+            const dataRes = await axios.get(apiUrl, { headers });
+
+            response = dataRes.data;
+          } else {
+            response = await searchProductsElastic(businessId, debouncedQuery);
+          }
+
           console.log(response.data, "Elastic Search Response");
           if (response && response.data && response.data.items) {
             const mappedItems = response.data.items.map((item) => ({
