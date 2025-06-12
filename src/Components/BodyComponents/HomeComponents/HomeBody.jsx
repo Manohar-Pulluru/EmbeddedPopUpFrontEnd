@@ -54,7 +54,8 @@ export const HomeBody = () => {
     fetchData,
     handleAddToCart,
     showPayment,
-    toggleChangeCart
+    toggleChangeCart,
+    handleSearch,
   } = useContext(AppContext);
 
   // Define static Search section
@@ -103,15 +104,11 @@ export const HomeBody = () => {
   // Fetch template data when activeTemplateId changes
   useEffect(() => {
     if (activeTemplateId) {
-
       fetchData();
     }
   }, [activeTemplateId]);
 
   // Handle search input change
-  const handleSearch = (e) => {
-    setSearchQuery(e.target.value);
-  };
 
   // Loader component (modern dual-ring spinner)
   const Loader = () => (
@@ -125,40 +122,20 @@ export const HomeBody = () => {
 
   // Handle adding item to cart
 
-  // Close popup manually
-  const closePopup = () => {
-    setShowPopup(false);
-  };
-
   return (
     <div className="h-full w-full px-8 pt-4 flex flex-col">
       {/* Header */}
-      <HomeHeader
-        businessData={businessData}
-        setLoginPage={setLoginPage}
-        searchQuery={searchQuery}
-        handleSearch={handleSearch}
-      />
+      <HomeHeader />
 
       {/* Template Tabs */}
 
-      {!searchQuery.length && (
-        <TemplateTabs
-          templates={templates}
-          activeTemplateId={activeTemplateId}
-          setActiveTemplateId={setActiveTemplateId}
-        />
-      )}
+      {!searchQuery.length && <TemplateTabs />}
 
       {/* Body Content */}
       <div className="w-full mt-8 h-[82%] overflow-hidden relative">
-        <Popup
-          showPopup={showPopup}
-          popupMessage={popupMessage}
-          closePopup={closePopup}
-        />
+        <Popup />
 
-        <div className="w-full h-[90%] px-8 overflow-y-scroll scrollbar-hide">
+        <div className="w-full h-full px-8 overflow-y-scroll scrollbar-hide">
           {loading || templateLoading || searchLoading ? (
             <Loader />
           ) : debouncedQuery.trim() ? (
@@ -172,24 +149,13 @@ export const HomeBody = () => {
                   sectionTitle: "Search Results",
                   items: searchedItems,
                 }}
-                showPayment={showPayment}
-                handleAddToCart={handleAddToCart}
-                itemLoading={itemLoading}
-                itemAdded={itemAdded}
               />
             )
           ) : (
             <>
               {templates?.length > 0 && sections?.length > 0 ? (
                 sections.map((section, index) => (
-                  <Section
-                    key={index}
-                    section={section}
-                    showPayment={showPayment}
-                    handleAddToCart={handleAddToCart}
-                    itemLoading={itemLoading}
-                    itemAdded={itemAdded}
-                  />
+                  <Section key={index} section={section} />
                 ))
               ) : templates?.length === 0 ? (
                 <div className="w-full text-center text-xl text-[#ffffffaf]">
@@ -202,13 +168,7 @@ export const HomeBody = () => {
               )}
 
               {/* Static Search Section */}
-              <Section
-                section={staticSearchSection}
-                showPayment={showPayment}
-                handleAddToCart={handleAddToCart}
-                itemLoading={itemLoading}
-                itemAdded={itemAdded}
-              />
+              <Section section={staticSearchSection} />
             </>
           )}
         </div>

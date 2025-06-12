@@ -3,10 +3,7 @@ import { OrderTabs } from "./OrderFlowComponents/OrderTabs";
 import { CartView } from "./OrderFlowComponents/CartView";
 import { OrderSummary } from "./OrderFlowComponents/OrderSummary";
 
-export const Orders = ({
-  items,
-  subtotal,
-}) => {
+export const Orders = ({ items, subtotal }) => {
   return (
     <div className="h-full w-full flex flex-col bg-[#1F1D2B] p-8">
       {/* Header Section */}
@@ -37,12 +34,7 @@ export const Orders = ({
         />
       </div>
       <>
-        <CartView
-          items={items}
-          handleQuantityChange={handleQuantityChange}
-          handleNoteChange={handleNoteChange}
-          handleDelete={handleDelete}
-        />
+        <CartView />
         <OrderSummary
           discount={discount}
           subtotal={subtotal}

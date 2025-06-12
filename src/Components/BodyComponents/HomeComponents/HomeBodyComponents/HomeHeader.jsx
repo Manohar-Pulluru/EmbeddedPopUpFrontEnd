@@ -1,32 +1,30 @@
-import React from "react";
+import React, { useContext } from "react";
+import { AppContext } from "../../../../Service/Context/AppContext";
 
-export const HomeHeader = ({
-  businessData,
-  searchQuery,
-  handleSearch,
-  setLoginPage,
-}) => {
+export const HomeHeader = () => {
+  const { businessData, searchQuery, handleSearch, setLoginPage } =
+    useContext(AppContext);
   return (
-    <div className="w-full px-4 sm:px-6 py-4 sm:py-6">
+    <div className="w-full px-3 sm:px-6 py-3 sm:py-6">
       {/* Business Info Section */}
-      <div className="mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight mb-2 sm:mb-3">
+      <div className="mb-4 sm:mb-8">
+        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white leading-tight mb-1 sm:mb-3">
           <span className="block truncate">
             {businessData?.name || "Business Name"}
           </span>
         </h1>
-        <p className="text-sm sm:text-base lg:text-lg text-gray-300 leading-relaxed">
+        <p className="text-xs sm:text-base lg:text-lg text-gray-300 leading-relaxed">
           {businessData?.address || "Business Address"}
         </p>
       </div>
 
       {/* Search and Login Section */}
-      <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-stretch sm:items-center">
+      <div className="flex flex-col sm:flex-row gap-3 sm:gap-6 items-stretch sm:items-center">
         {/* Search Bar */}
         <div className="flex-1 relative">
-          <div className="bg-[#2D303E] rounded-xl sm:rounded-2xl flex items-center px-4 py-3 sm:py-4 shadow-lg hover:shadow-xl transition-shadow duration-200">
+          <div className="bg-[#2D303E] rounded-lg sm:rounded-2xl flex items-center px-3 py-2.5 sm:py-4 shadow-lg hover:shadow-xl transition-shadow duration-200">
             <svg
-              className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400 mr-3 flex-shrink-0"
+              className="w-4 h-4 sm:w-6 sm:h-6 text-gray-400 mr-2.5 sm:mr-3 flex-shrink-0"
               fill="currentColor"
               viewBox="0 0 24 24"
             >
@@ -45,7 +43,7 @@ export const HomeHeader = ({
         {!localStorage.getItem("aftoAuthToken")?.length && (
           <button
             onClick={() => setLoginPage(true)}
-            className="bg-[#ea7c69] hover:bg-[#d96b57] active:bg-[#c75a47] text-white font-semibold px-6 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl text-sm sm:text-base whitespace-nowrap"
+            className="bg-[#ea7c69] hover:bg-[#d96b57] active:bg-[#c75a47] text-white font-semibold px-5 sm:px-8 py-2.5 sm:py-4 rounded-lg sm:rounded-2xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl text-sm sm:text-base whitespace-nowrap"
           >
             Login
           </button>

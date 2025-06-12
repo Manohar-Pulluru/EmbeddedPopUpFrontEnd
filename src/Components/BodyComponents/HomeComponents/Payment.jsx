@@ -115,24 +115,24 @@ const Payment = ({
     // Check for missing payment details
     if (!paymentDetails || !paymentDetails.clientSecret) {
       return (
-        <div className="text-[#fa755a] text-center">
+        <div className="text-[#fa755a] text-center text-sm md:text-base">
           Error: Payment details are missing or invalid.
         </div>
       );
     }
 
     return (
-      <div className="container bg-transparent p-6 rounded-lg max-w-md mx-auto">
-        <h1 className="text-2xl font-semibold text-[#ffffff] mb-6 text-center">
+      <div className="container bg-transparent p-2 md:p-6 rounded-lg max-w-md mx-auto">
+        <h1 className="text-base md:text-2xl font-semibold text-[#ffffff] mb-3 md:mb-6 text-center">
           Payment Details
         </h1>
 
         {/* Order Summary */}
-        <div className="order-summary mb-6 p-4 bg-transparent rounded-lg">
-          <div className="flex justify-between mb-2 text-[#ffffff]">
+        <div className="order-summary mb-3 md:mb-6 p-2 md:p-4 bg-transparent rounded-lg">
+          <div className="flex justify-between mb-1 md:mb-2 text-[#ffffff] text-xs md:text-base">
             <span>Order #{paymentDetails.orderId}</span>
           </div>
-          <div className="flex justify-between mb-2 text-[#ffffff]">
+          <div className="flex justify-between mb-1 md:mb-2 text-[#ffffff] text-xs md:text-base">
             <span>Subtotal</span>
             <span>
               {formatAmount(
@@ -140,8 +140,8 @@ const Payment = ({
               )}
             </span>
           </div>
-          <div className="flex justify-between mb-2 text-[#ffffff]">
-            <span>Delivery Charge</span>
+          <div className="flex justify-between mb-1 md:mb-2 text-[#ffffff] text-xs md:text-base">
+            <span>Delivery</span>
             <span>
               {formatAmount(
                 // paymentDetails.deliveryCharges
@@ -149,11 +149,11 @@ const Payment = ({
               )}
             </span>
           </div>
-          <div className="flex justify-between mb-2 text-[#ffffff]">
+          <div className="flex justify-between mb-1 md:mb-2 text-[#ffffff] text-xs md:text-base">
             <span>Fee</span>
             <span>{formatAmount(paymentDetails.applicationFeeAmount)}</span>
           </div>
-          <div className="flex justify-between font-bold border-t border-[#e6e6e6] pt-2 text-[#ffffff]">
+          <div className="flex justify-between font-bold border-t border-[#e6e6e6] pt-1 md:pt-2 text-[#ffffff] text-xs md:text-base">
             <span>Total</span>
             <span>{formatAmount(paymentDetails.amount)}</span>
           </div>
@@ -162,16 +162,16 @@ const Payment = ({
         {/* Payment Form or Success Message */}
         {!paymentSucceeded ? (
           <form onSubmit={handleSubmit}>
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-2 text-[#ffffff]">
+            <div className="mb-3 md:mb-4">
+              <label className="block text-xs md:text-sm font-medium mb-1 md:mb-2 text-[#ffffff]">
                 Credit or debit card
               </label>
-              <div className="border border-[#e6e6e6] rounded-md p-3 bg-white">
+              <div className="border border-[#e6e6e6] rounded-md p-2 md:p-3 bg-white">
                 <CardElement
                   options={{
                     style: {
                       base: {
-                        fontSize: "16px",
+                        fontSize: "12px",
                         color: "#32325d",
                         "::placeholder": { color: "#aab7c4" },
                       },
@@ -184,7 +184,7 @@ const Payment = ({
                 />
               </div>
               {error && (
-                <div className="text-[#fa755a] text-sm mt-2" role="alert">
+                <div className="text-[#fa755a] text-xs md:text-sm mt-1 md:mt-2" role="alert">
                   {error}
                 </div>
               )}
@@ -192,7 +192,7 @@ const Payment = ({
             <button
               type="submit"
               disabled={!stripe || isProcessing}
-              className={`w-full py-3 rounded-md text-lg font-semibold text-white flex items-center justify-center transition-colors duration-200 ${
+              className={`w-full py-2 md:py-3 rounded-md text-sm md:text-lg font-semibold text-white flex items-center justify-center transition-colors duration-200 ${
                 isProcessing
                   ? "bg-gray-500 opacity-50 cursor-not-allowed"
                   : "bg-[#ea7c69] hover:bg-[#db8070]"
@@ -200,8 +200,8 @@ const Payment = ({
             >
               {isProcessing ? (
                 <>
-                  <span className="inline-block w-5 h-5 border-2 border-t-white border-gray-300 rounded-full animate-spin mr-2"></span>
-                  Processing...
+                  <span className="inline-block w-3 h-3 md:w-5 md:h-5 border-2 border-t-white border-gray-300 rounded-full animate-spin mr-2"></span>
+                  <span className="text-xs md:text-base">Processing...</span>
                 </>
               ) : (
                 `Pay ${formatAmount(paymentDetails.amount)}`
@@ -210,11 +210,11 @@ const Payment = ({
           </form>
         ) : (
           <div className="text-center">
-            <div className="text-5xl text-[#2dce89] mb-4">✓</div>
-            <h2 className="text-xl font-semibold text-[#ffffff] mb-2">
+            <div className="text-2xl md:text-5xl text-[#2dce89] mb-2 md:mb-4">✓</div>
+            <h2 className="text-base md:text-xl font-semibold text-[#ffffff] mb-1 md:mb-2">
               Payment successful!
             </h2>
-            <p className="text-[#ffffff] mb-4">
+            <p className="text-[#ffffff] mb-2 md:mb-4 text-xs md:text-base">
               Thank you for your payment. A receipt has been sent to your email.
             </p>
             <button
@@ -223,7 +223,7 @@ const Payment = ({
                 localStorage.setItem("cartItems", JSON.stringify([]));
                 window.location.reload();
               }}
-              className="bg-[#ea7c69] hover:bg-[#db8070] text-white py-2 px-4 rounded-md"
+              className="bg-[#ea7c69] hover:bg-[#db8070] text-white py-2 px-4 rounded-md text-xs md:text-base"
             >
               Close
             </button>
@@ -235,7 +235,7 @@ const Payment = ({
 
   // Main render
   return (
-    <div className="bg-[#1F1D2B] flex flex-col justify-between text-white px-6 py-8 border-l border-[#ea7c6965] h-full w-full relative">
+    <div className="bg-[#1F1D2B] flex flex-col justify-between text-white px-3 md:px-6 py-4 md:py-8 border-l border-[#ea7c6965] h-full w-full relative">
       <CloseButton
         onClose={() => {
           console.log(paymentSucceeded, "Payment succeeded status");
@@ -249,8 +249,8 @@ const Payment = ({
         }}
       />
       <div>
-        <h2 className="text-2xl font-semibold mb-2">Payment</h2>
-        <p className="text-gray-400 text-sm mb-12">
+        <h2 className="text-lg md:text-2xl font-semibold mb-1 md:mb-2">Payment</h2>
+        <p className="text-gray-400 text-xs md:text-sm mb-6 md:mb-12">
           3 payment methods available
         </p>
 
@@ -272,7 +272,7 @@ const Payment = ({
         )}
 
         {paymentMethod === "Credit Card" && !paymentDetails && (
-          <div className="text-gray-400">Loading payment details...</div>
+          <div className="text-gray-400 text-sm md:text-base">Loading payment details...</div>
         )}
 
         {paymentMethod === "Apple Pay" && (

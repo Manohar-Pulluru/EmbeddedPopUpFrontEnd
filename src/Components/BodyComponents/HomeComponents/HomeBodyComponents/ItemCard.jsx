@@ -71,7 +71,9 @@ export const ItemCard = ({
 
   const truncateText = (text, maxLength) => {
     if (!text) return "";
-    return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
+    return text.length > maxLength
+      ? text.substring(0, maxLength) + "..."
+      : text;
   };
 
   return (
@@ -81,7 +83,7 @@ export const ItemCard = ({
         onClick={handleCardClick}
       >
         {/* Main card container with responsive sizing */}
-        <div className={`
+        {/* <div className={`
           ${showPayment 
             ? "h-[180px] xs:h-[200px] sm:h-[220px] md:h-[240px]" 
             : "h-[200px] xs:h-[220px] sm:h-[250px] md:h-[280px]"
@@ -95,10 +97,35 @@ export const ItemCard = ({
           shadow-lg hover:shadow-2xl
           border border-gray-800 hover:border-gray-700
           transition-all duration-300
-        `}>
-          
+        `}> */}
+        {/* <div
+          className={`h-[200px] xs:h-[220px] sm:h-[250px] md:h-[280px]
+          mt-8 xs:mt-10 sm:mt-12 md:mt-16 lg:mt-20 
+          bg-[#1F1D2B] hover:bg-[#252332] 
+          relative rounded-2xl sm:rounded-3xl 
+          flex flex-col justify-end 
+          p-3 xs:p-4 sm:p-5 md:p-6 
+          w-full
+          shadow-lg hover:shadow-2xl
+          border border-gray-800 hover:border-gray-700
+          transition-all duration-300
+        `}
+        > */}
+        <div
+          className={`h-[150px] xs:h-[220px] sm:h-[250px] md:h-[280px] w-full aspect-[3/4]
+          mt-8 xs:mt-10 sm:mt-12 md:mt-16 lg:mt-20 
+          bg-[#1F1D2B] hover:bg-[#252332] 
+          relative rounded-2xl sm:rounded-3xl 
+          flex flex-col justify-end 
+          p-4 sm:p-5 md:p-6 
+          shadow-lg hover:shadow-2xl
+          border border-gray-800 hover:border-gray-700
+          transition-all duration-300
+        `}
+        >
           {/* Image container with improved responsive positioning */}
-          <div className="
+          <div
+            className="
             w-12 h-12 xs:w-14 xs:h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 
             absolute 
             top-[-24px] xs:top-[-28px] sm:top-[-32px] md:top-[-40px] lg:top-[-48px] 
@@ -107,10 +134,15 @@ export const ItemCard = ({
             border-2 sm:border-4 border-white
             shadow-lg group-hover:shadow-xl
             transition-all duration-300 group-hover:scale-110
-          ">
+          "
+          >
             <img
               className="w-full h-full object-cover rounded-full"
-              src={item.imageURL?.length ? item.imageURL : "https://via.placeholder.com/150"}
+              src={
+                item.imageURL?.length
+                  ? item.imageURL
+                  : "https://via.placeholder.com/150"
+              }
               alt={item.itemName || "Food item"}
               loading="lazy"
             />
@@ -118,9 +150,9 @@ export const ItemCard = ({
 
           {/* Content container with improved spacing */}
           <div className="text-center flex-1 flex flex-col justify-between items-center pt-2 xs:pt-3 sm:pt-4 md:pt-6">
-            
             {/* Item name with responsive text and better line clamping */}
-            <h3 className="
+            <h3
+              className="
               text-xs xs:text-sm sm:text-base md:text-lg lg:text-xl 
               font-medium text-white 
               mb-1 xs:mb-2 sm:mb-3 
@@ -128,17 +160,21 @@ export const ItemCard = ({
               text-center w-full
               line-clamp-2
               group-hover:text-[#EA7C69] transition-colors duration-300
-            ">
-              {truncateText(item.itemName, showPayment ? 30 : 35)}
+            "
+            >
+              {/* {truncateText(item.itemName, showPayment ? 30 : 35)} */}
+              {truncateText(item.itemName, 35)}
             </h3>
 
             {/* Price with better typography */}
-            <div className="
+            <div
+              className="
               text-sm xs:text-base sm:text-lg md:text-xl 
               font-semibold text-white 
               mb-2 xs:mb-3 sm:mb-4
               group-hover:text-[#EA7C69] transition-colors duration-300
-            ">
+            "
+            >
               ${item.regPrice}
             </div>
 
@@ -166,15 +202,18 @@ export const ItemCard = ({
               `}
             >
               {isInCart ? (
-                <span className="text-white whitespace-nowrap">Added to Cart</span>
+                <span className="text-white whitespace-nowrap">
+                  Added to Cart
+                </span>
               ) : (
                 <>
-                  <Icon 
+                  {/* <Icon 
                     height={showPayment ? 12 : 14} 
                     width={showPayment ? 12 : 14} 
-                    name="plus" 
+                    name={icons.plus} 
                     fill="white" 
-                  />
+                  /> */}
+                  <Icon height={14} width={14} name={icons.plus} fill="white" />
                   <span className="text-white whitespace-nowrap">
                     {itemLoading[item.id] ? "Adding..." : "Add to Cart"}
                   </span>

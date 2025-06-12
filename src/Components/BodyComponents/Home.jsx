@@ -7,7 +7,7 @@ import App from "../../App";
 import { AppContext } from "../../Service/Context/AppContext";
 
 export const Home = () => {
-  const { 
+  const {
     businessId,
     showPayment,
     setShowPayment,
@@ -29,7 +29,9 @@ export const Home = () => {
     setDeliveryCharge,
     mode,
     setMode,
-    toggleChangeCart
+    toggleChangeCart,
+    isCartOpen,
+    isMobile
   } = useContext(AppContext);
 
   // Fetch items from localStorage on mount or when changeCart changes
@@ -97,31 +99,46 @@ export const Home = () => {
   console.log("orderData__", orderData);
 
   return (
-    <div className="h-full w-full flex flex-col sm:flex-row">
-      <div className={`${showPayment ? "sm:w-[40%] w-full" : "sm:w-[70%] w-full"} h-[90vh] sm:h-full`}>
-      {/* <div className="w-full h-full"> */}
-        <HomeBody/>
+    <div className="h-full w-full relative">
+      {/* <div
+        className={`${
+          showPayment ? "sm:w-[40%] w-full" : "sm:w-[70%] w-full"
+        } h-[90vh] sm:h-full`}
+      > */}
+      <div
+        className={`
++          w-full h-[100vh]
++          ${isCartOpen ? "pointer-events-none" : ""}
++        `}
+      >
+        <HomeBody />
       </div>
       {/* // the cart tab should come here */}
-      <div className="sm:w-[30%] w-full h-[40vh] sm:h-full relative right-0">
-        <Orders />
-      </div>
-      {showPayment && (
-        <div className="sm:w-[30%] w-full h-[60vh] sm:h-full">
-          <Payment
-            showPayment={showPayment}
-            setShowPayment={setShowPayment}
-            orderData={orderData}
-            setChangeCart={setChangeCart}
-            changeCart={changeCart}
-            setPaymentDetails={setPaymentDetails}
-            paymentDetails={paymentDetails}
-            setOrderData={setOrderData}
-            setSubtotal={setSubtotal}
-            subtotal={subtotal}
-            deliveryCharge={deliveryCharge}
-          />
+
+      {isCartOpen && (
+        <div className="fixed top-0 right-0 bottom-0 h-full w-full flex justify-end bg-[#2d2c30]/50  ">
+          <div className="sm:w-1/3 w-full sm:h-[100vh] h-[calc(100vh-64px)]">
+            <Orders />
+          </div>
+          {showPayment && (
+            <div className="absolute sm:relative sm:w-1/3 w-full h-[100vh] z-300">
+              <Payment
+                showPayment={showPayment}
+                setShowPayment={setShowPayment}
+                orderData={orderData}
+                setChangeCart={setChangeCart}
+                changeCart={changeCart}
+                setPaymentDetails={setPaymentDetails}
+                paymentDetails={paymentDetails}
+                setOrderData={setOrderData}
+                setSubtotal={setSubtotal}
+                subtotal={subtotal}
+                deliveryCharge={deliveryCharge}
+              />
+            </div>
+          )}
         </div>
+
       )}
     </div>
   );

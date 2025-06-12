@@ -19,11 +19,11 @@ export const Body = () => {
       case 0:
         return <Home />;
       case 1:
-        return <Orders />;
-      case 2:
-        return <Profile />;
-      default:
         return <Home />;
+      case 2:
+        return <Orders />;
+      default:
+        return <Profile />;
     }
   }
 

@@ -1,10 +1,13 @@
 import { useState } from "react";
 import {
+  getUserAddress,
   getTemplateData,
   getTemplates,
   searchProductsElastic,
   calculateDeliveryCharge,
+  placeOrder
 } from "../api";
+import { jwtDecode } from "jwt-decode";
 
 export const useAppStates = () => {
   const [user, setUser] = useState(null);
@@ -30,6 +33,7 @@ export const useAppStates = () => {
 
   // Home.jsx
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   // navBar.jsx
   const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
@@ -86,6 +90,7 @@ export const useAppStates = () => {
           }));
           setSearchedItems(mappedItems);
           console.log("Mapped search results:", mappedItems);
+          console.log("Search results updated:", searchedItems);
         } else {
           setSearchedItems([]);
           console.log("No items found for query:", debouncedQuery);
@@ -191,6 +196,15 @@ export const useAppStates = () => {
     }, 500);
   };
 
+  const handleSearch = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  // Close popup manually
+  const closePopup = () => {
+    setShowPopup(false);
+  };
+
   // Qrders.jsx
   const [activeTab, setActiveTab] = useState("Cart");
   const [name, setName] = useState("");
@@ -214,7 +228,7 @@ export const useAppStates = () => {
     );
   };
 
-  const fetchAddress = async () => {
+    const fetchAddress = async () => {
     const token = localStorage.getItem("aftoAuthToken");
     if (!token) {
       console.log("No token found in localStorage");
@@ -531,6 +545,10 @@ export const useAppStates = () => {
     handleDelete,
     handleNext,
     isTabDisabled,
-    businessAccountId
+    businessAccountId,
+    handleSearch,
+    closePopup,
+    isCartOpen,
+    setIsCartOpen,
   };
 };

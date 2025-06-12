@@ -1,8 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import { postWithoutAuth } from "../../../../Service/httpService";
 import { createUser } from "../../../../Service/api";
+import { AppContext } from "../../../../Service/Context/AppContext";
 
-export const LoginPage = ({ setLoginPage, businessId }) => {
+export const LoginPage = () => {
+  const { setLoginPage, businessId } = useContext(AppContext);
   const [mode, setMode] = useState("login"); // "login" or "signup"
   const [step, setStep] = useState(1); // 1 for email, 2 for OTP
   const [email, setEmail] = useState("");
@@ -146,17 +148,18 @@ export const LoginPage = ({ setLoginPage, businessId }) => {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-[#0000008a] bg-opacity-50 z-20">
-      <div className="bg-[#252836] text-white w-[700px] min-h-[400px] rounded-2xl shadow-lg relative flex flex-col items-center justify-center p-6">
+    <div className="fixed inset-0 flex items-center justify-center bg-[#0000008a] bg-opacity-50 z-20 p-4">
+      <div className="bg-[#252836] text-white w-full max-w-[700px] sm:max-w-[500px] md:max-w-[600px] lg:max-w-[700px] min-h-[400px] rounded-2xl shadow-lg relative flex flex-col items-center justify-center p-4 sm:p-6 mx-4">
         {/* Close Button */}
         <button
           onClick={handleClose}
-          className="absolute top-4 right-4 text-[#EA7C69] hover:text-white"
+          className="absolute top-3 right-3 sm:top-4 sm:right-4 text-[#EA7C69] hover:text-white p-1"
           aria-label="Close login modal"
         >
           <svg
-            width="24"
-            height="24"
+            width="20"
+            height="20"
+            className="sm:w-6 sm:h-6"
             viewBox="0 0 24 24"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
@@ -173,8 +176,8 @@ export const LoginPage = ({ setLoginPage, businessId }) => {
 
         {step === 1 ? (
           // Step 1: Email Input
-          <div className="w-[400px] flex flex-col items-center">
-            <h2 className="text-3xl font-semibold mb-6">
+          <div className="w-full max-w-[400px] flex flex-col items-center px-2 sm:px-0">
+            <h2 className="text-2xl sm:text-3xl font-semibold mb-4 sm:mb-6 text-center">
               {mode === "login" ? "Login" : "Signup"}
             </h2>
             <div className="w-full mb-4">
@@ -190,7 +193,7 @@ export const LoginPage = ({ setLoginPage, businessId }) => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
-                className="w-full py-3 px-4 rounded-lg border border-[#393C49] text-white bg-[#1F1D2B] placeholder-[#ffffff9c] focus:outline-none focus:border-[#EA7C69]"
+                className="w-full py-3 px-4 rounded-lg border border-[#393C49] text-white bg-[#1F1D2B] placeholder-[#ffffff9c] focus:outline-none focus:border-[#EA7C69] text-sm sm:text-base"
                 aria-invalid={!!emailError}
                 aria-describedby={emailError ? "email-error" : undefined}
                 disabled={isLoading}
@@ -204,7 +207,7 @@ export const LoginPage = ({ setLoginPage, businessId }) => {
             <button
               onClick={handleEmailSubmit}
               disabled={isLoading}
-              className={`px-6 py-3 rounded-2xl bg-[#EA7C69] cursor-pointer text-white font-medium w-full ${
+              className={`px-6 py-3 rounded-2xl bg-[#EA7C69] cursor-pointer text-white font-medium w-full text-sm sm:text-base ${
                 isLoading
                   ? "opacity-50 cursor-not-allowed"
                   : "hover:bg-[#d68475]"
@@ -215,12 +218,14 @@ export const LoginPage = ({ setLoginPage, businessId }) => {
           </div>
         ) : (
           // Step 2: OTP Input
-          <div className="w-[400px] flex flex-col items-center">
-            <h2 className="text-3xl font-semibold mb-6">Enter OTP</h2>
-            <p className="text-[#ffffffb4] text-sm mb-6">
-              An OTP has been sent to {email}
+          <div className="w-full max-w-[400px] flex flex-col items-center px-2 sm:px-0">
+            <h2 className="text-2xl sm:text-3xl font-semibold mb-4 sm:mb-6 text-center">
+              Enter OTP
+            </h2>
+            <p className="text-[#ffffffb4] text-sm mb-4 sm:mb-6 text-center px-2">
+              An OTP has been sent to <span className="break-all">{email}</span>
             </p>
-            <div className="flex gap-4 mb-4" onPaste={handleOtpPaste}>
+            <div className="flex gap-2 sm:gap-4 mb-4 justify-center" onPaste={handleOtpPaste}>
               {[...Array(4)].map((_, index) => (
                 <input
                   key={index}
@@ -229,19 +234,19 @@ export const LoginPage = ({ setLoginPage, businessId }) => {
                   value={otp[index] || ""}
                   onChange={(e) => handleOtpChange(index, e.target.value)}
                   maxLength="1"
-                  className="w-12 h-12 text-center text-2xl rounded-lg border border-[#393C49] text-white bg-[#1F1D2B] focus:outline-none focus:border-[#EA7C69]"
+                  className="w-10 h-10 sm:w-12 sm:h-12 text-center text-lg sm:text-2xl rounded-lg border border-[#393C49] text-white bg-[#1F1D2B] focus:outline-none focus:border-[#EA7C69]"
                   aria-label={`OTP digit ${index + 1}`}
                   disabled={isLoading}
                 />
               ))}
             </div>
             {otpError && (
-              <p className="text-[#EA7C69] text-sm mb-4">{otpError}</p>
+              <p className="text-[#EA7C69] text-sm mb-4 text-center px-2">{otpError}</p>
             )}
             <button
               onClick={handleOtpSubmit}
               disabled={isLoading}
-              className={`px-6 py-3 cursor-pointer rounded-2xl bg-[#EA7C69] text-white font-medium w-full ${
+              className={`px-6 py-3 cursor-pointer rounded-2xl bg-[#EA7C69] text-white font-medium w-full text-sm sm:text-base ${
                 isLoading
                   ? "opacity-50 cursor-not-allowed"
                   : "hover:bg-[#d68475]"
@@ -249,7 +254,7 @@ export const LoginPage = ({ setLoginPage, businessId }) => {
             >
               {isLoading ? "Verifying..." : "Submit"}
             </button>
-            <p className="text-[#ffffffb4] text-sm mt-4">
+            <p className="text-[#ffffffb4] text-sm mt-4 text-center px-2">
               {resendTimer > 0 ? (
                 `Resend OTP in ${resendTimer}s`
               ) : (
@@ -267,7 +272,7 @@ export const LoginPage = ({ setLoginPage, businessId }) => {
           </div>
         )}
 
-        <p className="text-[#ffffffb4] text-sm mt-6">
+        <p className="text-[#ffffffb4] text-sm mt-4 sm:mt-6 text-center px-2">
           {mode === "login"
             ? "Don't have an account?"
             : "Already have an account?"}{" "}

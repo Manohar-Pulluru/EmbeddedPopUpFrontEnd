@@ -5,7 +5,8 @@ import { AppContext } from "../Service/Context/AppContext";
 
 export const NavBar = ({ activeIndex, setActiveIndex }) => {
   // const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
-  const { isMobile, setIsMobile } = useContext(AppContext);
+  const { isMobile, setIsMobile, isCartOpen, setIsCartOpen } =
+    useContext(AppContext);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 640);
@@ -14,23 +15,12 @@ export const NavBar = ({ activeIndex, setActiveIndex }) => {
   }, []);
 
   // Desktop options
-  const desktopOptions = [
+  const options = [
     { name: "Home", iconName: icons.home },
-    { name: "Search", iconName: icons.orders },
-    { name: "Library", iconName: icons.profile },
-    { name: "Notification", iconName: icons.heart },
+    { name: "Cart", iconName: icons.cart },
+    { name: "Orders", iconName: icons.orders },
+    { name: "Profile", iconName: icons.profile },
   ];
-
-  // Mobile options (includes See Cart)
-  const mobileOptions = [
-    { name: "Home", iconName: icons.home },
-    { name: "Search", iconName: icons.orders },
-    { name: "See Cart", iconName: "shopping-cart" }, // Generic cart icon
-    { name: "Library", iconName: icons.profile },
-    { name: "Notification", iconName: icons.heart },
-  ];
-
-  const options = isMobile ? mobileOptions : desktopOptions;
 
   const triggerLogout = () => {
     localStorage.removeItem("aftoAuthToken");
@@ -62,7 +52,18 @@ export const NavBar = ({ activeIndex, setActiveIndex }) => {
   );
 
   return (
-    <div className="h-full w-full flex sm:flex-col flex-row bg-[#1F1D2B] relative">
+    // <div className="h-full w-full flex sm:flex-col flex-row bg-[#1F1D2B] relative">
+    <div
+      className="
+        fixed bottom-0 left-0
+        sm:static
+        flex sm:flex-col flex-row
+        w-full sm:w-[5%]
+        h-16 sm:h-full
+        bg-[#1F1D2B]
+        z-20
+      "
+    >
       {/* Logo - only visible on desktop */}
       <div className="sm:h-34 sm:w-full aspect-square sm:flex hidden items-center justify-center z-10">
         <svg
@@ -94,14 +95,15 @@ export const NavBar = ({ activeIndex, setActiveIndex }) => {
       </div>
 
       {/* Moving box (desktop - vertical) */}
+      {/* Moving box (desktop - vertical, left aligned) */}
       {!isMobile && (
         <div
-          className="w-full absolute hidden sm:flex flex-col h-34 bg-[#252836] transition-all duration-300 ease-in-out z-0"
+          className="absolute hidden sm:flex flex-col h-34 w-16 left-3 bg-transparent transition-all duration-300 ease-in-out z-0"
           style={{ top: `${topPosition}px` }}
         >
           <div className="w-full h-6 bg-[#1F1D2B] rounded-br-4xl"></div>
-          <div className="w-full flex-1 bg-[#1F1D2B] flex justify-end">
-            <div className="h-full aspect-square bg-[#252836] p-4 rounded-l-3xl">
+          <div className="w-full flex-1 bg-[#1F1D2B] flex justify-start">
+            <div className="h-full aspect-square bg-[#252836] p-4 pr-5 rounded-l-3xl">
               <div className="bg-[#EA7C69] rounded-2xl h-full aspect-square"></div>
             </div>
           </div>
@@ -109,22 +111,23 @@ export const NavBar = ({ activeIndex, setActiveIndex }) => {
         </div>
       )}
 
-      {/* Moving box (mobile - horizontal) - Fixed positioning and sizing */}
+      {/* this is not alligned  */}
       {isMobile && (
         <div
           className="absolute sm:hidden bottom-0 h-16 transition-all duration-300 ease-in-out z-0"
-          style={{ 
+          // className="absolute bottom-0 sm:hidden h-16 transition-all duration-300 ease-in-out z-0"
+          style={{
             left: `${leftPosition}px`,
-            width: `${mobileItemWidth}px`
+            width: `${mobileItemWidth}px`,
           }}
         >
           <div className="w-full h-2 bg-[#1F1D2B]"></div>
           <div className="w-full flex-1 bg-[#1F1D2B] flex items-start justify-center">
-            <div 
-              className="bg-[#EA7C69] rounded-2xl mt-[-8px]"
+            <div
+              className="bg-[#EA7C69] rounded-xl"
               style={{
                 width: `${Math.min(mobileItemWidth * 0.7, 48)}px`,
-                height: `${Math.min(mobileItemWidth * 0.7, 48)}px`
+                height: `${Math.min(mobileItemWidth * 0.7, 48)}px`,
               }}
             ></div>
           </div>
@@ -138,9 +141,16 @@ export const NavBar = ({ activeIndex, setActiveIndex }) => {
           <div
             key={index}
             className={`flex items-center justify-center sm:h-34 h-16 cursor-pointer z-10 relative ${
-              isMobile ? 'flex-1' : 'w-16 sm:w-full'
+              isMobile ? "flex-1" : "w-16 sm:w-full"
             }`}
-            onClick={() => setActiveIndex(index)}
+            onClick={() => {
+              setActiveIndex(index);
+              if (option.name === "Cart") {
+                setIsCartOpen(true);
+              } else {
+                setIsCartOpen(false);
+              }
+            }}
           >
             <div className="w-full sm:ml-2 flex items-center justify-center flex-col sm:flex-row gap-1 sm:gap-0">
               {option.name === "See Cart" ? (
@@ -159,11 +169,11 @@ export const NavBar = ({ activeIndex, setActiveIndex }) => {
               )}
               {/* Label for mobile - optional */}
               {isMobile && (
-                <span 
+                <span
                   className={`text-xs font-medium ${
-                    isActive ? 'text-white' : 'text-[#EA7C69]'
+                    isActive ? "text-white" : "text-[#EA7C69]"
                   }`}
-                  style={{ fontSize: '10px' }}
+                  style={{ fontSize: "10px" }}
                 >
                   {option.name === "See Cart" ? "Cart" : option.name}
                 </span>
@@ -177,13 +187,14 @@ export const NavBar = ({ activeIndex, setActiveIndex }) => {
       {!isMobile && (
         <>
           {!localStorage.getItem("aftoAuthToken")?.length ? (
-            <div className="sm:h-34 sm:w-full flex-col absolute bottom-0 aspect-square sm:flex hidden items-center justify-center z-10">
+            <div className="sm:h-34 sm:w-auto pl-7 flex-col absolute bottom-0 aspect-square sm:flex hidden items-start justify-center z-10">
               <svg
                 width="32"
                 height="32"
                 viewBox="0 0 24 24"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
+                className="pl-2"
               >
                 <g clipPath="url(#clip0_6_14602)">
                   <path
@@ -197,13 +208,13 @@ export const NavBar = ({ activeIndex, setActiveIndex }) => {
                   </clipPath>
                 </defs>
               </svg>
-              <div className="text-[#ea7c69] w-full font-semibold text-center">
+              <div className="text-[#ea7c69] w-full font-semibold text-start">
                 Guest
               </div>
             </div>
           ) : (
-            <div 
-              onClick={triggerLogout} 
+            <div
+              onClick={triggerLogout}
               className="sm:h-34 cursor-pointer flex-col sm:w-full absolute bottom-0 aspect-square sm:flex hidden items-center justify-center z-10"
             >
               <svg
