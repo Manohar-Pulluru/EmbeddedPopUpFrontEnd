@@ -39,7 +39,7 @@ export const Section = ({ section }) => {
         `}
       > */}
       <div
-        className="grid gap-3 sm:gap-4 md:gap-6 lg:gap-8
+        className="grid gap-8 mt-12 sm:mt-4 sm:gap-4 md:gap-6 lg:gap-8
           transition-all duration-300 ease-in-out
           grid-cols-2
           sm:grid-cols-3

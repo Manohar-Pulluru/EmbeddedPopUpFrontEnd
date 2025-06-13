@@ -126,9 +126,9 @@ export const ItemCard = ({
           {/* Image container with improved responsive positioning */}
           <div
             className="
-            w-12 h-12 xs:w-14 xs:h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 
+            w-22 h-22 xs:w-14 xs:h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-34 lg:h-34
             absolute 
-            top-[-24px] xs:top-[-28px] sm:top-[-32px] md:top-[-40px] lg:top-[-48px] 
+            top-[-55px] xs:top-[-28px] sm:top-[-32px] md:top-[-40px] lg:top-[-48px] 
             left-1/2 transform -translate-x-1/2 
             overflow-hidden bg-white rounded-full 
             border-2 sm:border-4 border-white
@@ -153,7 +153,7 @@ export const ItemCard = ({
             {/* Item name with responsive text and better line clamping */}
             <h3
               className="
-              text-xs xs:text-sm sm:text-base md:text-lg lg:text-xl 
+              text-xs xs:text-sm mt-4 sm:mt-16 sm:text-base md:text-lg lg:text-xl 
               font-medium text-white 
               mb-1 xs:mb-2 sm:mb-3 
               leading-tight

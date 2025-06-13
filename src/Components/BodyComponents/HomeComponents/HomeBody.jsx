@@ -11,6 +11,7 @@ import { Popup } from "./HomeBodyComponents/Popup";
 import { LoginPage } from "./HomeBodyComponents/LoginPage";
 import itemImage from "../../../assets/default.jpg";
 import { AppContext } from "../../../Service/Context/AppContext";
+import axios from "axios";
 
 export const HomeBody = () => {
   const {
@@ -219,7 +220,7 @@ export const HomeBody = () => {
   // Handle adding item to cart
 
   return (
-    <div className="h-full w-full px-8 pt-4 flex flex-col">
+    <div className="h-full w-full px-2 pt-4 flex flex-col">
       {/* Header */}
       <HomeHeader />
 
