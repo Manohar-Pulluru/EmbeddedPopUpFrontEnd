@@ -2,7 +2,9 @@ import axios from "axios";
 
 // Authenticated Axios instance
 const axiosInstance = axios.create({
+  // baseURL: import.meta.env.VITE_BASE_URL,
   baseURL: localStorage.getItem("backendUrl"),
+  // baseURL: "https://app.getafto.com/backend",
   headers: {
     "Content-Type": "application/json",
     "embedded-static-token": import.meta.env.VITE_EMBEDDED_STATIC_TOKEN,

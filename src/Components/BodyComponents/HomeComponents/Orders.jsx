@@ -21,7 +21,7 @@ export const Orders = () => {
     showPayment,
     changeCart,
     items,
-    businessAccountId,
+    businessId,
     setItems,
     setCustomerName,
     setCustomerWhatsappNumber,
@@ -71,13 +71,13 @@ export const Orders = () => {
 
   useEffect(() => {
     fetchAddress();
-    getTemplates(businessAccountId).then((response) => {
+    getTemplates(businessId).then((response) => {
       // console.log("Templates fetched successfully:", response);
       // console.log(response.businessData.address)
-      // setRestrauntAddress(response.businessData.address);
-      setRestrauntAddress(
-        "2275 Britannia Rd W unit 15, Mississauga, ON L5M 2G6, Canada"
-      );
+      setRestrauntAddress(response.businessData.address);
+      // setRestrauntAddress(
+      //   "2275 Britannia Rd W unit 15, Mississauga, ON L5M 2G6, Canada"
+      // );
     });
   }, []);
 
