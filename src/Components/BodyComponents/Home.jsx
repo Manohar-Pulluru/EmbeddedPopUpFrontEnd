@@ -1,22 +1,38 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Orders } from "./HomeComponents/Orders";
 import { HomeBody } from "./HomeComponents/HomeBody";
 // import { Payment } from "./HomeComponents/Payment";
 import Payment from "./HomeComponents/Payment";
+import App from "../../App";
+import { AppContext } from "../../Service/Context/AppContext";
 
-export const Home = ({ businessId }) => {
-  const [showPayment, setShowPayment] = useState(false);
-  const [changeCart, setChangeCart] = useState(false);
-  const [items, setItems] = useState([]);
-  const [customerName, setCustomerName] = useState("");
-  const [customerWhatsappNumber, setCustomerWhatsappNumber] = useState("");
-  const [orderData, setOrderData] = useState({}); // Initialize as empty
-  const [paymentDetails, setPaymentDetails] = useState(null);
-  const [subtotal, setSubtotal] = useState(0);
-
-  const toggleChangeCart = () => {
-    setChangeCart(!changeCart);
-  };
+export const Home = () => {
+  const {
+    businessId,
+    showPayment,
+    setShowPayment,
+    changeCart,
+    setChangeCart,
+    items,
+    setItems,
+    customerName,
+    setCustomerName,
+    customerWhatsappNumber,
+    setCustomerWhatsappNumber,
+    orderData,
+    setOrderData,
+    paymentDetails,
+    setPaymentDetails,
+    subtotal,
+    setSubtotal,
+    deliveryCharge,
+    setDeliveryCharge,
+    mode,
+    setMode,
+    toggleChangeCart,
+    isCartOpen,
+    isMobile
+  } = useContext(AppContext);
 
   // Fetch items from localStorage on mount or when changeCart changes
   useEffect(() => {
@@ -55,6 +71,8 @@ export const Home = ({ businessId }) => {
       customerName: customerName || "John Doe",
       customerWhatsappNumber: customerWhatsappNumber || "+1234567890",
       businessAccountId: businessId,
+      deliveryCharge: deliveryCharge,
+      deliveryType: "delivery",
       items: items.map((item, index) => ({
         id: item.id,
         sectionTitle: "Rice", // Hardcoded for now, adjust as needed
@@ -81,48 +99,46 @@ export const Home = ({ businessId }) => {
   console.log("orderData__", orderData);
 
   return (
-    <div className="h-full w-full flex">
-      <div className={`${showPayment ? "w-[40%]" : "w-[70%]"} h-full`}>
-        <HomeBody
-          toggleChangeCart={toggleChangeCart}
-          changeCart={changeCart}
-          showPayment={showPayment}
-          setShowPayment={setShowPayment}
-          businessId={businessId}
-        />
+    <div className="h-full w-full relative">
+      {/* <div
+        className={`${
+          showPayment ? "sm:w-[40%] w-full" : "sm:w-[70%] w-full"
+        } h-[90vh] sm:h-full`}
+      > */}
+      <div
+        className={`
++          w-full h-[100vh]
++          ${isCartOpen ? "pointer-events-none" : ""}
++        `}
+      >
+        <HomeBody />
       </div>
-      <div className="w-[30%] h-full">
-        <Orders
-          showPayment={showPayment}
-          changeCart={changeCart}
-          setShowPayment={setShowPayment}
-          items={items}
-          setPaymentDetails={setPaymentDetails}
-          paymentDetails={paymentDetails}
-          setItems={setItems}
-          setCustomerName={setCustomerName}
-          setCustomerWhatsappNumber={setCustomerWhatsappNumber}
-          setOrderData={setOrderData} // Pass setOrderData to Orders
-          businessAccountId={businessId}
-          setSubtotal={setSubtotal}
-          subtotal={subtotal}
-        />
-      </div>
-      {showPayment && (
-        <div className="w-[30%] h-full">
-          <Payment
-            showPayment={showPayment}
-            setShowPayment={setShowPayment}
-            orderData={orderData}
-            setChangeCart={setChangeCart}
-            changeCart={changeCart}
-            setPaymentDetails={setPaymentDetails}
-            paymentDetails={paymentDetails}
-            setOrderData={setOrderData}
-            setSubtotal={setSubtotal}
-            subtotal={subtotal}
-          />
+      {/* // the cart tab should come here */}
+
+      {isCartOpen && (
+        <div className="fixed top-0 right-0 bottom-0 h-full w-full flex justify-end bg-[#2d2c30]/50  ">
+          <div className="sm:w-1/3 w-full sm:h-[100vh] h-[calc(100vh-64px)]">
+            <Orders />
+          </div>
+          {showPayment && (
+            <div className="absolute sm:relative sm:w-1/3 w-full h-[100vh] z-300">
+              <Payment
+                showPayment={showPayment}
+                setShowPayment={setShowPayment}
+                orderData={orderData}
+                setChangeCart={setChangeCart}
+                changeCart={changeCart}
+                setPaymentDetails={setPaymentDetails}
+                paymentDetails={paymentDetails}
+                setOrderData={setOrderData}
+                setSubtotal={setSubtotal}
+                subtotal={subtotal}
+                deliveryCharge={deliveryCharge}
+              />
+            </div>
+          )}
         </div>
+
       )}
     </div>
   );

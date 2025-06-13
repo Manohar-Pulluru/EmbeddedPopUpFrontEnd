@@ -1,3 +1,4 @@
+// ItemCard.js
 import React, { useState, useEffect } from "react";
 import { ItemPopup } from "./ItemPopup";
 import Icon from "../../../../assets/Icon";
@@ -13,18 +14,22 @@ export const ItemCard = ({
 }) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isInCart, setIsInCart] = useState(false);
-  const { isCartChanged} = useAppContext(); // Access context
+  const { isCartChanged } = useAppContext();
 
-  useEffect(()=>{
-    console.log("Cart Items Changed Reset by Checing the Add to Buttion")
-  },[isCartChanged])
-
+  useEffect(() => {
+    console.log("Cart Items Changed Reset by Checking the Add to Button");
+  }, [isCartChanged]);
 
   // Function to check if item exists in cart
   const checkItemInCart = () => {
-    const cartItems = JSON.parse(localStorage.getItem("cartItems") || "[]");
-    const itemExists = cartItems.some((cartItem) => cartItem.id === item.id);
-    setIsInCart(itemExists);
+    try {
+      const cartItems = JSON.parse(localStorage.getItem("cartItems") || "[]");
+      const itemExists = cartItems.some((cartItem) => cartItem.id === item.id);
+      setIsInCart(itemExists);
+    } catch (error) {
+      console.error("Error checking cart items:", error);
+      setIsInCart(false);
+    }
   };
 
   // Run on mount and when itemAdded changes
@@ -53,56 +58,168 @@ export const ItemCard = ({
     };
   }, [item.id]);
 
+  const handleCardClick = () => {
+    setIsPopupOpen(true);
+  };
+
+  const handleAddToCartClick = (e) => {
+    e.stopPropagation();
+    if (!isInCart && !itemLoading[item.id]) {
+      handleAddToCart(item);
+    }
+  };
+
+  const truncateText = (text, maxLength) => {
+    if (!text) return "";
+    return text.length > maxLength
+      ? text.substring(0, maxLength) + "..."
+      : text;
+  };
+
   return (
     <>
       <div
-        className={`${
-          showPayment ? "w-[45%] h-[250px]" : "w-[30%] h-[300px]"
-        } mt-[150px] bg-[#1F1D2B] hover:bg-[#23212e] cursor-pointer relative rounded-4xl flex flex-col justify-end p-4`}
-        onClick={() => setIsPopupOpen(true)}
+        className="group relative cursor-pointer transform transition-all duration-300 hover:scale-[1.02] hover:shadow-xl"
+        onClick={handleCardClick}
       >
-        <div className="w-[70%] absolute top-[-50%] left-[50%] translate-x-[-50%] translate-y-[20%] mx-auto overflow-hidden aspect-square p-0.5 bg-white rounded-full border">
-          <img
-            className="w-full h-full object-cover rounded-full"
-            src={ item.imageURL.length ? item.imageURL : "https://via.placeholder.com/150"}
-            alt={item.itemName}
-          />
-        </div>
-        <div className="text-center min-h-[45%] max-h-[50%] mt-4 flex-col items-center flex justify-between">
-          <div className="text-xl w-full text-center text-nowrap line-clamp-0 font-medium text-white">
-            {item.itemName.length > 25
-              ? item.itemName.substring(0, 25) + "..."
-              : item.itemName}
-          </div>
-          <div className="text-lg font-normal w-full text-center text-white">
-            $ {item.regPrice}
-          </div>
+        {/* Main card container with responsive sizing */}
+        {/* <div className={`
+          ${showPayment 
+            ? "h-[180px] xs:h-[200px] sm:h-[220px] md:h-[240px]" 
+            : "h-[200px] xs:h-[220px] sm:h-[250px] md:h-[280px]"
+          } 
+          mt-8 xs:mt-10 sm:mt-12 md:mt-16 lg:mt-20 
+          bg-[#1F1D2B] hover:bg-[#252332] 
+          relative rounded-2xl sm:rounded-3xl 
+          flex flex-col justify-end 
+          p-3 xs:p-4 sm:p-5 md:p-6 
+          w-full
+          shadow-lg hover:shadow-2xl
+          border border-gray-800 hover:border-gray-700
+          transition-all duration-300
+        `}> */}
+        {/* <div
+          className={`h-[200px] xs:h-[220px] sm:h-[250px] md:h-[280px]
+          mt-8 xs:mt-10 sm:mt-12 md:mt-16 lg:mt-20 
+          bg-[#1F1D2B] hover:bg-[#252332] 
+          relative rounded-2xl sm:rounded-3xl 
+          flex flex-col justify-end 
+          p-3 xs:p-4 sm:p-5 md:p-6 
+          w-full
+          shadow-lg hover:shadow-2xl
+          border border-gray-800 hover:border-gray-700
+          transition-all duration-300
+        `}
+        > */}
+        <div
+          className={`h-[150px] xs:h-[220px] sm:h-[250px] md:h-[280px] w-full aspect-[3/4]
+          mt-8 xs:mt-10 sm:mt-12 md:mt-16 lg:mt-20 
+          bg-[#1F1D2B] hover:bg-[#252332] 
+          relative rounded-2xl sm:rounded-3xl 
+          flex flex-col justify-end 
+          p-4 sm:p-5 md:p-6 
+          shadow-lg hover:shadow-2xl
+          border border-gray-800 hover:border-gray-700
+          transition-all duration-300
+        `}
+        >
+          {/* Image container with improved responsive positioning */}
           <div
-            onClick={(e) => {
-              e.stopPropagation();
-              if (!isInCart && !itemLoading[item.id]) {
-                handleAddToCart(item);
-              }
-            }}
-            className={`px-4 py-2 rounded-2xl w-fit flex gap-2 items-center cursor-pointer hover:shadow-emerald-500 hover:shadow ${
-              itemLoading[item.id]
-                ? "bg-[#d68475] cursor-not-allowed"
-                : isInCart
-                ? "bg-[#58685c] cursor-default"
-                : "bg-[#EA7C69]"
-            }`}
-            disabled={itemLoading[item.id]}
+            className="
+            w-12 h-12 xs:w-14 xs:h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 
+            absolute 
+            top-[-24px] xs:top-[-28px] sm:top-[-32px] md:top-[-40px] lg:top-[-48px] 
+            left-1/2 transform -translate-x-1/2 
+            overflow-hidden bg-white rounded-full 
+            border-2 sm:border-4 border-white
+            shadow-lg group-hover:shadow-xl
+            transition-all duration-300 group-hover:scale-110
+          "
           >
-            {isInCart ? (
-              <span>Added to Cart</span>
-            ) : (
-              <>
-                <Icon height={16} width={16} name={icons.plus} fill="white" />
-                <span>
-                  {itemLoading[item.id] ? "Adding..." : "Cart"}
+            <img
+              className="w-full h-full object-cover rounded-full"
+              src={
+                item.imageURL?.length
+                  ? item.imageURL
+                  : "https://via.placeholder.com/150"
+              }
+              alt={item.itemName || "Food item"}
+              loading="lazy"
+            />
+          </div>
+
+          {/* Content container with improved spacing */}
+          <div className="text-center flex-1 flex flex-col justify-between items-center pt-2 xs:pt-3 sm:pt-4 md:pt-6">
+            {/* Item name with responsive text and better line clamping */}
+            <h3
+              className="
+              text-xs xs:text-sm sm:text-base md:text-lg lg:text-xl 
+              font-medium text-white 
+              mb-1 xs:mb-2 sm:mb-3 
+              leading-tight
+              text-center w-full
+              line-clamp-2
+              group-hover:text-[#EA7C69] transition-colors duration-300
+            "
+            >
+              {/* {truncateText(item.itemName, showPayment ? 30 : 35)} */}
+              {truncateText(item.itemName, 35)}
+            </h3>
+
+            {/* Price with better typography */}
+            <div
+              className="
+              text-sm xs:text-base sm:text-lg md:text-xl 
+              font-semibold text-white 
+              mb-2 xs:mb-3 sm:mb-4
+              group-hover:text-[#EA7C69] transition-colors duration-300
+            "
+            >
+              ${item.regPrice}
+            </div>
+
+            {/* Add to cart button with improved responsive design */}
+            <button
+              onClick={handleAddToCartClick}
+              disabled={itemLoading[item.id]}
+              className={`
+                px-2 xs:px-3 sm:px-4 md:px-5 
+                py-1 xs:py-1.5 sm:py-2 
+                rounded-lg xs:rounded-xl sm:rounded-2xl 
+                text-xs xs:text-sm sm:text-base 
+                font-medium
+                flex items-center gap-1 xs:gap-1.5 sm:gap-2 
+                transition-all duration-300 
+                shadow-md hover:shadow-lg
+                transform hover:scale-105 active:scale-95
+                ${
+                  itemLoading[item.id]
+                    ? "bg-[#d68475] cursor-not-allowed opacity-70"
+                    : isInCart
+                    ? "bg-[#58685c] cursor-default"
+                    : "bg-[#EA7C69] hover:bg-[#d96b57] hover:shadow-orange-500/25"
+                }
+              `}
+            >
+              {isInCart ? (
+                <span className="text-white whitespace-nowrap">
+                  Added to Cart
                 </span>
-              </>
-            )}
+              ) : (
+                <>
+                  {/* <Icon 
+                    height={showPayment ? 12 : 14} 
+                    width={showPayment ? 12 : 14} 
+                    name={icons.plus} 
+                    fill="white" 
+                  /> */}
+                  <Icon height={14} width={14} name={icons.plus} fill="white" />
+                  <span className="text-white whitespace-nowrap">
+                    {itemLoading[item.id] ? "Adding..." : "Add to Cart"}
+                  </span>
+                </>
+              )}
+            </button>
           </div>
         </div>
       </div>
