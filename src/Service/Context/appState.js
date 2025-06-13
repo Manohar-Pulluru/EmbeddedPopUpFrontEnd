@@ -12,6 +12,8 @@ import { jwtDecode } from "jwt-decode";
 export const useAppStates = () => {
   const [user, setUser] = useState(null);
   const [theme, setTheme] = useState("light");
+  const [showFlyerTemplate, setShowFlyerTemplate] = useState(false);
+  const [flyerTemplateId, setFlyerTemplateId] = useState(null)
 
   const login = (userData) => setUser(userData);
   const logout = () => setUser(null);
@@ -28,8 +30,9 @@ export const useAppStates = () => {
   // const businessId = "5d118426-7ff9-40d8-a2f1-476d859da48e";
   // const businessAccountId = "5d118426-7ff9-40d8-a2f1-476d859da48e";
   
-  const businessId = "91182be9-9446-4e29-9ade-b0312b238668";
-  const businessAccountId = "91182be9-9446-4e29-9ade-b0312b238668";
+  // const businessId = "91182be9-9446-4e29-9ade-b0312b238668";
+  // const businessAccountId = "91182be9-9446-4e29-9ade-b0312b238668";
+  const [businessId, setBusinessId] = useState(null);
 
   // Home.jsx
   const [activeIndex, setActiveIndex] = useState(0);
@@ -449,6 +452,7 @@ export const useAppStates = () => {
     toggleCart,
     isCartChanged,
     businessId,
+    setBusinessId,
     isMobile,
     setIsMobile,
     activeIndex,
@@ -545,10 +549,13 @@ export const useAppStates = () => {
     handleDelete,
     handleNext,
     isTabDisabled,
-    businessAccountId,
     handleSearch,
     closePopup,
     isCartOpen,
     setIsCartOpen,
+    showFlyerTemplate,
+    setShowFlyerTemplate,
+    flyerTemplateId,
+    setFlyerTemplateId
   };
 };

@@ -49,14 +49,38 @@ export const HomeBody = () => {
     setDebouncedQuery,
     searchedItems,
     setSearchedItems,
-    fetchResults,
-    fetchTemplates,
+    // fetchResults,
+    // fetchTemplates,
     fetchData,
     handleAddToCart,
     showPayment,
     toggleChangeCart,
     handleSearch,
+    showFlyerTemplate,
+    flyerTemplateId
   } = useContext(AppContext);
+// import { useAppContext } from "../../../Service/Context/AppContext";
+// import axios from "axios";
+
+// export const HomeBody = ({ showPayment, toggleChangeCart, businessId }) => {
+//   const [templates, setTemplates] = useState([]);
+//   const [sections, setSections] = useState([]);
+//   const [activeTemplateId, setActiveTemplateId] = useState("");
+//   const [templateData, setTemplateData] = useState(null);
+//   const [loading, setLoading] = useState(false);
+//   const [templateLoading, setTemplateLoading] = useState(false);
+//   const [searchLoading, setSearchLoading] = useState(false);
+//   const [searchQuery, setSearchQuery] = useState("");
+//   const [quantity, setQuantity] = useState(1);
+//   const [itemLoading, setItemLoading] = useState({});
+//   const [itemAdded, setItemAdded] = useState({});
+//   const [showPopup, setShowPopup] = useState(false);
+//   const [popupMessage, setPopupMessage] = useState("");
+//   const [showLoginPage, setLoginPage] = useState(false);
+//   const [businessData, setBusinessData] = useState(null);
+//   const [debouncedQuery, setDebouncedQuery] = useState("");
+//   const [searchedItems, setSearchedItems] = useState(null);
+//   const { showFlyerTemplate, flyerTemplateId } = useAppContext();
 
   // Define static Search section
   const staticSearchSection = {
@@ -84,6 +108,52 @@ export const HomeBody = () => {
 
   // Fetch search results
   useEffect(() => {
+    const fetchResults = async () => {
+      if (debouncedQuery.trim() && businessId) {
+        setSearchLoading(true);
+        try {
+          console.log("Sending search query to API:", debouncedQuery);
+          let response = null;
+          if (businessId == "80b6fc97-aa38-46b1-bee8-a106d9b7cd96") {
+            const apiUrl = `https://qa3.getafto.com/backend/embedded/user/search-products-elastic?index=91182be9-9446-4e29-9ade-b0312b238668&search=${debouncedQuery}`;
+            const headers = {
+              "embedded-static-token": import.meta.env
+                .VITE_EMBEDDED_STATIC_TOKEN,
+            };
+
+            const dataRes = await axios.get(apiUrl, { headers });
+
+            response = dataRes.data;
+          } else {
+            response = await searchProductsElastic(businessId, debouncedQuery);
+          }
+
+          console.log(response.data, "Elastic Search Response");
+          if (response && response.data && response.data.items) {
+            const mappedItems = response.data.items.map((item) => ({
+              ...item,
+              imageURL: item.imageURL || itemImage,
+            }));
+            setSearchedItems(mappedItems);
+            console.log("Mapped search results:", mappedItems);
+          } else {
+            setSearchedItems([]);
+            console.log("No items found for query:", debouncedQuery);
+          }
+        } catch (error) {
+          console.error("Search error:", error);
+          setSearchedItems([]);
+          setPopupMessage("Failed to fetch search results. Please try again.");
+          setShowPopup(true);
+        } finally {
+          setSearchLoading(false);
+        }
+      } else {
+        setSearchedItems(null);
+        setSearchLoading(false);
+      }
+    };
+
     fetchResults();
   }, [debouncedQuery, businessId]);
 
@@ -91,6 +161,32 @@ export const HomeBody = () => {
   useEffect(() => {
     if (!businessId) return;
 
+    const fetchTemplates = async () => {
+      try {
+        console.log(businessId, "businessId__1");
+        const result = await getTemplates(businessId);
+        setTemplates(result.templates);
+        setBusinessData(result.businessData);
+        if (result.templates?.length > 0) {
+          const isValidTemplate = result.templates.some(
+            (template) => template.id === activeTemplateId
+          );
+          if (!activeTemplateId || !isValidTemplate) {
+            if (showFlyerTemplate) {
+              setActiveTemplateId(flyerTemplateId);
+            } else {
+              setActiveTemplateId(result.templates[0].id);
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch templates:", err);
+        setPopupMessage("Failed to load templates. Please try again.");
+        setShowPopup(true);
+      } finally {
+        setLoading(false);
+      }
+    };
     setLoading(true);
     fetchTemplates();
 
