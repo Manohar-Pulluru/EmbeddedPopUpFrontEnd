@@ -56,8 +56,8 @@ export const DetailsView = () => {
         if (!value.trim()) error = "Name is required.";
         break;
       case "phone":
-        if (!/^\+\d{1,4}\d{7,12}$/.test(value))
-          error = "Phone must include country code (e.g. +14155552671).";
+        if (!/^\+\d{1,1}\d{10}$/.test(value))
+          error = "Phone must include country code and exactly 10 digits (e.g. +14155552671).";
         break;
       case "email":
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
