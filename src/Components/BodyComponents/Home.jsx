@@ -5,6 +5,7 @@ import { HomeBody } from "./HomeComponents/HomeBody";
 import Payment from "./HomeComponents/Payment";
 import App from "../../App";
 import { AppContext } from "../../Service/Context/AppContext";
+import AlertCard from "./HomeComponents/HomeBodyComponents/AlertCard";
 
 export const Home = () => {
   const {
@@ -34,6 +35,8 @@ export const Home = () => {
     setIsCartOpen,
     setActiveIndex,
     isMobile,
+    showAlert,
+    setShowAlert,
   } = useContext(AppContext);
 
   // Fetch items from localStorage on mount or when changeCart changes
@@ -107,11 +110,26 @@ export const Home = () => {
           showPayment ? "sm:w-[40%] w-full" : "sm:w-[70%] w-full"
         } h-[90vh] sm:h-full`}
       > */}
+
+      <AlertCard
+        isVisible={showAlert}
+        onClose={() => {
+          setShowAlert(false);
+        }}
+        onGoToCart={() => {
+          setIsCartOpen(true);
+          setActiveIndex(1);
+          console.log("Go to cart clicked");
+        }}
+        // itemName="Pizza Margherita"
+        autoCloseDelay={5000}
+      />
+
       <div
         className={`
-+          w-full h-[100vh]
-+          ${isCartOpen ? "pointer-events-none" : ""}
-+        `}
+          w-full h-[100vh]
+          ${isCartOpen ? "pointer-events-none" : ""}
+        `}
       >
         <HomeBody />
       </div>
