@@ -38,6 +38,7 @@ export const useAppStates = () => {
   // Home.jsx
   const [activeIndex, setActiveIndex] = useState(0);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
 
   // navBar.jsx
   const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
@@ -557,6 +558,8 @@ export const useAppStates = () => {
     showFlyerTemplate,
     setShowFlyerTemplate,
     flyerTemplateId,
-    setFlyerTemplateId
+    setFlyerTemplateId,
+    showAlert,
+    setShowAlert
   };
 };
