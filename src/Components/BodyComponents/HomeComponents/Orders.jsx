@@ -95,7 +95,7 @@ export const Orders = () => {
               ? `Your Cart (${items.length})`
               : activeTab === "Details"
               ? "Customer Details"
-              : "Payment"}
+              : "Delivery"}
           </div>
           <div className="text-xs sm:text-lg text-[#ffffff9c]">
             {/* show current date and day */}
