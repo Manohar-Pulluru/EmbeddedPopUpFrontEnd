@@ -5,8 +5,10 @@ import { AppContext } from "../Service/Context/AppContext";
 
 export const NavBar = ({ activeIndex, setActiveIndex }) => {
   // const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
-  const { isMobile, setIsMobile, isCartOpen, setIsCartOpen } =
+  const { isMobile, setIsMobile, isCartOpen, setIsCartOpen, items } =
     useContext(AppContext);
+
+  const itemCount = items.reduce((acc, item) => acc + item.quantity, 0); // here is the item count
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 640);
@@ -160,12 +162,33 @@ export const NavBar = ({ activeIndex, setActiveIndex }) => {
                   fill={isActive ? "#FFFFFF" : "#EA7C69"}
                 />
               ) : (
-                <Icon
-                  name={option.iconName}
-                  width={isMobile ? 20 : 32}
-                  height={isMobile ? 20 : 32}
-                  fill={isActive ? "#FFFFFF" : "#EA7C69"}
-                />
+                <div className="relative">
+                  <Icon
+                    name={option.iconName}
+                    width={isMobile ? 20 : 32}
+                    height={isMobile ? 20 : 32}
+                    fill={isActive ? "#FFFFFF" : "#EA7C69"}
+                  />
+                  {option.name === "Cart" && itemCount > 0 && (
+                    <div
+                      className={`
+                        absolute 
+                        ${isMobile ? '-top-1 -right-1' : '-top-2 -right-2'}
+                        ${isMobile ? 'h-4 min-w-[16px] px-1' : 'h-5 min-w-[20px] px-1.5'}
+                        bg-gradient-to-br from-[#EA7C69] to-[#EA6969]
+                        text-white 
+                        ${isMobile ? 'text-[9px]' : 'text-xs'}
+                        font-bold 
+                        rounded-full 
+                        flex items-center justify-center
+                        shadow-lg
+                        border-2 border-[#1F1D2B]
+                      `}
+                    >
+                      {itemCount > 99 ? '99+' : itemCount}
+                    </div>
+                  )}
+                </div>
               )}
               {/* Label for mobile - optional */}
               {isMobile && (

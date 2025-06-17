@@ -31,7 +31,9 @@ export const Home = () => {
     setMode,
     toggleChangeCart,
     isCartOpen,
-    isMobile
+    setIsCartOpen,
+    setActiveIndex,
+    isMobile,
   } = useContext(AppContext);
 
   // Fetch items from localStorage on mount or when changeCart changes
@@ -116,12 +118,24 @@ export const Home = () => {
       {/* // the cart tab should come here */}
 
       {isCartOpen && (
-        <div className="fixed top-0 right-0 bottom-0 h-full w-full flex justify-end bg-[#2d2c30]/50  ">
-          <div className="sm:w-1/3 w-full sm:h-[100vh] h-[calc(100vh-64px)]">
+        <div
+          className="fixed top-0 right-0 bottom-0 h-full w-full flex justify-end bg-[#2d2c30]/50"
+          onClick={() => {
+            setIsCartOpen(false);
+            setActiveIndex(0);
+          }}
+        >
+          <div
+            className="sm:w-1/3 w-full sm:h-[100vh] h-[calc(100vh-64px)]"
+            onClick={(e) => e.stopPropagation()}
+          >
             <Orders />
           </div>
           {showPayment && (
-            <div className="absolute sm:relative sm:w-1/3 w-full h-[100vh] z-300">
+            <div
+              className="absolute sm:relative sm:w-1/3 w-full h-[100vh] z-300"
+              onClick={(e) => e.stopPropagation()}
+            >
               <Payment
                 showPayment={showPayment}
                 setShowPayment={setShowPayment}
@@ -138,7 +152,6 @@ export const Home = () => {
             </div>
           )}
         </div>
-
       )}
     </div>
   );
