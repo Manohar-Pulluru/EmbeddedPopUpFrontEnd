@@ -173,11 +173,15 @@ export const NavBar = ({ activeIndex, setActiveIndex }) => {
                     <div
                       className={`
                         absolute 
-                        ${isMobile ? '-top-1 -right-1' : '-top-2 -right-2'}
-                        ${isMobile ? 'h-4 min-w-[16px] px-1' : 'h-5 min-w-[20px] px-1.5'}
+                        ${isMobile ? "-top-1 -right-1" : "-top-2 -right-2"}
+                        ${
+                          isMobile
+                            ? "h-4 min-w-[16px] px-1"
+                            : "h-5 min-w-[20px] px-1.5"
+                        }
                         bg-gradient-to-br from-[#EA7C69] to-[#EA6969]
                         text-white 
-                        ${isMobile ? 'text-[9px]' : 'text-xs'}
+                        ${isMobile ? "text-[9px]" : "text-xs"}
                         font-bold 
                         rounded-full 
                         flex items-center justify-center
@@ -185,7 +189,7 @@ export const NavBar = ({ activeIndex, setActiveIndex }) => {
                         border-2 border-[#1F1D2B]
                       `}
                     >
-                      {itemCount > 99 ? '99+' : itemCount}
+                      {itemCount > 99 ? "99+" : itemCount}
                     </div>
                   )}
                 </div>
@@ -236,11 +240,9 @@ export const NavBar = ({ activeIndex, setActiveIndex }) => {
               </div>
             </div>
           ) : (
-            <div
-              onClick={triggerLogout}
-              className="sm:h-34 cursor-pointer flex-col sm:w-full absolute bottom-0 aspect-square sm:flex hidden items-center justify-center z-10"
-            >
+            <div className="sm:h-34 sm:w-auto cursor-pointer pl-7 flex-col absolute bottom-0 aspect-square sm:flex hidden items-start justify-center z-10">
               <svg
+                onClick={triggerLogout}
                 width="32"
                 height="32"
                 viewBox="0 0 24 24"

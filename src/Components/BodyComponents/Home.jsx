@@ -6,6 +6,7 @@ import Payment from "./HomeComponents/Payment";
 import App from "../../App";
 import { AppContext } from "../../Service/Context/AppContext";
 import AlertCard from "./HomeComponents/HomeBodyComponents/AlertCard";
+import CartButton from "./HomeComponents/HomeBodyComponents/CartButton";
 
 export const Home = () => {
   const {
@@ -116,14 +117,11 @@ export const Home = () => {
         onClose={() => {
           setShowAlert(false);
         }}
-        onGoToCart={() => {
-          setIsCartOpen(true);
-          setActiveIndex(1);
-          console.log("Go to cart clicked");
-        }}
         // itemName="Pizza Margherita"
         autoCloseDelay={5000}
       />
+
+      {!isCartOpen && <CartButton />}
 
       <div
         className={`
