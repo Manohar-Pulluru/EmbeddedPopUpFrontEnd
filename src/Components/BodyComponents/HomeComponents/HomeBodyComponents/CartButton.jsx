@@ -36,7 +36,7 @@ const CartButton = () => {
     <button
       onClick={onClick}
       className={`
-        fixed top-4 right-4 z-50
+        fixed top-4 right-4 z-10
         ${sizeClasses[size]}
         bg-gradient-to-br from-[#EA7C69] to-[#EA6969]
         hover:from-[#d96b57] hover:to-[#d96b57]
