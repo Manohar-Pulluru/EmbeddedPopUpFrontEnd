@@ -33,6 +33,25 @@ export const DetailsView = () => {
     state: false,
   });
 
+  const savedSignupForm = localStorage.getItem("aftoSignupForm");
+  console.log("UserData:", savedSignupForm ? JSON.parse(savedSignupForm) : null);
+
+  useEffect(() => {
+    if (savedSignupForm) {
+      const data = JSON.parse(savedSignupForm);
+      setTouched({
+        name: !!data.name,
+        phone: !!data.phoneNo,
+        email: !!data.email,
+        address: !!data.address,
+        city: !!data.city,
+        pincode: !!(data.pincode || data.postalCode),
+        state: !!data.province_or_territory,
+      });
+    }
+  }, []);
+
+
   // New states for validation button
   const [isValidating, setIsValidating] = useState(false);
   const [validationSuccess, setValidationSuccess] = useState(false);
@@ -221,7 +240,7 @@ export const DetailsView = () => {
       );
     }
 
-    return <span className="text-xs font-medium">Valid</span>;
+    return <span className="text-xs font-medium">Validate</span>;
   };
 
   return (

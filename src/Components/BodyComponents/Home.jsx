@@ -7,6 +7,7 @@ import App from "../../App";
 import { AppContext } from "../../Service/Context/AppContext";
 import AlertCard from "./HomeComponents/HomeBodyComponents/AlertCard";
 import CartButton from "./HomeComponents/HomeBodyComponents/CartButton";
+import UserProfile from "./HomeComponents/HomeBodyComponents/UserProfile";
 
 export const Home = () => {
   const {
@@ -121,7 +122,8 @@ export const Home = () => {
         autoCloseDelay={5000}
       />
 
-      {!isCartOpen && <CartButton />}
+      {/* {!isCartOpen && <CartButton />} */}
+      {!isCartOpen && <UserProfile />}
 
       <div
         className={`
