@@ -17,7 +17,7 @@ const UserProfile = ({
   };
 
   return (
-    <div className="fixed top-4 right-4 z-20">
+    <div className="fixed top-4 right-4 z-10">
       {/* Mobile View - Cart Button Only */}
       <div className="block md:hidden">
         <button
