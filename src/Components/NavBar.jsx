@@ -26,6 +26,7 @@ export const NavBar = ({ activeIndex, setActiveIndex }) => {
 
   const triggerLogout = () => {
     localStorage.removeItem("aftoAuthToken");
+    localStorage.removeItem("aftoSignupForm");
     window.location.reload();
   };
 
@@ -63,6 +64,7 @@ export const NavBar = ({ activeIndex, setActiveIndex }) => {
         w-full sm:w-[5%]
         h-16 sm:h-full
         bg-[#1F1D2B]
+        overflow-hidden
         z-20
       "
     >
@@ -105,7 +107,7 @@ export const NavBar = ({ activeIndex, setActiveIndex }) => {
         >
           <div className="w-full h-6 bg-[#1F1D2B] rounded-br-4xl"></div>
           <div className="w-full flex-1 bg-[#1F1D2B] flex justify-start">
-            <div className="h-full aspect-square bg-[#252836] p-4 pr-5 rounded-l-3xl">
+            <div className="h-full w-[132%] aspect-square bg-[#252836] p-4 pr-5 rounded-l-3xl">
               <div className="bg-[#EA7C69] rounded-2xl h-full aspect-square"></div>
             </div>
           </div>
@@ -116,7 +118,7 @@ export const NavBar = ({ activeIndex, setActiveIndex }) => {
       {/* this is not alligned  */}
       {isMobile && (
         <div
-          className="absolute sm:hidden bottom-0 h-16 transition-all duration-300 ease-in-out z-0"
+          className="absolute sm:hidden bottom-0 h-16 transition-all duration-300 ease-in-out z-0 "
           // className="absolute bottom-0 sm:hidden h-16 transition-all duration-300 ease-in-out z-0"
           style={{
             left: `${leftPosition}px`,

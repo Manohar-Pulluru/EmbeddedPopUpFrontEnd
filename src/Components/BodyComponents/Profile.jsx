@@ -1,33 +1,33 @@
 import React, { useState, useEffect, useContext } from "react";
 import { AppContext } from "../../Service/Context/AppContext";
 
-// Mock API functions for demonstration
-const updateUserDetails = async (payload, token) => {
-  console.log("Updating user details:", payload);
-  return { success: true };
-};
+// // Mock API functions for demonstration
+// const updateUserDetails = async (payload, token) => {
+//   console.log("Updating user details:", payload);
+//   return { success: true };
+// };
 
-const getUserAddress = async (payload) => {
-  console.log("Fetching user address:", payload);
-  return {
-    embeddedUser: {
-      otherDetails: {
-        name: "John Doe",
-        email: "john@example.com",
-        phone: "+1234567890",
-        address: "123 Main Street",
-        city: "New York",
-        pincode: "10001",
-        state: "NY",
-      },
-    },
-  };
-};
+// const getUserAddress = async (payload) => {
+//   console.log("Fetching user address:", payload);
+//   return {
+//     embeddedUser: {
+//       otherDetails: {
+//         name: "John Doe",
+//         email: "john@example.com",
+//         phone: "+1234567890",
+//         address: "123 Main Street",
+//         city: "New York",
+//         pincode: "10001",
+//         state: "NY",
+//       },
+//     },
+//   };
+// };
 
-const jwtDecode = (token) => ({
-  name: "John Doe",
-  email: "john@example.com",
-});
+// const jwtDecode = (token) => ({
+//   name: "John Doe",
+//   email: "john@example.com",
+// });
 
 export const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -45,77 +45,106 @@ export const Profile = () => {
   const { isMobile } = useContext(AppContext);
 
   // Simulate localStorage for demo
-  const mockLocalStorage = {
-    getItem: (key) => {
-      if (key === "aftoAuthToken") return "mock-token";
-      if (key === "aftoAuthBusinessId") return "mock-business-id";
-      return null;
-    },
-  };
+  // const mockLocalStorage = {
+  //   getItem: (key) => {
+  //     if (key === "aftoAuthToken") return "mock-token";
+  //     if (key === "aftoAuthBusinessId") return "mock-business-id";
+  //     return null;
+  //   },
+  // };
+
+  const savedSignupForm = localStorage.getItem("aftoSignupForm");
+  console.log(
+    "UserData:",
+    savedSignupForm ? JSON.parse(savedSignupForm) : null
+  );
 
   // Populate form data from token and fetch address if token exists
   useEffect(() => {
-    const token = mockLocalStorage.getItem("aftoAuthToken");
-    if (token) {
-      setHasToken(true);
+    // const token = mockLocalStorage.getItem("aftoAuthToken");
+    // if (token) {
+    //   setHasToken(true);
+    //   try {
+    //     const decodedToken = jwtDecode(token);
+    //     setFormData((prev) => ({
+    //       ...prev,
+    //       name: decodedToken.name || prev.name,
+    //       email: decodedToken.email || prev.email,
+    //     }));
+
+    //     // Fetch address details
+    //     const fetchAddress = async () => {
+    //       try {
+    //         const email = decodedToken.email;
+    //         const businessAccountId =
+    //           mockLocalStorage.getItem("aftoAuthBusinessId");
+
+    //         if (!email || !businessAccountId) {
+    //           console.log("Email or businessAccountId missing");
+    //           return;
+    //         }
+
+    //         const payload = {
+    //           email,
+    //           businessAccountId,
+    //         };
+
+    //         console.log("Fetching address with payload:", payload);
+    //         const response = await getUserAddress(payload);
+
+    //         if (response?.embeddedUser?.otherDetails) {
+    //           const { name, email, phone, address, city, pincode, state } =
+    //             response.embeddedUser.otherDetails;
+    //           setFormData((prev) => ({
+    //             ...prev,
+    //             name: name || prev.name,
+    //             email: email || prev.email,
+    //             phone: phone || "",
+    //             address: address || "",
+    //             city: city || "",
+    //             pincode: pincode || "",
+    //             state: state || "",
+    //           }));
+    //           console.log(
+    //             "Address data set:",
+    //             response.embeddedUser.otherDetails
+    //           );
+    //         } else {
+    //           console.log("No address data in response");
+    //         }
+    //       } catch (error) {
+    //         console.error("Error fetching address:", error);
+    //       }
+    //     };
+
+    //     fetchAddress();
+    //   } catch (error) {
+    //     console.error("Error decoding token:", error);
+    //   }
+    // }
+
+
+    // Populate form data from savedSignupForm if available
+    if (savedSignupForm) {
       try {
-        const decodedToken = jwtDecode(token);
-        setFormData((prev) => ({
-          ...prev,
-          name: decodedToken.name || prev.name,
-          email: decodedToken.email || prev.email,
-        }));
-
-        // Fetch address details
-        const fetchAddress = async () => {
-          try {
-            const email = decodedToken.email;
-            const businessAccountId =
-              mockLocalStorage.getItem("aftoAuthBusinessId");
-
-            if (!email || !businessAccountId) {
-              console.log("Email or businessAccountId missing");
-              return;
-            }
-
-            const payload = {
-              email,
-              businessAccountId,
-            };
-
-            console.log("Fetching address with payload:", payload);
-            const response = await getUserAddress(payload);
-
-            if (response?.embeddedUser?.otherDetails) {
-              const { name, email, phone, address, city, pincode, state } =
-                response.embeddedUser.otherDetails;
-              setFormData((prev) => ({
-                ...prev,
-                name: name || prev.name,
-                email: email || prev.email,
-                phone: phone || "",
-                address: address || "",
-                city: city || "",
-                pincode: pincode || "",
-                state: state || "",
-              }));
-              console.log(
-                "Address data set:",
-                response.embeddedUser.otherDetails
-              );
-            } else {
-              console.log("No address data in response");
-            }
-          } catch (error) {
-            console.error("Error fetching address:", error);
-          }
-        };
-
-        fetchAddress();
+      const parsedForm = JSON.parse(savedSignupForm);
+      setFormData((prev) => ({
+        ...prev,
+        name: parsedForm.name || prev.name,
+        email: parsedForm.email || prev.email,
+        phone: parsedForm.phoneNo|| "",
+        address: parsedForm.address || "",
+        city: parsedForm.city || "",
+        pincode: parsedForm.pincode || "",
+        state: parsedForm.state || "",
+      }));
+      setHasToken(false);
+      console.log("Loaded form data from localStorage:", parsedForm);
       } catch (error) {
-        console.error("Error decoding token:", error);
+      console.error("Error parsing savedSignupForm:", error);
       }
     }
+
   }, []);
 
   const handleInputChange = (e) => {
@@ -128,70 +157,70 @@ export const Profile = () => {
   };
 
   const handleSave = async () => {
-    const token = mockLocalStorage.getItem("aftoAuthToken");
-    try {
-      const decodedToken = jwtDecode(token);
-      console.log("Decoded aftoAuthToken:", decodedToken);
+    // const token = mockLocalStorage.getItem("aftoAuthToken");
+    // try {
+    //   const decodedToken = jwtDecode(token);
+    //   console.log("Decoded aftoAuthToken:", decodedToken);
 
-      const payload = {
-        email: decodedToken.email || formData.email,
-        businessAccountId: mockLocalStorage.getItem("aftoAuthBusinessId"),
-        addressDetails: { ...formData },
-      };
+    //   const payload = {
+    //     email: decodedToken.email || formData.email,
+    //     businessAccountId: mockLocalStorage.getItem("aftoAuthBusinessId"),
+    //     addressDetails: { ...formData },
+    //   };
 
-      const response = await updateUserDetails(payload, token);
-      console.log("Update response:", response);
-      setIsEditing(false);
+    //   const response = await updateUserDetails(payload, token);
+    //   console.log("Update response:", response);
+    //   setIsEditing(false);
 
-      // Refetch address after save to ensure UI is up-to-date
-      const fetchAddress = async () => {
-        try {
-          const email = decodedToken.email;
-          const businessAccountId =
-            mockLocalStorage.getItem("aftoAuthBusinessId");
+    //   // Refetch address after save to ensure UI is up-to-date
+    //   const fetchAddress = async () => {
+    //     try {
+    //       const email = decodedToken.email;
+    //       const businessAccountId =
+    //         mockLocalStorage.getItem("aftoAuthBusinessId");
 
-          if (!email || !businessAccountId) {
-            console.log("Email or businessAccountId missing");
-            return;
-          }
+    //       if (!email || !businessAccountId) {
+    //         console.log("Email or businessAccountId missing");
+    //         return;
+    //       }
 
-          const payload = {
-            email,
-            businessAccountId,
-          };
+    //       const payload = {
+    //         email,
+    //         businessAccountId,
+    //       };
 
-          console.log("Fetching address with payload:", payload);
-          const response = await getUserAddress(payload);
+    //       console.log("Fetching address with payload:", payload);
+    //       const response = await getUserAddress(payload);
 
-          if (response?.embeddedUser?.otherDetails) {
-            const { name, email, phone, address, city, pincode, state } =
-              response.embeddedUser.otherDetails;
-            setFormData((prev) => ({
-              ...prev,
-              name: name || prev.name,
-              email: email || prev.email,
-              phone: phone || "",
-              address: address || "",
-              city: city || "",
-              pincode: pincode || "",
-              state: state || "",
-            }));
-            console.log(
-              "Address data set:",
-              response.embeddedUser.otherDetails
-            );
-          } else {
-            console.log("No address data in response");
-          }
-        } catch (error) {
-          console.error("Error fetching address:", error);
-        }
-      };
+    //       if (response?.embeddedUser?.otherDetails) {
+    //         const { name, email, phone, address, city, pincode, state } =
+    //           response.embeddedUser.otherDetails;
+    //         setFormData((prev) => ({
+    //           ...prev,
+    //           name: name || prev.name,
+    //           email: email || prev.email,
+    //           phone: phone || "",
+    //           address: address || "",
+    //           city: city || "",
+    //           pincode: pincode || "",
+    //           state: state || "",
+    //         }));
+    //         console.log(
+    //           "Address data set:",
+    //           response.embeddedUser.otherDetails
+    //         );
+    //       } else {
+    //         console.log("No address data in response");
+    //       }
+    //     } catch (error) {
+    //       console.error("Error fetching address:", error);
+    //     }
+    //   };
 
-      fetchAddress();
-    } catch (error) {
-      console.error("Error decoding token or saving details:", error);
-    }
+    //   fetchAddress();
+    // } catch (error) {
+    //   console.error("Error decoding token or saving details:", error);
+    // }
   };
 
   const toggleSidebar = () => {
@@ -200,6 +229,7 @@ export const Profile = () => {
 
   const triggerLogout = () => {
     localStorage.removeItem("aftoAuthToken");
+    localStorage.removeItem("aftoSignupForm");
     window.location.reload();
   };
 
