@@ -33,26 +33,7 @@ export const DetailsView = () => {
     state: false,
   });
 
-  const savedSignupForm = localStorage.getItem("aftoSignupForm");
-  console.log("UserData:", savedSignupForm ? JSON.parse(savedSignupForm) : null);
-
-  useEffect(() => {
-    if (savedSignupForm) {
-      const data = JSON.parse(savedSignupForm);
-      setTouched({
-        name: !!data.name,
-        phone: !!data.phoneNo,
-        email: !!data.email,
-        address: !!data.address,
-        city: !!data.city,
-        pincode: !!(data.pincode || data.postalCode),
-        state: !!data.province_or_territory,
-      });
-    }
-  }, []);
-
-
-  // New states for validation button
+    // New states for validation button
   const [isValidating, setIsValidating] = useState(false);
   const [validationSuccess, setValidationSuccess] = useState(false);
 
@@ -68,6 +49,52 @@ export const DetailsView = () => {
       : phone || ""
   );
 
+  const savedSignupForm = localStorage.getItem("aftoSignupForm");
+  console.log(
+    "UserData:",
+    savedSignupForm ? JSON.parse(savedSignupForm) : null
+  );
+
+  // useEffect(() => {
+  //   if (savedSignupForm) {
+  //     const data = JSON.parse(savedSignupForm);
+  //     setTouched({
+  //       name: !!data.name,
+  //       phone: !!data.phoneNo,
+  //       email: !!data.email,
+  //       address: !!data.address,
+  //       city: !!data.city,
+  //       pincode: !!(data.pincode || data.postalCode),
+  //       state: !!data.province_or_territory,
+  //     });
+  //   }
+  // }, []);
+
+  useEffect(() => {
+    if (savedSignupForm) {
+      const data = JSON.parse(savedSignupForm);
+
+      setName(data.name || "");
+      setPhoneNumber((data.phoneNo || "").slice(-10)); // take only last 10 characters
+      setEmail(data.email || "");
+      setAddress(data.address || "");
+      setCity(data.city || "");
+      setPincode(data.pincode || data.postalCode || "");
+      setState(data.province_or_territory || data.state || "");
+      setTouched({
+        name: !!data.name,
+        phone: !!data.phoneNo,
+        email: !!data.email,
+        address: !!data.address,
+        city: !!data.city,
+        pincode: !!(data.pincode || data.postalCode),
+        state: !!data.province_or_territory,
+      });
+    }
+  }, []);
+
+
+
   const validateField = (field, value) => {
     let error = "";
     switch (field) {
@@ -76,7 +103,8 @@ export const DetailsView = () => {
         break;
       case "phone":
         if (!/^\+\d{1,1}\d{10}$/.test(value))
-          error = "Phone must include country code and exactly 10 digits (e.g. +14155552671).";
+          error =
+            "Phone must include country code and exactly 10 digits (e.g. +14155552671).";
         break;
       case "email":
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
@@ -228,7 +256,11 @@ export const DetailsView = () => {
     if (validationSuccess) {
       return (
         <div className="flex items-center gap-1">
-          <svg className="w-2 h-2 sm:w-3 sm:h-3" fill="currentColor" viewBox="0 0 20 20">
+          <svg
+            className="w-2 h-2 sm:w-3 sm:h-3"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
             <path
               fillRule="evenodd"
               d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -247,7 +279,9 @@ export const DetailsView = () => {
     <div className="h-auto w-full overflow-scroll scrollbar-hide flex flex-col gap-3 sm:gap-6 mt-4">
       {/* Name */}
       <div>
-        <label className="block text-xs sm:text-sm font-medium mb-1">Name</label>
+        <label className="block text-xs sm:text-sm font-medium mb-1">
+          Name
+        </label>
         <input
           type="text"
           value={name}
@@ -263,7 +297,9 @@ export const DetailsView = () => {
 
       {/* Phone Number */}
       <div>
-        <label className="block text-xs sm:text-sm font-medium mb-1">Phone Number</label>
+        <label className="block text-xs sm:text-sm font-medium mb-1">
+          Phone Number
+        </label>
         <div className="flex gap-1 sm:gap-2">
           <input
             type="text"
@@ -289,7 +325,9 @@ export const DetailsView = () => {
 
       {/* Email */}
       <div>
-        <label className="block text-xs sm:text-sm font-medium mb-1">Email</label>
+        <label className="block text-xs sm:text-sm font-medium mb-1">
+          Email
+        </label>
         <input
           type="email"
           value={email}
@@ -305,7 +343,9 @@ export const DetailsView = () => {
 
       {/* Address */}
       <div>
-        <label className="block text-xs sm:text-sm font-medium mb-1">Address</label>
+        <label className="block text-xs sm:text-sm font-medium mb-1">
+          Address
+        </label>
         <div className="relative">
           <input
             type="text"
@@ -331,14 +371,18 @@ export const DetailsView = () => {
           </button>
         </div>
         {touched.address && errors.address && (
-          <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.address}</p>
+          <p className="text-red-500 text-xs sm:text-sm mt-1">
+            {errors.address}
+          </p>
         )}
       </div>
 
       {/* City & Pincode */}
       <div className="flex gap-2 sm:gap-4">
         <div className="w-1/2">
-          <label className="block text-xs sm:text-sm font-medium mb-1">City</label>
+          <label className="block text-xs sm:text-sm font-medium mb-1">
+            City
+          </label>
           <input
             type="text"
             value={city}
@@ -348,11 +392,15 @@ export const DetailsView = () => {
             className="w-full py-2 px-2 sm:py-4 sm:px-4 rounded-lg sm:rounded-2xl border border-[#393C49] text-sm sm:text-lg bg-[#252836] focus:outline-none placeholder:text-white text-white"
           />
           {touched.city && errors.city && (
-            <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.city}</p>
+            <p className="text-red-500 text-xs sm:text-sm mt-1">
+              {errors.city}
+            </p>
           )}
         </div>
         <div className="w-1/2">
-          <label className="block text-xs sm:text-sm font-medium mb-1">Pincode</label>
+          <label className="block text-xs sm:text-sm font-medium mb-1">
+            Pincode
+          </label>
           <input
             type="text"
             value={pincode}
@@ -362,7 +410,9 @@ export const DetailsView = () => {
             className="w-full py-2 px-2 sm:py-4 sm:px-4 rounded-lg sm:rounded-2xl border border-[#393C49] text-sm sm:text-lg bg-[#252836] focus:outline-none placeholder:text-white text-white"
           />
           {touched.pincode && errors.pincode && (
-            <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.pincode}</p>
+            <p className="text-red-500 text-xs sm:text-sm mt-1">
+              {errors.pincode}
+            </p>
           )}
         </div>
       </div>
