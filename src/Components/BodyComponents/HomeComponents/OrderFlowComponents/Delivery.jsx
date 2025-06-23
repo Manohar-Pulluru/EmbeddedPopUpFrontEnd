@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useState } from "react";
-import { MapPin, Clock, Navigation, Truck, Package } from "lucide-react";
+import React, { useContext, useEffect, useState, useMemo } from "react";
+import { MapPin, Clock, Navigation, Truck, Package, ChevronDown } from "lucide-react";
 import { AppContext } from "../../../../Service/Context/AppContext";
 
 export const Delivery = () => {
@@ -18,6 +18,39 @@ export const Delivery = () => {
     mode,
     setMode,
   } = useContext(AppContext);
+
+  const [orderTiming, setOrderTiming] = useState("now"); // "now" or "later"
+  const [selectedTime, setSelectedTime] = useState("");
+  const [selectedTimeLabel, setSelectedTimeLabel] = useState(""); // Store the label separately
+  const [isTimeDropdownOpen, setIsTimeDropdownOpen] = useState(false);
+
+  // Generate time options for next 24 hours in 30-minute intervals
+  const timeOptions = useMemo(() => {
+    const options = [];
+    const now = new Date();
+    
+    for (let i = 2; i < 48; i++) { // 48 half-hour slots in 24 hours
+      const time = new Date(now.getTime() + (i * 30 * 60 * 1000));
+      const timeString = time.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      });
+      const dateString = time.toLocaleDateString('en-US', {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric'
+      });
+      
+      options.push({
+        value: time.toISOString(),
+        label: `${timeString} - ${dateString}`,
+        time: timeString,
+        date: dateString
+      });
+    }
+    return options;
+  }, []); // Empty dependency array so it only generates once
 
   useEffect(() => {
     if (deliveryResult) {
@@ -78,6 +111,104 @@ export const Delivery = () => {
           <Truck size={12} className="sm:w-3.5 sm:h-3.5" />
           Delivery
         </button>
+      </div>
+
+      {/* Compact Order Timing Section */}
+      <div className="mb-3 sm:mb-4">
+        <div className="bg-gray-800 rounded-lg border border-gray-700 p-3 shadow-lg">
+          {/* Compact Toggle */}
+          <div className="flex items-center gap-2 mb-2">
+            <Clock className="text-[#ea7c69]" size={14} />
+            <span className="text-white text-sm font-medium">Schedule:</span>
+            <div className="flex bg-gray-700 rounded-lg p-0.5 ml-auto">
+              <button
+                onClick={() => {
+                  setOrderTiming("now");
+                  setSelectedTime("");
+                  setSelectedTimeLabel("");
+                  setIsTimeDropdownOpen(false);
+                }}
+                className={`px-3 py-1.5 text-xs font-medium rounded transition-all duration-200 ${
+                  orderTiming === "now" 
+                    ? "bg-[#ea7c69] text-white" 
+                    : "text-gray-300 hover:text-white"
+                }`}
+              >
+                Now
+              </button>
+              <button
+                onClick={() => setOrderTiming("later")}
+                className={`px-3 py-1.5 text-xs font-medium rounded transition-all duration-200 ${
+                  orderTiming === "later" 
+                    ? "bg-[#ea7c69] text-white" 
+                    : "text-gray-300 hover:text-white"
+                }`}
+              >
+                Later
+              </button>
+            </div>
+          </div>
+
+          {/* Time Dropdown for Order Later */}
+          {orderTiming === "later" && (
+            <div className="relative">
+              <button
+                onClick={() => setIsTimeDropdownOpen(!isTimeDropdownOpen)}
+                className="w-full bg-gray-700 hover:bg-gray-600 text-white px-3 py-2 rounded-lg flex items-center justify-between transition-all duration-200 border border-gray-600"
+              >
+                <span className="text-sm">
+                  {selectedTimeLabel || "Select time"}
+                </span>
+                <ChevronDown 
+                  className={`transition-transform duration-200 text-[#ea7c69] ${
+                    isTimeDropdownOpen ? "rotate-180" : ""
+                  }`} 
+                  size={14} 
+                />
+              </button>
+
+              {isTimeDropdownOpen && (
+                <div className="absolute top-full left-0 right-0 mt-1 bg-gray-800 border border-gray-600 rounded-lg shadow-xl z-50 max-h-48 overflow-y-auto scrollbar-hide">
+                  <div className="p-1">
+                    {timeOptions.map((option, index) => (
+                      <button
+                        key={option.value}
+                        onClick={() => {
+                          setSelectedTime(option.value);
+                          setSelectedTimeLabel(option.label);
+                          setIsTimeDropdownOpen(false);
+                        }}
+                        className={`w-full px-3 py-2 text-left hover:bg-[#ea7c69]/20 text-white text-sm transition-all duration-200 rounded mb-0.5 ${
+                          selectedTime === option.value ? 'bg-[#ea7c69]/30' : ''
+                        }`}
+                      >
+                        <div className="flex justify-between items-center">
+                          <span className="font-medium">{option.time}</span>
+                          <span className="text-gray-400 text-xs">{option.date}</span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Compact Status Info */}
+          {orderTiming === "now" && (
+            <div className="flex items-center gap-2 mt-2 text-green-400 text-xs">
+              <div className="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
+              <span>Order will be prepared immediately</span>
+            </div>
+          )}
+
+          {orderTiming === "later" && selectedTime && (
+            <div className="flex items-center gap-2 mt-2 text-blue-400 text-xs">
+              <div className="w-1.5 h-1.5 bg-blue-400 rounded-full"></div>
+              <span>Scheduled: {selectedTimeLabel}</span>
+            </div>
+          )}
+        </div>
       </div>
 
       {deliveryResult ? (

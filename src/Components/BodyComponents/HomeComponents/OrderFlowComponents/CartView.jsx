@@ -6,7 +6,7 @@ export const CartView = () => {
   const { items, handleQuantityChange, handleNoteChange, handleDelete } =
     useContext(AppContext);
   return (
-    <div className="h-[60%] w-full flex flex-col">
+    <div className="h-[65%] w-full flex flex-col">
       <div className="w-full h-14 pt-2 flex items-center font-semibold text-base md:text-base">
         <div className="w-[70%] h-full text-sm md:text-base">Item</div>
         <div className="w-[13%] h-full text-center text-sm md:text-base">Qty</div>
