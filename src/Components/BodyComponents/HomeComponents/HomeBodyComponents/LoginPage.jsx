@@ -640,10 +640,10 @@ export const LoginPage = () => {
         setShowEmailOtp(false);
         localStorage.setItem("aftoAuthToken", response?.entity?.token);
       } else {
-        setOtpError(response.message || "Invalid OTP");
+        setEmailOtpError(response.message || "Invalid OTP");
       }
     } catch (error) {
-      setOtpError(error.response?.message || "OTP verification failed");
+      setEmailOtpError(error.response?.message || "OTP verification failed");
     } finally {
       setIsLoading(false);
     }
@@ -653,6 +653,8 @@ export const LoginPage = () => {
   // 7. Handler for resend OTP
   const handleEmailResendOtp = async () => {
     // Make your API call to send new OTP
+    // handleEmailOtpSubmit();
+    const response = await sendOtp(email);
     // Reset OTP fields
     setEmailOtp(["", "", "", ""]);
     setEmailOtpError("");
@@ -916,17 +918,7 @@ export const LoginPage = () => {
                       </p>
                     )}
                     <div className="flex gap-2">
-                      <button
-                        onClick={handleEmailOtpSubmit}
-                        disabled={isLoading || emailOtp.join("").length !== 4}
-                        className={`flex-1 py-1.5 px-3 rounded text-xs font-medium bg-blue-600 hover:bg-blue-700 text-white transition-all duration-200 ${
-                          isLoading || emailOtp.join("").length !== 4
-                            ? "opacity-50 cursor-not-allowed"
-                            : ""
-                        }`}
-                      >
-                        {isLoading ? "Verifying..." : "Verify"}
-                      </button>
+                      
                       {emailResendTimer > 0 ? (
                         <span className="flex-1 py-1.5 px-3 text-xs text-slate-400 text-center">
                           Resend in {emailResendTimer}s
@@ -939,6 +931,17 @@ export const LoginPage = () => {
                           Resend
                         </button>
                       )}
+                      <button
+                        onClick={handleEmailOtpSubmit}
+                        disabled={isLoading || emailOtp.join("").length !== 4}
+                        className={`flex-1 py-1.5 px-3 rounded text-xs font-medium bg-blue-600 hover:bg-blue-700 text-white transition-all duration-200 ${
+                          isLoading || emailOtp.join("").length !== 4
+                            ? "opacity-50 cursor-not-allowed"
+                            : ""
+                        }`}
+                      >
+                        {isLoading ? "Verifying..." : "Verify"}
+                      </button>
                     </div>
                   </div>
                 )}
