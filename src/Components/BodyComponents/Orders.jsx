@@ -15,7 +15,7 @@ export const Orders = () => {
   }, []);
 
   return (
-    <div className="h-full w-full bg-transparent p-8 text-white flex flex-col">
+    <div className="h-full w-full bg-[#252836] p-8 text-white flex flex-col">
       {/* Header */}
       <div className="text-2xl font-semibold mb-6">Order History</div>
 
