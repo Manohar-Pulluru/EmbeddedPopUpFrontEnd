@@ -28,7 +28,7 @@ export const Body = () => {
   }
 
   return (
-    <div className="h-full sm:block  w-full fl">{renderComponent()}</div>
+    <div className="h-full sm:block  w-full">{renderComponent()}</div>
   );
 };
 

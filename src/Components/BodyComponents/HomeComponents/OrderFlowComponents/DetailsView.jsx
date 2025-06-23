@@ -276,7 +276,7 @@ export const DetailsView = () => {
   };
 
   return (
-    <div className="h-auto w-full overflow-scroll scrollbar-hide flex flex-col gap-3 sm:gap-6 mt-4">
+    <div className="h-[65%] w-full overflow-scroll scrollbar-hide flex flex-col gap-3 sm:gap-6 mt-4">
       {/* Name */}
       <div>
         <label className="block text-xs sm:text-sm font-medium mb-1">
