@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
-import { postWithoutAuth } from "../../../../Service/httpService";
-import { createUser } from "../../../../Service/api";
+// import { postWithoutAuth } from "../../../../Service/httpService";
+// import { createUser } from "../../../../Service/api";
 import { AppContext } from "../../../../Service/Context/AppContext";
 
 const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_API_KEY || "";
@@ -313,7 +313,7 @@ export const LoginPage = () => {
         //
         const token = localStorage.getItem("aftoAuthToken");
         if (token) {
-          getCustomerData(email, businessId).then((customerData) => {
+          getCustomerData(signupData.email, businessId).then((customerData) => {
             console.log("Customer Data:", customerData.user.otherDetails);
             const name = customerData.user.otherDetails.name;
             const email = customerData.user.otherDetails.email;
@@ -342,6 +342,7 @@ export const LoginPage = () => {
         setSignupErrors((prev) => ({
           ...prev,
           phoneNo: "Phone no already used.",
+          // email: "email already used.",
         }));
         // console.log(response?.message || "Signup failed. Please try again.");
         console.log(
@@ -577,14 +578,14 @@ export const LoginPage = () => {
 
     return (
       <>
-      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+      {/* <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
         <path
         fillRule="evenodd"
         d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
         clipRule="evenodd"
         />
-      </svg>
-      {/* <span className="hidden sm:inline">Verified</span> */}
+      </svg> */}
+      <span className="hidden sm:inline">OTP</span>
       </>
     );
   };
@@ -595,7 +596,7 @@ export const LoginPage = () => {
     setShowEmailOtp(false);
     
     // const response = await sendPhoneOtp(signupData.phoneNo);
-    const response = await sendOtp(email);
+    const response = await sendOtp(signupData.email);
 
     setIsEmailValidating(false);
     if (response.status) {
@@ -632,7 +633,7 @@ export const LoginPage = () => {
       return;
     }
     try {
-      const response = await verifyOtp(email, emailOtp.join(""));
+      const response = await verifyOtp(signupData.email, emailOtp.join(""));
 
       console.log(response?.entity?.token, "response");
       if (response.status) {
@@ -654,7 +655,7 @@ export const LoginPage = () => {
   const handleEmailResendOtp = async () => {
     // Make your API call to send new OTP
     // handleEmailOtpSubmit();
-    const response = await sendOtp(email);
+    const response = await sendOtp(signupData.email);
     // Reset OTP fields
     setEmailOtp(["", "", "", ""]);
     setEmailOtpError("");

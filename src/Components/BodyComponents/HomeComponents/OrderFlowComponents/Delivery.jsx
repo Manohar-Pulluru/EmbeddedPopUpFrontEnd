@@ -19,38 +19,38 @@ export const Delivery = () => {
     setMode,
   } = useContext(AppContext);
 
-  const [orderTiming, setOrderTiming] = useState("now"); // "now" or "later"
-  const [selectedTime, setSelectedTime] = useState("");
-  const [selectedTimeLabel, setSelectedTimeLabel] = useState(""); // Store the label separately
-  const [isTimeDropdownOpen, setIsTimeDropdownOpen] = useState(false);
+  // const [orderTiming, setOrderTiming] = useState("now"); // "now" or "later"
+  // const [selectedTime, setSelectedTime] = useState("");
+  // const [selectedTimeLabel, setSelectedTimeLabel] = useState(""); // Store the label separately
+  // const [isTimeDropdownOpen, setIsTimeDropdownOpen] = useState(false);
 
   // Generate time options for next 24 hours in 30-minute intervals
-  const timeOptions = useMemo(() => {
-    const options = [];
-    const now = new Date();
+  // const timeOptions = useMemo(() => {
+  //   const options = [];
+  //   const now = new Date();
     
-    for (let i = 2; i < 48; i++) { // 48 half-hour slots in 24 hours
-      const time = new Date(now.getTime() + (i * 30 * 60 * 1000));
-      const timeString = time.toLocaleTimeString('en-US', {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true
-      });
-      const dateString = time.toLocaleDateString('en-US', {
-        weekday: 'short',
-        month: 'short',
-        day: 'numeric'
-      });
+  //   for (let i = 2; i < 48; i++) { // 48 half-hour slots in 24 hours
+  //     const time = new Date(now.getTime() + (i * 30 * 60 * 1000));
+  //     const timeString = time.toLocaleTimeString('en-US', {
+  //       hour: 'numeric',
+  //       minute: '2-digit',
+  //       hour12: true
+  //     });
+  //     const dateString = time.toLocaleDateString('en-US', {
+  //       weekday: 'short',
+  //       month: 'short',
+  //       day: 'numeric'
+  //     });
       
-      options.push({
-        value: time.toISOString(),
-        label: `${timeString} - ${dateString}`,
-        time: timeString,
-        date: dateString
-      });
-    }
-    return options;
-  }, []); // Empty dependency array so it only generates once
+  //     options.push({
+  //       value: time.toISOString(),
+  //       label: `${timeString} - ${dateString}`,
+  //       time: timeString,
+  //       date: dateString
+  //     });
+  //   }
+  //   return options;
+  // }, []); // Empty dependency array so it only generates once
 
   useEffect(() => {
     if (deliveryResult) {
@@ -114,9 +114,8 @@ export const Delivery = () => {
       </div>
 
       {/* Compact Order Timing Section */}
-      <div className="mb-3 sm:mb-4">
+      {/* <div className="mb-3 sm:mb-4">
         <div className="bg-gray-800 rounded-lg border border-gray-700 p-3 shadow-lg">
-          {/* Compact Toggle */}
           <div className="flex items-center gap-2 mb-2">
             <Clock className="text-[#ea7c69]" size={14} />
             <span className="text-white text-sm font-medium">Schedule:</span>
@@ -149,7 +148,6 @@ export const Delivery = () => {
             </div>
           </div>
 
-          {/* Time Dropdown for Order Later */}
           {orderTiming === "later" && (
             <div className="relative">
               <button
@@ -194,7 +192,6 @@ export const Delivery = () => {
             </div>
           )}
 
-          {/* Compact Status Info */}
           {orderTiming === "now" && (
             <div className="flex items-center gap-2 mt-2 text-green-400 text-xs">
               <div className="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
@@ -209,7 +206,7 @@ export const Delivery = () => {
             </div>
           )}
         </div>
-      </div>
+      </div> */}
 
       {deliveryResult ? (
         <div className="space-y-3 sm:space-y-4">
