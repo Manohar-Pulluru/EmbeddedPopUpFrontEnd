@@ -4,6 +4,7 @@ import { ItemPopup } from "./ItemPopup";
 import Icon from "../../../../assets/Icon";
 import icons from "../../../../assets/icons.json";
 import { useAppContext } from "../../../../Service/Context/AppContext";
+import { addItemToCart, updateCart } from "../../../../Service/api";
 
 export const ItemCard = ({
   item,
@@ -14,7 +15,7 @@ export const ItemCard = ({
 }) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isInCart, setIsInCart] = useState(false);
-  const { isCartChanged, setShowAlert } = useAppContext();
+  const { isCartChanged, setShowAlert, setLoginPage } = useAppContext();
 
   useEffect(() => {
     console.log("Cart Items Changed Reset by Checking the Add to Button");
@@ -64,9 +65,36 @@ export const ItemCard = ({
 
   const handleAddToCartClick = (e) => {
     e.stopPropagation();
-    setShowAlert(true);
     if (!isInCart && !itemLoading[item.id]) {
-      handleAddToCart(item);
+      const aftoAuthToken = localStorage.getItem("aftoAuthToken");
+      if (!aftoAuthToken) {
+        setLoginPage(true);
+      } else {
+        // handleAddToCart(item)
+
+        const isNewCart = localStorage.getItem("cartOrderId");
+
+        const userDataInLocal = localStorage.getItem("aftoSignupForm");
+        console.log("userDataInLocal", userDataInLocal);
+
+        if (!isNewCart) {
+          localStorage.setItem("cartOrderId", "1308");
+        } else {
+          const cartOrderId = localStorage.getItem("cartOrderId");
+          const payload = {
+            orderId: cartOrderId,
+            items: [item],
+          };
+          const addItemToCartResponse = updateCart(payload);
+
+          console.log(addItemToCartResponse, "addItemToCartResponse");
+        }
+
+        // const payload = {};
+
+        // addItemToCart(payload);
+        // setShowAlert(true);
+      }
     }
   };
 
