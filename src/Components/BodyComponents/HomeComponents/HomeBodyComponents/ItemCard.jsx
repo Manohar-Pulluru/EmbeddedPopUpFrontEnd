@@ -14,7 +14,7 @@ export const ItemCard = ({
 }) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isInCart, setIsInCart] = useState(false);
-  const { isCartChanged, setShowAlert } = useAppContext();
+  const { isCartChanged, setShowAlert, setLoginPage } = useAppContext();
 
   useEffect(() => {
     console.log("Cart Items Changed Reset by Checking the Add to Button");
@@ -64,6 +64,11 @@ export const ItemCard = ({
 
   const handleAddToCartClick = (e) => {
     e.stopPropagation();
+    const token = localStorage.getItem("aftoAuthToken");
+    if (!token) {
+      setLoginPage(true);
+      return;
+    }
     setShowAlert(true);
     if (!isInCart && !itemLoading[item.id]) {
       handleAddToCart(item);
