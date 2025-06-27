@@ -1,5 +1,9 @@
 // templateService.js
 import { getRequest, postRequest } from "./httpService";
+import axios from 'axios';
+
+// const ELASTIC_AUTH_TOKEN = import.meta.env.VITE_ELASTIC_AUTH_TOKEN;
+// const ELASTIC_AUTH_TOKEN = "Basic ZWxhc3RpYzpJbXlkUnpPZ1o2UnhkVjZUTHdDOA==";
 
 export const getTemplateData = async (templateId) => {
   const endpoint = `/embedded/getTemplateSectionsItems/${templateId}`;
@@ -68,6 +72,46 @@ export const calculateDeliveryCharge = async (
   //     console.error(err);
   //   }
   };
+
+export const sendChatMessage = async (sessionId, message, businessId) => {
+  const url = 'https://chatbot-qa.getafto.com/api/chat/message';
+  const payload = {
+    session_id: sessionId,
+    message,
+    business_id: businessId,
+  };
+
+  try {
+    const response = await axios.post(url, payload, {
+      headers: { 'Content-Type': 'application/json' },
+    });
+    return response.data; // or return response if you need status, headers, etc.
+  } catch (error) {
+    console.error('sendChatMessage error:', error);
+    throw error;
+  }
+}
+export async function searchByRetailerIds(businessId, retailerIds) {
+  const url = `https://qa3.getafto.com/backend/embedded/user/search-products-by-retailer-id/${businessId}`;
+  const payload = {
+    _source: { excludes: ["vector_embedding"] },
+    query: { terms: { retailer_id: retailerIds } }
+  };
+
+  try {
+    const { data } = await axios.post(url, payload, {
+      headers: {
+        "Content-Type": "application/json",
+        "embedded-static-token": import.meta.env.VITE_EMBEDDED_STATIC_TOKEN,
+        "accept": "application/json, text/plain, */*"
+      }
+    });
+    return data;
+  } catch (error) {
+    console.error("searchByRetailerIds error:", error);
+    throw error;
+  }
+}
 
 
 
