@@ -639,7 +639,8 @@ export const useAppStates = () => {
         localStorage.setItem("orderHistory", JSON.stringify(history));
 
         setShowPayment(true);
-        setPaymentDetails(data.paymentIntent);
+        console.log("Payment Data: ", data.data.paymentIntent);
+        setPaymentDetails(data.data.paymentIntent);
 
         // optional: clear your cart
         // localStorage.removeItem("cartItems");
