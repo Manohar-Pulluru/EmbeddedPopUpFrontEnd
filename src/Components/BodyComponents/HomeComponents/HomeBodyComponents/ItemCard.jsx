@@ -4,7 +4,7 @@ import { ItemPopup } from "./ItemPopup";
 import Icon from "../../../../assets/Icon";
 import icons from "../../../../assets/icons.json";
 import { useAppContext } from "../../../../Service/Context/AppContext";
-import { addItemToCart, updateCart } from "../../../../Service/api";
+import { addItemToCart, updateCart, getTemplateData } from "../../../../Service/api";
 
 export const ItemCard = ({
   item,
@@ -15,8 +15,7 @@ export const ItemCard = ({
 }) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isInCart, setIsInCart] = useState(false);
-  const { isCartChanged, setShowAlert, setLoginPage, mode } = useAppContext();
-
+  const { isCartChanged, setShowAlert, setLoginPage, mode, businessId, activeTemplateId, toggleChangeCart, addItemLocal, setItemLoading, setItemAdded } = useAppContext();
 
   useEffect(() => {
     console.log("Cart Items Changed Reset by Checking the Add to Button");
@@ -102,24 +101,67 @@ export const ItemCard = ({
         const cartOrderId = localStorage.getItem("cartOrderId");
 
         if (!cartOrderId) {
+          // setItemLoading((prev) => ({ ...prev, [item.id]: true }));
           const signup = JSON.parse(
             localStorage.getItem("aftoSignupForm") || "{}"
           );
 
+          // const orderPayload = {
+          //   customerName: signup.name,
+          //   customerWhatsappNumber: signup.phoneNo,
+          //   customerEmail: signup.email,
+          //   businessAccountId: signup.businessAccountId,
+          //   deliveryCharges: 0,
+          //   deliveryType: "delivery",
+          //   items: [item],
+          // };
+          // const result = await getTemplateData(activeTemplateId);
+          // const templateID = await result.data.id;
+          // console.log("template Id ",templateID);
+          // console.log("active template Id ",activeTemplateId);
+
+
+          const normalizedItem = {
+            id: item.id,
+            sectionTitle: "Rice", // or derive from your Section
+            itemId: item.id, // or item.productRetailerId
+            itemName: item.itemName,
+            itemDescription: `${item.itemName}.`, // simple description
+            regPrice: item.regPrice.toString(),
+            salePrice: "0", // string
+            imageURL: item.imageURL,
+            serial_number: 1, // or index+1 if batch
+            productTemplateSectionId: activeTemplateId, // your template section ID
+            isHSTApplied: false,
+            HSTPercentage: "13.00",
+            inventoryId: null,
+            inventoryName: null,
+            isSyncToInventory: false,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            quantity: 1,
+          };
+
           const orderPayload = {
             customerName: signup.name,
-            customerWhatsappNumber: signup.whatsapp,
+            customerWhatsappNumber: signup.phoneNo,
             customerEmail: signup.email,
-            businessAccountId: signup.businessAccountId,
+            businessAccountId: businessId,
             deliveryCharges: 0,
-            deliveryType: mode,
-            items: [item],
+            deliveryType: "delivery",
+            items: [normalizedItem],
           };
 
           try {
-            const { orderId } = await addItemToCart(orderPayload);
-            localStorage.setItem("cartOrderId", orderId);
+            const order = await addItemToCart(orderPayload);
+            const txn = order.data.orderTransaction;
+            console.log("Order ID 1223", txn.id);
+            localStorage.setItem("cartOrderId", txn.id);
             setShowAlert(true);
+            toggleChangeCart();
+            // setItemLoading((prev) => ({ ...prev, [item.id]: false }));
+            // setItemAdded((prev) => ({ ...prev, [item.id]: true }));
+            // addItemLocal(item);
             // window.dispatchEvent(new Event("cartUpdated"));
           } catch (err) {
             console.error("addItemToCart failed:", err);
@@ -133,11 +175,17 @@ export const ItemCard = ({
           try {
             await updateCart(payload);
             setShowAlert(true);
+            toggleChangeCart();
+            // setItemAdded((prev) => ({ ...prev, [item.id]: true }));
+            // addItemLocal(item);
             // window.dispatchEvent(new Event("cartUpdated"));
           } catch (err) {
             console.error("updateCart failed:", err);
           }
         }
+        // setTimeout(() => {
+        //   setItemLoading((prev) => ({ ...prev, [item.id]: false }));
+        // }, 1000);
 
         // const payload = {};
 
@@ -224,7 +272,7 @@ export const ItemCard = ({
               group-hover:text-[#EA7C69] transition-colors duration-300
             "
             >
-              ${item.itemRegPrice}
+              ${item.regPrice}
             </div>
 
             {/* Add to cart button with improved responsive design */}

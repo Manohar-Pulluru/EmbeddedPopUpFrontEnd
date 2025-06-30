@@ -8,6 +8,7 @@ import {
   placeOrder,
   updateCartItemQuantity,
   deleteCartItem,
+  confirmOrder,
 } from "../api";
 import { jwtDecode } from "jwt-decode";
 
@@ -40,7 +41,9 @@ export const useAppStates = () => {
   //   "91182be9-9446-4e29-9ade-b0312b238668"
   // );
   // const [businessId, setBusinessId] = useState("5d118426-7ff9-40d8-a2f1-476d859da48e");
-  // const [businessId, setBusinessId] = useState("91182be9-9446-4e29-9ade-b0312b238668");
+  // const [businessId, setBusinessId] = useState(
+  //   "91182be9-9446-4e29-9ade-b0312b238668"
+  // );
   // const [businessId, setBusinessId] = useState(
   //   "5d118426-7ff9-40d8-a2f1-476d859da48e"
   // );
@@ -66,6 +69,7 @@ export const useAppStates = () => {
   const [mode, setMode] = useState("Pick Up");
 
   const toggleChangeCart = () => {
+    console.log("cart changed");
     setChangeCart(!changeCart);
   };
 
@@ -154,6 +158,7 @@ export const useAppStates = () => {
       const data = result.data;
       setTemplateData(data);
       setSections(data.sections);
+      // console.log("Section data", data.id);
     } catch (err) {
       console.error("Failed to fetch template data:", err);
       setPopupMessage("Failed to load template data. Please try again.");
@@ -161,6 +166,68 @@ export const useAppStates = () => {
     } finally {
       setTemplateLoading(false);
     }
+  };
+
+  const addItemLocal = (item) => {
+    console.log("Added to local");
+    let cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
+    const existingItemIndex = cartItems.findIndex(
+      (cartItem) => cartItem.id === item.id || cartItem.itemId === item.id
+    );
+
+    if (existingItemIndex !== -1) {
+      setPopupMessage(`Item "${item.itemName}" already in cart!`);
+      setShowPopup(true);
+    } else {
+      const newItem = {
+        id: item.id,
+        itemId: item.id,
+        itemName: item.itemName,
+        itemRegPrice: item.itemRegPrice,
+        imageURL: item.imageURL,
+        quantity: 1,
+      };
+      cartItems.push(newItem);
+      toggleChangeCart();
+    }
+
+    cartItems = cartItems.map((cartItem) => ({
+      ...cartItem,
+      totalPrice:
+        (parseFloat(cartItem.itemRegPrice || 0) || 0) * cartItem.quantity,
+    }));
+
+    localStorage.setItem("cartItems", JSON.stringify(cartItems));
+  };
+
+  const removeItemLocal = (itemId) => {
+    console.log("Removed from local");
+    // 1. Fetch existing cart
+    let cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
+
+    // 2. Try to remove the matching item
+    const filteredItems = cartItems.filter(
+      (cartItem) => cartItem.id !== itemId && cartItem.itemId !== itemId
+    );
+
+    // 3. If nothing was removed, show a popup
+    if (filteredItems.length === cartItems.length) {
+      setPopupMessage(`Item not found in cart!`);
+      setShowPopup(true);
+      return;
+    }
+
+    // 4. Otherwise, update the cart and notify
+    toggleChangeCart();
+
+    // 5. Recalculate totals
+    const updatedItems = filteredItems.map((ci) => ({
+      ...ci,
+      totalPrice: (parseFloat(ci.itemRegPrice || 0) || 0) * (ci.quantity || 1),
+    }));
+
+    // 6. Persist back to localStorage
+    localStorage.setItem("cartItems", JSON.stringify(updatedItems));
   };
 
   const handleAddToCart = (item) => {
@@ -379,6 +446,7 @@ export const useAppStates = () => {
 
       // 2) Remove it from your local `items` state
       setItems((prev) => prev.filter((item) => item.id !== id));
+      // removeItemLocal(id);
 
       // (optional) also clear it out of orderData if you track that separately
     } catch (err) {
@@ -424,6 +492,107 @@ export const useAppStates = () => {
   //   localStorage.setItem("cartItems", JSON.stringify(itemsForStorage));
   // };
 
+  // const handleNext = async () => {
+  //   if (activeTab === "Cart") {
+  //     const token = localStorage.getItem("aftoAuthToken");
+  //     if (!token) {
+  //       setLoginPage(true);
+  //       return;
+  //     }
+  //     setActiveTab("Details");
+  //   } else if (activeTab === "Details" && isFormValid) {
+  //     // fetchDeliveryDetails();
+
+  //     // getTemplates(businessAccountId).then((response) => {
+  //     //   // console.log("Templates fetched successfully:", response);
+  //     //   // console.log(response.businessData.address)
+  //     //   // setRestrauntAddress(response.businessData.address);
+  //     //   setRestrauntAddress(
+  //     //     "2275 Britannia Rd W unit 15, Mississauga, ON L5M 2G6, Canada"
+  //     //   );
+  //     // });
+
+  //     // const response = await getTemplates(businessAccountId);
+  //     // const res = await calculateDeliveryCharge(
+  //     //   response.businessData.address,
+  //     //   address + " " + city + " " + state + " " + pincode
+  //     // );
+  //     const res = await calculateDeliveryCharge(
+  //       restrauntAddress,
+  //       address + " " + city + " " + state + " " + pincode
+  //     );
+  //     console.log("Restaurant Address:", restrauntAddress);
+  //     console.log("Customer Address:", address, city, pincode, state);
+
+  //     // const res = await calculateDeliveryCharge(restrauntAddress, address);
+  //     setDeliveryResult(res);
+  //     setDeliveryCharge(res.delivery_charge || 0);
+  //     // console.log("Delivery Result:", res);
+  //     setActiveTab("Delivery");
+  //   } else if (activeTab === "Delivery" && isFormValid) {
+  //     // Only proceed if form is valid
+  //     // Update customer details
+
+  //     // change the place order here
+  //     setCustomerName(name);
+  //     setCustomerWhatsappNumber(phone);
+
+  //     // Construct orderData with user-provided values only
+  //     const updatedOrderData = {
+  //       customerName: name,
+  //       customerWhatsappNumber: phone,
+  //       customerEmail: email,
+  //       businessAccountId: businessId,
+  //       deliveryCharges: deliveryCharge,
+  //       deliveryType: "delivery",
+  //       items: items.map((item, index) => ({
+  //         id: item.id,
+  //         sectionTitle: "Rice", // Adjust as needed
+  //         itemId: item.itemId,
+  //         itemName: item.itemName,
+  //         itemDescription: `${item.itemName}.`,
+  //         itemRegPrice: item.itemRegPrice.toString(),
+  //         salePrice: "0",
+  //         imageURL: item.imageURL,
+  //         serial_number: index + 1,
+  //         productTemplateSectionId: "20903f70-bc7a-48f0-89fc-07bbede56cf1",
+  //         isHSTApplied: false,
+  //         HSTPercentage: "13.00",
+  //         inventoryId: null,
+  //         inventoryName: null,
+  //         isSyncToInventory: false,
+  //         createdAt: "2025-04-18T14:23:31.222Z",
+  //         updatedAt: "2025-04-18T14:23:31.222Z",
+  //         quantity: item.quantity,
+  //       })),
+  //     };
+
+  //     setOrderData(updatedOrderData);
+  //     console.log("Updated orderData:", updatedOrderData);
+
+  //     // Place the order
+  //     setIsLoading(true);
+  //     try {
+  //       const response = await placeOrder(updatedOrderData);
+  //       let orderHistory = JSON.parse(
+  //         localStorage.getItem("orderHistory") || "[]"
+  //       );
+  //       orderHistory.push(response.data);
+  //       localStorage.setItem("orderHistory", JSON.stringify(orderHistory));
+  //       // localStorage.setItem("cartItems", JSON.stringify([]));
+  //       // setItems([]); // Clear items in state
+  //       setShowPayment(true);
+  //       setPaymentDetails(response.data.paymentIntent);
+  //       console.log(showPayment, "showPayment", response.data.paymentIntent);
+  //       toggleCart();
+  //     } catch (error) {
+  //       console.error("Failed to place order:", error);
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   }
+  // };
+
   const handleNext = async () => {
     if (activeTab === "Cart") {
       const token = localStorage.getItem("aftoAuthToken");
@@ -433,90 +602,51 @@ export const useAppStates = () => {
       }
       setActiveTab("Details");
     } else if (activeTab === "Details" && isFormValid) {
-      // fetchDeliveryDetails();
-
-      // getTemplates(businessAccountId).then((response) => {
-      //   // console.log("Templates fetched successfully:", response);
-      //   // console.log(response.businessData.address)
-      //   // setRestrauntAddress(response.businessData.address);
-      //   setRestrauntAddress(
-      //     "2275 Britannia Rd W unit 15, Mississauga, ON L5M 2G6, Canada"
-      //   );
-      // });
-
-      // const response = await getTemplates(businessAccountId);
-      // const res = await calculateDeliveryCharge(
-      //   response.businessData.address,
-      //   address + " " + city + " " + state + " " + pincode
-      // );
       const res = await calculateDeliveryCharge(
         restrauntAddress,
-        address + " " + city + " " + state + " " + pincode
+        `${address} ${city} ${state} ${pincode}`
       );
-      console.log("Restaurant Address:", restrauntAddress);
-      console.log("Customer Address:", address, city, pincode, state);
-
-      // const res = await calculateDeliveryCharge(restrauntAddress, address);
       setDeliveryResult(res);
       setDeliveryCharge(res.delivery_charge || 0);
-      // console.log("Delivery Result:", res);
       setActiveTab("Delivery");
     } else if (activeTab === "Delivery" && isFormValid) {
-      // Only proceed if form is valid
-      // Update customer details
-      setCustomerName(name);
-      setCustomerWhatsappNumber(phone);
+      // 1) Get saved user data and orderId
+      const signup = JSON.parse(localStorage.getItem("aftoSignupForm") || "{}");
+      const orderId = localStorage.getItem("cartOrderId");
+      if (!orderId) {
+        console.error("No orderId in storage!");
+        return;
+      }
 
-      // Construct orderData with user-provided values only
-      const updatedOrderData = {
-        customerName: name,
-        customerWhatsappNumber: phone,
-        customerEmail: email,
+      // 2) Build payload from storage + state
+      const payload = {
+        customerName: signup.name || signup.customerName || "",
+        customerWhatsappNumber: signup.phoneNo || "",
+        customerEmail: signup.email || signup.customerEmail || "",
         businessAccountId: businessId,
         deliveryCharges: deliveryCharge,
         deliveryType: "delivery",
-        items: items.map((item, index) => ({
-          id: item.id,
-          sectionTitle: "Rice", // Adjust as needed
-          itemId: item.itemId,
-          itemName: item.itemName,
-          itemDescription: `${item.itemName}.`,
-          itemRegPrice: item.itemRegPrice.toString(),
-          salePrice: "0",
-          imageURL: item.imageURL,
-          serial_number: index + 1,
-          productTemplateSectionId: "20903f70-bc7a-48f0-89fc-07bbede56cf1",
-          isHSTApplied: false,
-          HSTPercentage: "13.00",
-          inventoryId: null,
-          inventoryName: null,
-          isSyncToInventory: false,
-          createdAt: "2025-04-18T14:23:31.222Z",
-          updatedAt: "2025-04-18T14:23:31.222Z",
-          quantity: item.quantity,
-        })),
       };
 
-      setOrderData(updatedOrderData);
-      console.log("Updated orderData:", updatedOrderData);
-
-      // Place the order
+      // 3) Call confirmOrder instead of placeOrder
       setIsLoading(true);
       try {
-        const response = await placeOrder(updatedOrderData);
-        let orderHistory = JSON.parse(
-          localStorage.getItem("orderHistory") || "[]"
-        );
-        orderHistory.push(response.data);
-        localStorage.setItem("orderHistory", JSON.stringify(orderHistory));
-        // localStorage.setItem("cartItems", JSON.stringify([]));
-        // setItems([]); // Clear items in state
+        const data = await confirmOrder(orderId, payload);
+
+        // 4) mirror your existing post‐confirm behavior
+        let history = JSON.parse(localStorage.getItem("orderHistory") || "[]");
+        history.push(data);
+        localStorage.setItem("orderHistory", JSON.stringify(history));
+
         setShowPayment(true);
-        setPaymentDetails(response.data.paymentIntent);
-        console.log(showPayment, "showPayment", response.data.paymentIntent);
+        setPaymentDetails(data.paymentIntent);
+
+        // optional: clear your cart
+        // localStorage.removeItem("cartItems");
+        // setItems([]);
         toggleCart();
-      } catch (error) {
-        console.error("Failed to place order:", error);
+      } catch (err) {
+        console.error("Failed to confirm order:", err);
       } finally {
         setIsLoading(false);
       }
@@ -646,5 +776,8 @@ export const useAppStates = () => {
     setFlyerTemplateId,
     showAlert,
     setShowAlert,
+    addItemLocal,
+    removeItemLocal
+    // populateItems
   };
 };

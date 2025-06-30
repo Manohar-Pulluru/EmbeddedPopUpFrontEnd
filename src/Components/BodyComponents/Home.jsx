@@ -40,6 +40,7 @@ export const Home = () => {
     isMobile,
     showAlert,
     setShowAlert,
+    populateItems
   } = useContext(AppContext);
 
   // Fetch items from localStorage on mount or when changeCart changes
