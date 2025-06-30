@@ -90,7 +90,7 @@ export const HomeBody = () => {
       {
         id: "static-item-1",
         itemName: "Sample Search Product",
-        regPrice: 29.99,
+        itemRegPrice: 29.99,
         imageURL: "https://via.placeholder.com/150",
       },
     ],

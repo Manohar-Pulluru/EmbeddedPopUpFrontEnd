@@ -1,5 +1,5 @@
 // templateService.js
-import { getRequest, postRequest } from "./httpService";
+import { getRequest, postRequest, deleteRequest } from "./httpService";
 
 export const getTemplateData = async (templateId) => {
   const endpoint = `/embedded/getTemplateSectionsItems/${templateId}`;
@@ -199,6 +199,55 @@ export const getCartItems = async (orderId) => {
     return response.data;
   } catch (error) {
     console.error("Error while fetching cart items", error);
+    throw error;
+  }
+};
+
+// DELETE an item from the cart
+export const deleteCartItem = async (itemId) => {
+  const endpoint = `/embedded/order/item/${itemId}`;
+  try {
+    const response = await deleteRequest(endpoint);
+    return response.data;
+  } catch (error) {
+    console.error("Error while deleting cart item", error);
+    throw error;
+  }
+};
+
+// UPDATE just the quantity of a cart item
+export const updateCartItemQuantity = async (itemId, quantity) => {
+  const endpoint = `/embedded/order/item/${itemId}/${quantity}`;
+  try {
+    // the curl sends an empty body, so we just invoke postRequest without payload
+    const response = await getRequest(endpoint, {});
+    return response.data;
+  } catch (error) {
+    console.error("Error while updating cart item quantity", error);
+    throw error;
+  }
+};
+
+// CONFIRM the entire order
+export const confirmOrder = async (orderId, payload) => {
+  const endpoint = `/embedded/order/confirm/${orderId}`;
+  try {
+    const response = await postRequest(endpoint, payload);
+    return response.data;
+  } catch (error) {
+    console.error("Error while confirming order", error);
+    throw error;
+  }
+};
+
+// GET a user’s order history
+export const getUserOrderHistory = async (customerId, businessAccountId) => {
+  const endpoint = `/embedded/orders/${customerId}/${businessAccountId}`;
+  try {
+    const response = await getRequest(endpoint);
+    return response.data;
+  } catch (error) {
+    console.error("Error while fetching user order history", error);
     throw error;
   }
 };

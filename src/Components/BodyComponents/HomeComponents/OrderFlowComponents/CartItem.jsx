@@ -8,6 +8,9 @@ export const CartItem = ({
   handleNoteChange,
   handleDelete,
 }) => {
+  const unitPrice = parseFloat(item.itemRegPrice) || 0;
+  const qty = parseInt(item.quantity, 10) || 0;
+  const total = unitPrice * qty;
   return (
     <div className="w-full flex flex-col gap-3 py-3 px-2 sm:px-0">
       <div className="w-full flex items-center gap-2 sm:gap-4">
@@ -28,7 +31,7 @@ export const CartItem = ({
                 : "Unnamed Item"}
             </div>
             <div className="text-[#ffffff6b] text-xs sm:text-sm md:text-base">
-              $ {(parseFloat(item.regPrice) || 0).toFixed(2)}
+              $ {unitPrice.toFixed(2)}
             </div>
           </div>
         </div>
@@ -53,7 +56,7 @@ export const CartItem = ({
           </button>
         </div>
         <div className="text-center text-sm sm:text-base md:text-lg flex items-center justify-center font-semibold min-w-[60px] sm:min-w-[80px]">
-          $ {item.totalPrice.toFixed(2)}
+          $ {total.toFixed(2)}
         </div>
       </div>
       <div className="w-full flex items-center gap-2 sm:gap-4">

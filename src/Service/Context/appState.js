@@ -5,7 +5,9 @@ import {
   getTemplates,
   searchProductsElastic,
   calculateDeliveryCharge,
-  placeOrder
+  placeOrder,
+  updateCartItemQuantity,
+  deleteCartItem,
 } from "../api";
 import { jwtDecode } from "jwt-decode";
 
@@ -13,7 +15,7 @@ export const useAppStates = () => {
   const [user, setUser] = useState(null);
   const [theme, setTheme] = useState("light");
   const [showFlyerTemplate, setShowFlyerTemplate] = useState(false);
-  const [flyerTemplateId, setFlyerTemplateId] = useState(null)
+  const [flyerTemplateId, setFlyerTemplateId] = useState(null);
 
   const login = (userData) => setUser(userData);
   const logout = () => setUser(null);
@@ -29,12 +31,14 @@ export const useAppStates = () => {
   // App.jsx
   // const businessId = "5d118426-7ff9-40d8-a2f1-476d859da48e";
   // const businessAccountId = "5d118426-7ff9-40d8-a2f1-476d859da48e";
-  
+
   // const businessId = "91182be9-9446-4e29-9ade-b0312b238668";
   // const businessAccountId = "91182be9-9446-4e29-9ade-b0312b238668";
   const [businessId, setBusinessId] = useState(null);
   // const [businessId, setBusinessId] = useState("ddb91055-b5de-4d6f-a55a-3d8584c2c630");
-  // const [businessId, setBusinessId] = useState("91182be9-9446-4e29-9ade-b0312b238668");
+  // const [businessId, setBusinessId] = useState(
+  //   "91182be9-9446-4e29-9ade-b0312b238668"
+  // );
   // const [businessId, setBusinessId] = useState("5d118426-7ff9-40d8-a2f1-476d859da48e");
 
   // Home.jsx
@@ -55,7 +59,7 @@ export const useAppStates = () => {
   const [paymentDetails, setPaymentDetails] = useState(null);
   const [subtotal, setSubtotal] = useState(0);
   const [deliveryCharge, setDeliveryCharge] = useState(0);
-  const [mode, setMode] = useState("delivery");
+  const [mode, setMode] = useState("Pick Up");
 
   const toggleChangeCart = () => {
     setChangeCart(!changeCart);
@@ -177,7 +181,7 @@ export const useAppStates = () => {
           id: item.id,
           itemId: item.id,
           itemName: item.itemName,
-          regPrice: item.regPrice,
+          itemRegPrice: item.itemRegPrice,
           imageURL: item.imageURL,
           quantity: 1,
         };
@@ -188,7 +192,7 @@ export const useAppStates = () => {
       cartItems = cartItems.map((cartItem) => ({
         ...cartItem,
         totalPrice:
-          (parseFloat(cartItem.regPrice || 0) || 0) * cartItem.quantity,
+          (parseFloat(cartItem.itemRegPrice || 0) || 0) * cartItem.quantity,
       }));
 
       localStorage.setItem("cartItems", JSON.stringify(cartItems));
@@ -235,7 +239,7 @@ export const useAppStates = () => {
     );
   };
 
-    const fetchAddress = async () => {
+  const fetchAddress = async () => {
     const token = localStorage.getItem("aftoAuthToken");
     if (!token) {
       console.log("No token found in localStorage");
@@ -279,33 +283,103 @@ export const useAppStates = () => {
     }
   };
 
-  const handleQuantityChange = (id, value) => {
-    const updatedItems = items.map((item) => {
-      if (item.id === id) {
-        const newQuantity = Math.max(1, Number(value) || 1);
-        const newTotalPrice = parseFloat(item.regPrice) * newQuantity;
-        return {
-          ...item,
-          quantity: newQuantity,
-          totalPrice: newTotalPrice,
-        };
-      }
-      return item;
-    });
-    setItems(updatedItems);
-    setSubtotal(calculateSubtotal(updatedItems, deliveryCharge));
+  // const handleQuantityChange = async (id, value) => {
+  //   const updatedItems = items.map(async (item) => {
+  //     if (item.id === id) {
+  //       const newQuantity = Math.max(1, Number(value) || 1);
+  //       const{status} = await updateCartItemQuantity(id, newQuantity);
+  //       if(!status) return;
+  //       const newTotalPrice = parseFloat(item.itemRegPrice) * newQuantity;
+  //       return {
+  //         ...item,
+  //         quantity: newQuantity,
+  //         totalPrice: newTotalPrice,
+  //       };
+  //     }
+  //     return item;
+  //   });
+  //   setItems(updatedItems);
+  //   setSubtotal(calculateSubtotal(updatedItems, deliveryCharge));
 
-    const itemsForStorage = updatedItems.map((item) => ({
-      id: item.id,
-      itemId: item.itemId,
-      itemName: item.itemName,
-      regPrice: item.regPrice.toString(),
-      imageURL: item.imageURL,
-      quantity: item.quantity,
-      totalPrice: item.totalPrice,
-      note: item.note,
-    }));
-    localStorage.setItem("cartItems", JSON.stringify(itemsForStorage));
+  //   const itemsForStorage = updatedItems.map((item) => ({
+  //     id: item.id,
+  //     itemId: item.itemId,
+  //     itemName: item.itemName,
+  //     itemRegPrice: item.itemRegPrice.toString(),
+  //     imageURL: item.imageURL,
+  //     quantity: item.quantity,
+  //     totalPrice: item.totalPrice,
+  //     note: item.note,
+  //   }));
+  //   localStorage.setItem("cartItems", JSON.stringify(itemsForStorage));
+  // };
+
+  //   const handleQuantityChange = async (id, rawValue) => {
+  //   // 1) compute the desired new quantity
+  //   const newQuantity = Math.max(1, Number(rawValue) || 1);
+
+  //   // 2) hit the API to update it server-side
+  //   try {
+  //     const { status } = await updateCartItemQuantity(id, newQuantity);
+  //     if (!status) {
+  //       console.error("Server refused quantity update");
+  //       return;
+  //     }
+  //   } catch (err) {
+  //     console.error("Failed to update quantity:", err);
+  //     return;
+  //   }
+
+  //   // 3) build a fresh copy of your items array, with the one item updated
+  //   const updated = items.map(item => {
+  //     if (item.id !== id) return item;
+  //     const unit = parseFloat(item.itemRegPrice) || 0;
+  //     return {
+  //       ...item,
+  //       quantity: newQuantity,
+  //       totalPrice: unit * newQuantity,
+  //     };
+  //   });
+
+  //   // 4) push it into context
+  //   setItems(updated);
+
+  //   // 5) persist to localStorage if you need
+  //   localStorage.setItem(
+  //     "cartItems",
+  //     JSON.stringify(
+  //       updated.map(i => ({
+  //         ...i,
+  //         itemRegPrice: i.itemRegPrice.toString(),
+  //         // keep whatever you need in storage
+  //       }))
+  //     )
+  //   );
+  // };
+
+  const handleQuantityChange = async (id, qty) => {
+    await updateCartItemQuantity(id, qty);
+    setItems((current) =>
+      current.map((item) =>
+        item.id !== id
+          ? item
+          : { ...item, quantity: qty, totalPrice: item.itemRegPrice * qty }
+      )
+    );
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      // 1) Tell the server to delete that line-item
+      await deleteCartItem(id);
+
+      // 2) Remove it from your local `items` state
+      setItems((prev) => prev.filter((item) => item.id !== id));
+
+      // (optional) also clear it out of orderData if you track that separately
+    } catch (err) {
+      console.error("Failed to delete item:", err);
+    }
   };
 
   const handleNoteChange = (id, note) => {
@@ -318,7 +392,7 @@ export const useAppStates = () => {
       id: item.id,
       itemId: item.itemId,
       itemName: item.itemName,
-      regPrice: item.regPrice.toString(),
+      itemRegPrice: item.itemRegPrice.toString(),
       imageURL: item.imageURL,
       quantity: item.quantity,
       totalPrice: item.totalPrice,
@@ -327,24 +401,24 @@ export const useAppStates = () => {
     localStorage.setItem("cartItems", JSON.stringify(itemsForStorage));
   };
 
-  const handleDelete = (id) => {
-    toggleCart();
-    const updatedItems = items.filter((item) => item.id !== id);
-    setItems(updatedItems);
-    setSubtotal(calculateSubtotal(updatedItems, deliveryCharge));
+  // const handleDelete = (id) => {
+  //   toggleCart();
+  //   const updatedItems = items.filter((item) => item.id !== id);
+  //   setItems(updatedItems);
+  //   setSubtotal(calculateSubtotal(updatedItems, deliveryCharge));
 
-    const itemsForStorage = updatedItems.map((item) => ({
-      id: item.id,
-      itemId: item.itemId,
-      itemName: item.itemName,
-      regPrice: item.regPrice.toString(),
-      imageURL: item.imageURL,
-      quantity: item.quantity,
-      totalPrice: item.totalPrice,
-      note: item.note,
-    }));
-    localStorage.setItem("cartItems", JSON.stringify(itemsForStorage));
-  };
+  //   const itemsForStorage = updatedItems.map((item) => ({
+  //     id: item.id,
+  //     itemId: item.itemId,
+  //     itemName: item.itemName,
+  //     itemRegPrice: item.itemRegPrice.toString(),
+  //     imageURL: item.imageURL,
+  //     quantity: item.quantity,
+  //     totalPrice: item.totalPrice,
+  //     note: item.note,
+  //   }));
+  //   localStorage.setItem("cartItems", JSON.stringify(itemsForStorage));
+  // };
 
   const handleNext = async () => {
     if (activeTab === "Cart") {
@@ -398,7 +472,7 @@ export const useAppStates = () => {
           itemId: item.itemId,
           itemName: item.itemName,
           itemDescription: `${item.itemName}.`,
-          regPrice: item.regPrice.toString(),
+          itemRegPrice: item.itemRegPrice.toString(),
           salePrice: "0",
           imageURL: item.imageURL,
           serial_number: index + 1,
@@ -562,6 +636,6 @@ export const useAppStates = () => {
     flyerTemplateId,
     setFlyerTemplateId,
     showAlert,
-    setShowAlert
+    setShowAlert,
   };
 };

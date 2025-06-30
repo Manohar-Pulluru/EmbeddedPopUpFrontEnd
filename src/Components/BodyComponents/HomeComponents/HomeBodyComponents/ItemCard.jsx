@@ -15,7 +15,7 @@ export const ItemCard = ({
 }) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isInCart, setIsInCart] = useState(false);
-  const { isCartChanged, setShowAlert, setLoginPage } = useAppContext();
+  const { isCartChanged, setShowAlert, setLoginPage, mode } = useAppContext();
 
   useEffect(() => {
     console.log("Cart Items Changed Reset by Checking the Add to Button");
@@ -63,7 +63,7 @@ export const ItemCard = ({
     setIsPopupOpen(true);
   };
 
-  const handleAddToCartClick = (e) => {
+  const handleAddToCartClick = async (e) => {
     e.stopPropagation();
     if (!isInCart && !itemLoading[item.id]) {
       const aftoAuthToken = localStorage.getItem("aftoAuthToken");
@@ -72,22 +72,62 @@ export const ItemCard = ({
       } else {
         // handleAddToCart(item)
 
-        const isNewCart = localStorage.getItem("cartOrderId");
+        // const isNewCart = localStorage.getItem("cartOrderId");
 
-        const userDataInLocal = localStorage.getItem("aftoSignupForm");
-        console.log("userDataInLocal", userDataInLocal);
+        // const userDataInLocal = localStorage.getItem("aftoSignupForm");
+        // console.log("userDataInLocal", userDataInLocal);
 
-        if (!isNewCart) {
-          localStorage.setItem("cartOrderId", "1308");
+        // if (!isNewCart) {
+        //   localStorage.setItem("cartOrderId", "1308");
+        // } else {
+        //   const cartOrderId = localStorage.getItem("cartOrderId");
+        //   const payload = {
+        //     orderId: cartOrderId,
+        //     items: [item],
+        //   };
+        //   const addItemToCartResponse = updateCart(payload);
+
+        //   console.log(addItemToCartResponse, "addItemToCartResponse");
+        // }
+
+        const cartOrderId = localStorage.getItem("cartOrderId");
+
+        if (!cartOrderId) {
+          const signup = JSON.parse(
+            localStorage.getItem("aftoSignupForm") || "{}"
+          );
+
+          const orderPayload = {
+            customerName: signup.name,
+            customerWhatsappNumber: signup.whatsapp,
+            customerEmail: signup.email,
+            businessAccountId: signup.businessAccountId,
+            deliveryCharges: 0,
+            deliveryType: mode,
+            items: [item],
+          };
+
+          try {
+            const { orderId } = await addItemToCart(orderPayload);
+            localStorage.setItem("cartOrderId", orderId);
+            setShowAlert(true);
+            // window.dispatchEvent(new Event("cartUpdated"));
+          } catch (err) {
+            console.error("addItemToCart failed:", err);
+          }
         } else {
-          const cartOrderId = localStorage.getItem("cartOrderId");
+          // --- add to an existing incomplete order ---
           const payload = {
             orderId: cartOrderId,
             items: [item],
           };
-          const addItemToCartResponse = updateCart(payload);
-
-          console.log(addItemToCartResponse, "addItemToCartResponse");
+          try {
+            await updateCart(payload);
+            setShowAlert(true);
+            // window.dispatchEvent(new Event("cartUpdated"));
+          } catch (err) {
+            console.error("updateCart failed:", err);
+          }
         }
 
         // const payload = {};
@@ -111,35 +151,6 @@ export const ItemCard = ({
         className="group relative cursor-pointer transform transition-all duration-300 hover:scale-[1.02] hover:shadow-xl"
         onClick={handleCardClick}
       >
-        {/* Main card container with responsive sizing */}
-        {/* <div className={`
-          ${showPayment 
-            ? "h-[180px] xs:h-[200px] sm:h-[220px] md:h-[240px]" 
-            : "h-[200px] xs:h-[220px] sm:h-[250px] md:h-[280px]"
-          } 
-          mt-8 xs:mt-10 sm:mt-12 md:mt-16 lg:mt-20 
-          bg-[#1F1D2B] hover:bg-[#252332] 
-          relative rounded-2xl sm:rounded-3xl 
-          flex flex-col justify-end 
-          p-3 xs:p-4 sm:p-5 md:p-6 
-          w-full
-          shadow-lg hover:shadow-2xl
-          border border-gray-800 hover:border-gray-700
-          transition-all duration-300
-        `}> */}
-        {/* <div
-          className={`h-[200px] xs:h-[220px] sm:h-[250px] md:h-[280px]
-          mt-8 xs:mt-10 sm:mt-12 md:mt-16 lg:mt-20 
-          bg-[#1F1D2B] hover:bg-[#252332] 
-          relative rounded-2xl sm:rounded-3xl 
-          flex flex-col justify-end 
-          p-3 xs:p-4 sm:p-5 md:p-6 
-          w-full
-          shadow-lg hover:shadow-2xl
-          border border-gray-800 hover:border-gray-700
-          transition-all duration-300
-        `}
-        > */}
         <div
           className={`h-[150px] xs:h-[220px] sm:h-[250px] md:h-[280px] w-full aspect-[3/4]
           mt-8 xs:mt-10 sm:mt-12 md:mt-16 lg:mt-20 
@@ -204,7 +215,7 @@ export const ItemCard = ({
               group-hover:text-[#EA7C69] transition-colors duration-300
             "
             >
-              ${item.regPrice}
+              ${item.itemRegPrice}
             </div>
 
             {/* Add to cart button with improved responsive design */}
