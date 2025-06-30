@@ -17,6 +17,7 @@ export const ItemCard = ({
   const [isInCart, setIsInCart] = useState(false);
   const { isCartChanged, setShowAlert, setLoginPage, mode } = useAppContext();
 
+
   useEffect(() => {
     console.log("Cart Items Changed Reset by Checking the Add to Button");
   }, [isCartChanged]);
@@ -65,6 +66,14 @@ export const ItemCard = ({
 
   const handleAddToCartClick = async (e) => {
     e.stopPropagation();
+
+    const token = localStorage.getItem("aftoAuthToken");
+    if (!token) {
+      setLoginPage(true);
+      return;
+    }
+    setShowAlert(true);
+
     if (!isInCart && !itemLoading[item.id]) {
       const aftoAuthToken = localStorage.getItem("aftoAuthToken");
       if (!aftoAuthToken) {

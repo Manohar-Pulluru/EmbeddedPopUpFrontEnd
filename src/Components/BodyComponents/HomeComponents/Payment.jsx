@@ -13,7 +13,7 @@ import { GooglePayForm } from "./PaymentComponents/GooglePayForm";
 import { PaymentFooter } from "./PaymentComponents/PaymentFooter";
 import { useAppContext } from "../../../Service/Context/AppContext";
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+// const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
 // Payment form logic
 const PaymentForm = ({
@@ -229,12 +229,12 @@ const Payment = ({
   );
 
   // Initialize stripePromise inside Payment
-  // const stripePromise = loadStripe(
-  //   import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY,
-  //   {
-  //     stripeAccount: paymentDetails.stripeAccountId, // Add stripeAccount here
-  //   }
-  // );
+  const stripePromise = loadStripe(
+    import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY,
+    {
+      stripeAccount: paymentDetails.stripeAccountId, // Add stripeAccount here
+    }
+  );
 
   const [paymentMethod, setPaymentMethod] = useState("Credit Card");
   const [email, setEmail] = useState("levi@example.com");

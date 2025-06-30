@@ -19,10 +19,10 @@ export const Delivery = () => {
     setMode,
   } = useContext(AppContext);
 
-  const [orderTiming, setOrderTiming] = useState("now"); // "now" or "later"
-  const [selectedTime, setSelectedTime] = useState("");
-  const [selectedTimeLabel, setSelectedTimeLabel] = useState(""); // Store the label separately
-  const [isTimeDropdownOpen, setIsTimeDropdownOpen] = useState(false);
+  // const [orderTiming, setOrderTiming] = useState("now"); // "now" or "later"
+  // const [selectedTime, setSelectedTime] = useState("");
+  // const [selectedTimeLabel, setSelectedTimeLabel] = useState(""); // Store the label separately
+  // const [isTimeDropdownOpen, setIsTimeDropdownOpen] = useState(false);
 
   // Generate time options for next 24 hours in 30-minute intervals
   // const timeOptions = useMemo(() => {
@@ -114,9 +114,8 @@ export const Delivery = () => {
       </div>
 
       {/* Compact Order Timing Section */}
-      <div className="mb-3 sm:mb-4">
+      {/* <div className="mb-3 sm:mb-4">
         <div className="bg-gray-800 rounded-lg border border-gray-700 p-3 shadow-lg">
-          {/* Compact Toggle */}
           <div className="flex items-center gap-2 mb-2">
             <Clock className="text-[#ea7c69]" size={14} />
             <span className="text-white text-sm font-medium">Schedule:</span>
@@ -149,8 +148,8 @@ export const Delivery = () => {
             </div>
           </div>
 
-          {/* Time Dropdown for Order Later */}
-          {/* {orderTiming === "later" && (
+          {orderTiming === "later" && (
+>>>>>>> 7aadd0459edd0bcdd5da74f119033457c70e5f03
             <div className="relative">
               <button
                 onClick={() => setIsTimeDropdownOpen(!isTimeDropdownOpen)}
@@ -194,8 +193,7 @@ export const Delivery = () => {
             </div>
           )} */}
 
-          {/* Compact Status Info */}
-          {orderTiming === "now" && (
+          {/* {orderTiming === "now" && (
             <div className="flex items-center gap-2 mt-2 text-green-400 text-xs">
               <div className="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
               <span>Order will be prepared immediately</span>
@@ -209,7 +207,7 @@ export const Delivery = () => {
             </div>
           )}
         </div>
-      </div>
+      </div> */} 
 
       {deliveryResult ? (
         <div className="space-y-3 sm:space-y-4">

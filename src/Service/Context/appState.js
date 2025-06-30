@@ -40,6 +40,10 @@ export const useAppStates = () => {
   //   "91182be9-9446-4e29-9ade-b0312b238668"
   // );
   // const [businessId, setBusinessId] = useState("5d118426-7ff9-40d8-a2f1-476d859da48e");
+  // const [businessId, setBusinessId] = useState("91182be9-9446-4e29-9ade-b0312b238668");
+  // const [businessId, setBusinessId] = useState(
+  //   "5d118426-7ff9-40d8-a2f1-476d859da48e"
+  // );
 
   // Home.jsx
   const [activeIndex, setActiveIndex] = useState(0);
@@ -422,6 +426,11 @@ export const useAppStates = () => {
 
   const handleNext = async () => {
     if (activeTab === "Cart") {
+      const token = localStorage.getItem("aftoAuthToken");
+      if (!token) {
+        setLoginPage(true);
+        return;
+      }
       setActiveTab("Details");
     } else if (activeTab === "Details" && isFormValid) {
       // fetchDeliveryDetails();
