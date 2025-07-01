@@ -63,7 +63,7 @@ export const ItemCard = ({
     setIsPopupOpen(true);
   };
 
-  const handleAddToCartClick = async (e) => {
+  const handleAddToCartClick = async (e, item) => {
     e.stopPropagation();
 
     const token = localStorage.getItem("aftoAuthToken");
@@ -161,7 +161,8 @@ export const ItemCard = ({
             toggleChangeCart();
             // setItemLoading((prev) => ({ ...prev, [item.id]: false }));
             // setItemAdded((prev) => ({ ...prev, [item.id]: true }));
-            // addItemLocal(item);
+            addItemLocal(item);
+            setIsInCart(true);
             // window.dispatchEvent(new Event("cartUpdated"));
           } catch (err) {
             console.error("addItemToCart failed:", err);
@@ -177,7 +178,8 @@ export const ItemCard = ({
             setShowAlert(true);
             toggleChangeCart();
             // setItemAdded((prev) => ({ ...prev, [item.id]: true }));
-            // addItemLocal(item);
+            addItemLocal(item);
+            setIsInCart(true);
             // window.dispatchEvent(new Event("cartUpdated"));
           } catch (err) {
             console.error("updateCart failed:", err);
@@ -277,7 +279,7 @@ export const ItemCard = ({
 
             {/* Add to cart button with improved responsive design */}
             <button
-              onClick={handleAddToCartClick}
+              onClick={e => handleAddToCartClick(e, item)}
               disabled={itemLoading[item.id]}
               className={`
                 px-2 xs:px-3 sm:px-4 md:px-5 
@@ -325,7 +327,7 @@ export const ItemCard = ({
         <ItemPopup
           item={item}
           onClose={() => setIsPopupOpen(false)}
-          handleAddToCart={handleAddToCart}
+          handleAddToCart={handleAddToCartClick}
           itemAdded={itemAdded}
           itemLoading={itemLoading}
         />

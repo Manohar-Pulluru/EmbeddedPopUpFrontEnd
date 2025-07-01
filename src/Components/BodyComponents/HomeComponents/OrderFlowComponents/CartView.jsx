@@ -26,7 +26,8 @@ export const CartView = () => {
       .then((response) => {
         const normalized = (response.orderItems || []).map((i) => ({
           id: i.id,
-          itemId: i.productRetailerId,
+          // itemId: i.productRetailerId,
+          itemId: i.itemId,
           itemName: i.itemName,
           // convert the string price to a number
           itemRegPrice: parseFloat(i.itemRegPrice) || 0,

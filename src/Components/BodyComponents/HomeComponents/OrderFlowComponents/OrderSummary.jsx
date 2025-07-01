@@ -2,24 +2,16 @@ import React, { useContext } from "react";
 import { AppContext } from "../../../../Service/Context/AppContext";
 
 export const OrderSummary = ({
-    discount,
-    subtotal,
-    deliveryCharge,
-    handleNext,
-    items,
-    isLoading,
-    isFormValid,
-  }) => {
-  // const {
-  //   discount,
-  //   subtotal,
-  //   deliveryCharge,
-  //   handleNext,
-  //   items,
-  //   isLoading,
-  //   isFormValid,
-  // } = useContext(AppContext);
-  const isDisabled = items?.length === 0 || isFormValid === false; // Disable if cart is empty or form is invalid 
+  discount,
+  subtotal,
+  deliveryCharge,
+  handleNext,
+  items,
+  isLoading,
+  isFormValid,
+}) => {
+  const { activeTab } = useContext(AppContext);
+  const isDisabled = items?.length === 0 || isFormValid === false; // Disable if cart is empty or form is invalid
 
   return (
     <div className="min-h-[160px] sm:h-[25%] w-full flex-col flex p-2 sm:p-4 lg:p-0 lg:pt-3">
@@ -30,11 +22,15 @@ export const OrderSummary = ({
         </div> */}
         <div className="w-full text-sm sm:text-lg lg:text-xl flex justify-between items-center">
           <div className="text-[#ffffffb4]">Order Value</div>
-          <div className="font-semibold">$ {(subtotal - (deliveryCharge ?? 0)).toFixed(2)}</div>
+          <div className="font-semibold">
+            $ {(subtotal - (deliveryCharge ?? 0)).toFixed(2)}
+          </div>
         </div>
         <div className="w-full text-sm sm:text-lg lg:text-xl flex justify-between items-center">
           <div className="text-[#ffffffb4]">Delivery Charge</div>
-          <div className="font-semibold">$ {(deliveryCharge ?? 0).toFixed(2)}</div>
+          <div className="font-semibold">
+            $ {(deliveryCharge ?? 0).toFixed(2)}
+          </div>
         </div>
         {/* <hr className="border-t border-white " /> */}
         <div className="w-full text-base sm:text-xl lg:text-2xl flex justify-between items-center pt-1 sm:pt-2 border-t border-[#393C49]">
@@ -58,7 +54,11 @@ export const OrderSummary = ({
               <span>Processing...</span>
             </div>
           ) : (
-            "Next"
+            activeTab == "Delivery" ? (
+              "Confirm Order"
+            ) : (
+              "Next"
+            )
           )}
         </button>
       </div>

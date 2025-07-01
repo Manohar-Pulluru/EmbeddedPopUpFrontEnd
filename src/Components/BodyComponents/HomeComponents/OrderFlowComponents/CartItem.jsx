@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useContext } from "react";
 import Icon from "../../../../assets/Icon";
 import icons from "../../../../assets/icons.json";
+import { AppContext } from "../../../../Service/Context/AppContext";
 
 export const CartItem = ({
   item,
@@ -8,6 +9,8 @@ export const CartItem = ({
   handleNoteChange,
   handleDelete,
 }) => {
+  const { removeItemLocal } = useContext(AppContext);
+
   const unitPrice = parseFloat(item.itemRegPrice) || 0;
   const qty = parseInt(item.quantity, 10) || 0;
   const total = unitPrice * qty;
@@ -68,7 +71,11 @@ export const CartItem = ({
         />
         <div
           className="aspect-square flex items-center justify-center rounded-xl sm:rounded-2xl h-10 sm:h-12 w-10 sm:w-12 border border-[#FF7CA3] cursor-pointer hover:bg-[#FF7CA3] hover:bg-opacity-10 transition-colors duration-200 flex-shrink-0"
-          onClick={() => handleDelete(item.id)}
+          onClick={() => {
+            removeItemLocal(item.itemId);
+            console.log("CA item", item);
+            handleDelete(item.id);
+          }}
         >
           <Icon name={icons.delete} />
         </div>

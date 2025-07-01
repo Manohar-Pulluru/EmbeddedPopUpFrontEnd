@@ -189,6 +189,7 @@ export const useAppStates = () => {
       };
       cartItems.push(newItem);
       toggleChangeCart();
+      toggleCart();
     }
 
     cartItems = cartItems.map((cartItem) => ({
@@ -196,6 +197,8 @@ export const useAppStates = () => {
       totalPrice:
         (parseFloat(cartItem.itemRegPrice || 0) || 0) * cartItem.quantity,
     }));
+
+    console.log("CARTTT add:", cartItems, item.id);
 
     localStorage.setItem("cartItems", JSON.stringify(cartItems));
   };
@@ -205,20 +208,25 @@ export const useAppStates = () => {
     // 1. Fetch existing cart
     let cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
 
+    console.log("CARTTTT before: ", cartItems, itemId);
+
     // 2. Try to remove the matching item
     const filteredItems = cartItems.filter(
       (cartItem) => cartItem.id !== itemId && cartItem.itemId !== itemId
     );
+    console.log("CARTTTT after: ", filteredItems);
 
     // 3. If nothing was removed, show a popup
     if (filteredItems.length === cartItems.length) {
-      setPopupMessage(`Item not found in cart!`);
-      setShowPopup(true);
+      // setPopupMessage(`Item not found in cart!`);
+      // setShowPopup(true);
+      console.log("Delete Failed");
       return;
     }
 
     // 4. Otherwise, update the cart and notify
     toggleChangeCart();
+    toggleCart();
 
     // 5. Recalculate totals
     const updatedItems = filteredItems.map((ci) => ({
@@ -443,10 +451,8 @@ export const useAppStates = () => {
     try {
       // 1) Tell the server to delete that line-item
       await deleteCartItem(id);
-
       // 2) Remove it from your local `items` state
       setItems((prev) => prev.filter((item) => item.id !== id));
-      // removeItemLocal(id);
 
       // (optional) also clear it out of orderData if you track that separately
     } catch (err) {
@@ -643,8 +649,9 @@ export const useAppStates = () => {
         setPaymentDetails(data.data.paymentIntent);
 
         // optional: clear your cart
-        // localStorage.removeItem("cartItems");
-        // setItems([]);
+        localStorage.removeItem("cartItems");
+        localStorage.removeItem("cartOrderId");
+        setItems([]);
         toggleCart();
       } catch (err) {
         console.error("Failed to confirm order:", err);
@@ -778,7 +785,7 @@ export const useAppStates = () => {
     showAlert,
     setShowAlert,
     addItemLocal,
-    removeItemLocal
+    removeItemLocal,
     // populateItems
   };
 };
