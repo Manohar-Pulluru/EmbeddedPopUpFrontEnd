@@ -39,7 +39,7 @@ export const LoginPage = () => {
   });
   const [signupErrors, setSignupErrors] = useState({});
 
-  // api's:
+  // API functions
   const sendOtp = async (email) => {
     try {
       const response = await fetch(
@@ -52,7 +52,6 @@ export const LoginPage = () => {
           body: JSON.stringify({ email }),
         }
       );
-
       const data = await response.json();
       return data;
     } catch (error) {
@@ -73,7 +72,6 @@ export const LoginPage = () => {
           body: JSON.stringify({ email, otp }),
         }
       );
-
       const data = await response.json();
       return data;
     } catch (error) {
@@ -99,7 +97,7 @@ export const LoginPage = () => {
               email: signupData.email,
               blocked: false,
               phone_number: "+91" + signupData.phoneNo,
-              avatar_url: "", // Optional: Add avatar if needed
+              avatar_url: "",
               additional_attributes: {
                 address: signupData.address,
                 city: signupData.city,
@@ -111,7 +109,6 @@ export const LoginPage = () => {
           }),
         }
       );
-
       const data = await response.json();
       return data;
     } catch (error) {
@@ -137,7 +134,6 @@ export const LoginPage = () => {
           }),
         }
       );
-
       const data = await response.json();
       return data;
     } catch (error) {
@@ -153,7 +149,6 @@ export const LoginPage = () => {
       const payload = {
         address: { regionCode: "CA", addressLines: [enteredAddress] },
       };
-
       const response = await fetch(
         `https://addressvalidation.googleapis.com/v1:validateAddress?key=${GOOGLE_API_KEY}`,
         {
@@ -162,15 +157,11 @@ export const LoginPage = () => {
           body: JSON.stringify(payload),
         }
       );
-
       const data = await response.json();
-
       const pa = data?.result?.address?.postalAddress;
       if (pa) {
-        // const formattedAddress = data?.result?.address?.formattedAddress || enteredAddress;
         setSignupData((prev) => ({
           ...prev,
-          // address: formattedAddress,
           city: pa.locality || "",
           pincode: pa.postalCode || "",
           province_or_territory: pa.administrativeArea || "",
@@ -181,10 +172,9 @@ export const LoginPage = () => {
           ...prev,
           address: suggestion,
         }));
-        validateCanadaAddress(suggestion); // recursive call
+        validateCanadaAddress(suggestion);
       }
       setValidationSuccess(true);
-      // setTimeout(() => setValidationSuccess(false), 3000);
     } catch (err) {
       console.error("Address validation failed", err);
     } finally {
@@ -203,7 +193,6 @@ export const LoginPage = () => {
     validateCanadaAddress(signupData.address);
   };
 
-  // Handle resend OTP timer
   useEffect(() => {
     if (resendTimer > 0) {
       const timer = setInterval(() => {
@@ -213,7 +202,6 @@ export const LoginPage = () => {
     }
   }, [resendTimer]);
 
-  // Validate signup form
   const validateSignupForm = () => {
     const errors = {};
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -222,19 +210,16 @@ export const LoginPage = () => {
     if (!signupData.name.trim()) {
       errors.name = "Name is required";
     }
-
     if (!signupData.email.trim()) {
       errors.email = "Email is required";
     } else if (!emailRegex.test(signupData.email)) {
       errors.email = "Please enter a valid email address";
     }
-
     if (!signupData.phoneNo.trim()) {
       errors.phoneNo = "Phone number is required";
     } else if (!phoneRegex.test(signupData.phoneNo.replace(/\D/g, ""))) {
       errors.phoneNo = "Please enter a valid 10-digit phone number";
     }
-
     if (!signupData.address.trim()) {
       errors.address = "Address is required";
     }
@@ -244,18 +229,14 @@ export const LoginPage = () => {
     if (!signupData.pincode.trim()) {
       errors.pincode = "Pincode is required";
     }
-
     return errors;
   };
 
-  // Handle signup form input changes
   const handleSignupInputChange = (field, value) => {
     setSignupData((prev) => ({
       ...prev,
       [field]: value,
     }));
-
-    // Clear specific field error when user starts typing
     if (signupErrors[field]) {
       setSignupErrors((prev) => ({
         ...prev,
@@ -264,14 +245,12 @@ export const LoginPage = () => {
     }
   };
 
-  // Handle signup form submission
   const handleSignupSubmit = async () => {
     const errors = validateSignupForm();
     if (Object.keys(errors).length > 0) {
       setSignupErrors(errors);
       return;
     }
-    // 👉 block if address never validated
     if (!validationSuccess) {
       setSignupErrors((prev) => ({
         ...prev,
@@ -279,8 +258,6 @@ export const LoginPage = () => {
       }));
       return;
     }
-
-    // Block if phone not validated
     if (!emailValidationSuccess) {
       setSignupErrors((prev) => ({
         ...prev,
@@ -288,11 +265,9 @@ export const LoginPage = () => {
       }));
       return;
     }
-
     setIsLoading(true);
     try {
       const response = await customerSignup(signupData, businessId);
-
       if (response?.status || response?.success) {
         console.log(
           "Account created successfully! Please login with your email."
@@ -309,8 +284,6 @@ export const LoginPage = () => {
         setSignupErrors({});
         setMode("login");
         setStep(1);
-
-        //
         const token = localStorage.getItem("aftoAuthToken");
         if (token) {
           getCustomerData(signupData.email, businessId).then((customerData) => {
@@ -336,7 +309,6 @@ export const LoginPage = () => {
             );
           });
         }
-
         setLoginPage(false);
       } else {
         setSignupErrors((prev) => ({
@@ -344,7 +316,6 @@ export const LoginPage = () => {
           phoneNo: "Phone no already used.",
           // email: "email already used.",
         }));
-        // console.log(response?.message || "Signup failed. Please try again.");
         console.log(
           "Email/Phone already exists. Please use unique Phone/email."
         );
@@ -357,25 +328,18 @@ export const LoginPage = () => {
     }
   };
 
-  // Handle email submission (for login)
   const handleEmailSubmit = async () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       setEmailError("Please enter a valid email address");
       return;
     }
-
     setIsLoading(true);
     try {
       const UserData = await getCustomerData(email, businessId);
-      // const response = await postWithoutAuth("/user/signIn", { email });
       console.log(UserData, "UserData", email, businessId);
       if (UserData.isNewUser) {
-        // If user does not exist, switch to signup mode
-        setMode("signup");
-        setStep(1);
-        setSignupData((prev) => ({ ...prev, email })); // Pre-fill email in signup form
-        setEmailError("");
+        setEmailError("User not found. Please sign up to create an account.");
         return;
       } else {
         const response = await sendOtp(email);
@@ -383,7 +347,7 @@ export const LoginPage = () => {
           setEmailError("");
           setMode("otp");
           setStep(2);
-          setResendTimer(60); // Start 60-second cooldown
+          setResendTimer(60);
         } else {
           setEmailError(response.message || "Failed to send OTP");
         }
@@ -395,54 +359,42 @@ export const LoginPage = () => {
     }
   };
 
-  // Handle OTP input change
   const handleOtpChange = (index, value) => {
-    if (!/^\d?$/.test(value)) return; // Allow only single digit or empty
-
+    if (!/^\d?$/.test(value)) return;
     const newOtp = otp.split("");
     newOtp[index] = value;
-    const updatedOtp = newOtp.join("").slice(0, 4); // Ensure max 4 digits
+    const updatedOtp = newOtp.join("").slice(0, 4);
     setOtp(updatedOtp);
-
-    // Auto-focus next input
     if (value && index < 3 && updatedOtp.length <= index + 1) {
       otpInputs.current[index + 1]?.focus();
     }
-    // Auto-focus previous input on delete
     if (!value && index > 0) {
       otpInputs.current[index - 1]?.focus();
     }
-
-    setOtpError(""); // Clear error on input
+    setOtpError("");
   };
 
-  // Handle OTP paste
   const handleOtpPaste = (e) => {
     const pasted = e.clipboardData.getText().replace(/\D/g, "").slice(0, 4);
     if (pasted.length === 4) {
       setOtp(pasted);
-      otpInputs.current[3]?.focus(); // Focus last input
+      otpInputs.current[3]?.focus();
       e.preventDefault();
     }
   };
 
-  // Handle OTP submission
   const handleOtpSubmit = async () => {
     if (otp.length !== 4 || !/^\d{4}$/.test(otp)) {
       setOtpError("Please enter a valid 4-digit OTP");
       return;
     }
-
     setIsLoading(true);
     try {
       const response = await verifyOtp(email, otp);
-
       console.log(response?.entity?.token, "response");
       if (response.status) {
         setOtpError("");
-
         localStorage.setItem("aftoAuthToken", response?.entity?.token);
-
         getCustomerData(email, businessId).then((customerData) => {
           console.log("Customer Data:", customerData.user.otherDetails);
           const name = customerData.user.otherDetails.name;
@@ -466,10 +418,8 @@ export const LoginPage = () => {
           );
         });
         const savedSignupForm = localStorage.getItem("aftoSignupForm");
-        console.log(
-          "UserData:",
-          savedSignupForm ? JSON.parse(savedSignupForm) : null
-        );
+        savedSignupForm &&
+          console.log("UserData:", JSON.parse(savedSignupForm));
         setLoginPage(false);
       } else {
         setOtpError(response.message || "Invalid OTP");
@@ -481,19 +431,16 @@ export const LoginPage = () => {
     }
   };
 
-  // Handle resend OTP
   const handleResendOtp = async () => {
     setOtp("");
     setOtpError("");
     await handleEmailSubmit();
   };
 
-  // Handle close button
   const handleClose = () => {
     setLoginPage(false);
   };
 
-  // Render validate button content based on state
   const renderValidateButtonContent = () => {
     if (isAddressValidating) {
       return (
@@ -503,7 +450,6 @@ export const LoginPage = () => {
         </div>
       );
     }
-
     if (validationSuccess) {
       return (
         <div className="flex items-center gap-1">
@@ -522,7 +468,6 @@ export const LoginPage = () => {
         </div>
       );
     }
-
     return <span className="text-xs font-medium">Validate</span>;
   };
 
@@ -535,7 +480,6 @@ export const LoginPage = () => {
     }
   }, [phoneResendTimer]);
 
-  /* Updated renderPhoneValidateButtonContent function */
   const renderPhoneValidateButtonContent = () => {
     if (isEmailValidating) {
       return (
@@ -560,7 +504,6 @@ export const LoginPage = () => {
         </>
       );
     }
-
     if (emailValidationSuccess) {
       return (
         <>
@@ -571,21 +514,19 @@ export const LoginPage = () => {
               clipRule="evenodd"
             />
           </svg>
-          {/* <span className="hidden sm:inline">Verified</span> */}
         </>
       );
     }
-
     return (
       <>
-      {/* <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+        {/* <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
         <path
         fillRule="evenodd"
         d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
         clipRule="evenodd"
         />
       </svg> */}
-      <span className="hidden sm:inline">OTP</span>
+        <span className="hidden sm:inline">OTP</span>
       </>
     );
   };
@@ -594,38 +535,33 @@ export const LoginPage = () => {
     setIsEmailValidating(true);
     setEmailValidationSuccess(false);
     setShowEmailOtp(false);
-    
-    // const response = await sendPhoneOtp(signupData.phoneNo);
     const response = await sendOtp(signupData.email);
-
     setIsEmailValidating(false);
     if (response.status) {
       setShowEmailOtp(true);
       setPhoneResendTimer(60);
     } else {
       setShowEmailOtp(false);
-      
+      setSignupErrors((prev) => ({
+        ...prev,
+        email: response.message || "Failed to send OTP",
+      }));
     }
   };
 
-  // 5. Handler for OTP input change
   const handleEmailOtpChange = (idx, value) => {
-    if (!/^[0-9]{0,1}$/.test(value)) return; // Only allow single digit
+    if (!/^[0-9]{0,1}$/.test(value)) return;
     const newOtp = [...emailOtp];
     newOtp[idx] = value;
     setEmailOtp(newOtp);
-
-    // Auto-focus next input
     if (value && idx < 3) {
       emailOtpInputs.current[idx + 1]?.focus();
     }
-    // Optional: move to previous input if deleting
     if (!value && idx > 0) {
       emailOtpInputs.current[idx - 1]?.focus();
     }
   };
 
-  // 6. Handler for OTP submit
   const handleEmailOtpSubmit = async () => {
     setEmailOtpError("");
     if (emailOtp.join("").length !== 4) {
@@ -634,7 +570,6 @@ export const LoginPage = () => {
     }
     try {
       const response = await verifyOtp(signupData.email, emailOtp.join(""));
-
       console.log(response?.entity?.token, "response");
       if (response.status) {
         setEmailValidationSuccess(true);
@@ -648,19 +583,13 @@ export const LoginPage = () => {
     } finally {
       setIsLoading(false);
     }
-   
   };
 
-  // 7. Handler for resend OTP
   const handleEmailResendOtp = async () => {
-    // Make your API call to send new OTP
-    // handleEmailOtpSubmit();
     const response = await sendOtp(signupData.email);
-    // Reset OTP fields
     setEmailOtp(["", "", "", ""]);
     setEmailOtpError("");
-    setEmailResendTimer(30); // 30 seconds timer (adjust as needed)
-    // Start countdown
+    setEmailResendTimer(30);
     const interval = setInterval(() => {
       setEmailResendTimer((prev) => {
         if (prev <= 1) {
@@ -696,7 +625,7 @@ export const LoginPage = () => {
 
         <div className="relative z-10 p-4 sm:p-6 flex flex-col items-center">
           {mode === "login" ? (
-            // login Form
+            // Login Form
             <div className="w-full">
               <div className="text-center mb-4 sm:mb-6">
                 <h2 className="text-2xl sm:text-3xl font-bold mb-1 bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
@@ -764,9 +693,25 @@ export const LoginPage = () => {
                   "Send OTP"
                 )}
               </button>
+              <div className="text-center mt-4">
+                <p className="text-slate-400 text-xs sm:text-sm">
+                  New user?{" "}
+                  <button
+                    onClick={() => {
+                      setMode("signup");
+                      setStep(1);
+                      setEmailError("");
+                      setSignupData((prev) => ({ ...prev, email }));
+                    }}
+                    className="text-red-400 hover:text-red-300 font-medium hover:underline transition-colors duration-200"
+                  >
+                    Signup
+                  </button>
+                </p>
+              </div>
             </div>
-          ) : step === 1 ? (
-            // Step 1: signup Input (Login)
+          ) : mode === "signup" && step === 1 ? (
+            // Signup Form
             <div className="w-full">
               <div className="text-center mb-4 sm:mb-6">
                 <h2 className="text-2xl sm:text-3xl font-bold mb-1 bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
@@ -778,7 +723,6 @@ export const LoginPage = () => {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-2 mb-4">
-                {/* Name */}
                 <div className="sm:col-span-2">
                   <label
                     htmlFor="signup-name"
@@ -804,7 +748,6 @@ export const LoginPage = () => {
                     </p>
                   )}
                 </div>
-                {/* Email */}
                 <div>
                   <label
                     htmlFor="signup-email"
@@ -833,9 +776,7 @@ export const LoginPage = () => {
                           ? "bg-green-600 hover:bg-green-700 text-white"
                           : "bg-yellow-600 hover:bg-yellow-700 text-white"
                       } ${
-                        !signupData.phoneNo
-                          ? "opacity-50 cursor-not-allowed"
-                          : ""
+                        !signupData.email ? "opacity-50 cursor-not-allowed" : ""
                       }`}
                       onClick={handleEmailValidateClick}
                     >
@@ -848,7 +789,6 @@ export const LoginPage = () => {
                     </p>
                   )}
                 </div>
-                {/* Phone + OTP (keep both inside grid col) */}
                 <div>
                   <label
                     htmlFor="signup-phone"
@@ -876,8 +816,6 @@ export const LoginPage = () => {
                     </p>
                   )}
                 </div>
-
-                {/* Email OTP */}
                 {showEmailOtp && (
                   <div className="sm:col-span-2 mt-2 p-3 bg-slate-800/50 rounded-lg border border-slate-600">
                     <div className="flex items-center gap-2 mb-2">
@@ -888,7 +826,6 @@ export const LoginPage = () => {
                       >
                         <path d="M2.25 6.75A2.25 2.25 0 0 1 4.5 4.5h15a2.25 2.25 0 0 1 2.25 2.25v10.5A2.25 2.25 0 0 1 19.5 19.5h-15A2.25 2.25 0 0 1 2.25 17.25V6.75zm1.5 0v.637l8.25 5.513 8.25-5.513V6.75a.75.75 0 0 0-.75-.75h-15a.75.75 0 0 0-.75.75zm16.5 1.763-7.827 5.237a1.5 1.5 0 0 1-1.646 0L3.75 8.513V17.25c0 .414.336.75.75.75h15a.75.75 0 0 0 .75-.75V8.513z" />
                       </svg>
-
                       <span className="text-xs font-medium text-slate-300">
                         Email Verification
                       </span>
@@ -919,7 +856,6 @@ export const LoginPage = () => {
                       </p>
                     )}
                     <div className="flex gap-2">
-                      
                       {emailResendTimer > 0 ? (
                         <span className="flex-1 py-1.5 px-3 text-xs text-slate-400 text-center">
                           Resend in {emailResendTimer}s
@@ -946,8 +882,6 @@ export const LoginPage = () => {
                     </div>
                   </div>
                 )}
-
-                {/* Address */}
                 <div className="sm:col-span-2">
                   <label
                     htmlFor="signup-address"
@@ -971,7 +905,7 @@ export const LoginPage = () => {
                     <button
                       type="button"
                       disabled={isAddressValidating}
-                      className={`absolute right-1 top-1/2 -translate-y-1/2 py-0.5 px-2 rounded  text-white text-xs transition ${
+                      className={`absolute right-1 top-1/2 -translate-y-1/2 py-0.5 px-2 rounded text-white text-xs transition ${
                         validationSuccess ? "bg-green-700" : "bg-yellow-600"
                       }`}
                       onClick={handleValidateClick}
@@ -985,7 +919,6 @@ export const LoginPage = () => {
                     </p>
                   )}
                 </div>
-                {/* City */}
                 <div>
                   <label
                     htmlFor="signup-city"
@@ -1011,7 +944,6 @@ export const LoginPage = () => {
                     </p>
                   )}
                 </div>
-                {/* Pincode */}
                 <div>
                   <label
                     htmlFor="signup-pincode"
@@ -1037,7 +969,6 @@ export const LoginPage = () => {
                     </p>
                   )}
                 </div>
-                {/* Province */}
                 <div className="sm:col-span-2">
                   <label
                     htmlFor="signup-province"
@@ -1093,9 +1024,25 @@ export const LoginPage = () => {
                   "Create Account"
                 )}
               </button>
+              <div className="text-center mt-4">
+                <p className="text-slate-400 text-xs sm:text-sm">
+                  Already have an account?{" "}
+                  <button
+                    onClick={() => {
+                      setMode("login");
+                      setStep(1);
+                      setEmail("");
+                      setEmailError("");
+                    }}
+                    className="text-red-400 hover:text-red-300 font-medium hover:underline transition-colors duration-200"
+                  >
+                    Sign In
+                  </button>
+                </p>
+              </div>
             </div>
           ) : (
-            // Step 2: OTP Input
+            // OTP Input
             <div className="w-full">
               <div className="text-center mb-4 sm:mb-6">
                 <h2 className="text-2xl sm:text-3xl font-bold mb-1 bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
@@ -1182,7 +1129,7 @@ export const LoginPage = () => {
                   </p>
                 ) : (
                   <p className="text-slate-400 text-xs">
-                    Didn&apos;t receive the code?{" "}
+                    Didn't receive the code?{" "}
                     <button
                       onClick={handleResendOtp}
                       className="text-red-400 hover:text-red-300 font-medium hover:underline transition-colors duration-200"

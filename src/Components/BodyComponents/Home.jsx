@@ -8,6 +8,7 @@ import { AppContext } from "../../Service/Context/AppContext";
 import AlertCard from "./HomeComponents/HomeBodyComponents/AlertCard";
 import CartButton from "./HomeComponents/HomeBodyComponents/CartButton";
 import UserProfile from "./HomeComponents/HomeBodyComponents/UserProfile";
+import { getCartItems } from "../../Service/api";
 
 export const Home = () => {
   const {
@@ -39,37 +40,61 @@ export const Home = () => {
     isMobile,
     showAlert,
     setShowAlert,
+    populateItems
   } = useContext(AppContext);
 
   // Fetch items from localStorage on mount or when changeCart changes
   useEffect(() => {
-    const cartItemsString = localStorage.getItem("cartItems");
-    let cartItems = [];
-    if (cartItemsString) {
-      try {
-        const parsedItems = JSON.parse(cartItemsString);
-        if (Array.isArray(parsedItems)) {
-          cartItems = parsedItems.map((item) => ({
-            id: item.id || item.itemId,
-            itemId: item.itemId || item.id,
-            itemName: item.itemName || "Unnamed Item",
-            regPrice: parseFloat(item.regPrice || item.salePrice || 0),
-            imageURL: item.imageURL,
-            quantity: item.quantity || 1,
-            totalPrice:
-              (parseFloat(item.regPrice || item.salePrice || 0) || 0) *
-              (item.quantity || 1),
-            note: item.note || "",
-            name: item.itemName || "Unnamed Item",
-            unitPrice: parseFloat(item.regPrice || item.salePrice || 0),
-            image: item.imageURL,
-          }));
-        }
-      } catch (err) {
-        console.error("Failed to parse cartItems:", err);
-      }
-    }
-    setItems(cartItems);
+    // const cartItemsString = localStorage.getItem("cartItems");
+    // let cartItems = [];
+    // if (cartItemsString) {
+    //   try {
+    //     const parsedItems = JSON.parse(cartItemsString);
+    //     if (Array.isArray(parsedItems)) {
+    //       cartItems = parsedItems.map((item) => ({
+    //         id: item.id || item.itemId,
+    //         itemId: item.itemId || item.id,
+    //         itemName: item.itemName || "Unnamed Item",
+    //         regPrice: parseFloat(item.regPrice || item.salePrice || 0),
+    //         imageURL: item.imageURL,
+    //         quantity: item.quantity || 1,
+    //         totalPrice:
+    //           (parseFloat(item.regPrice || item.salePrice || 0) || 0) *
+    //           (item.quantity || 1),
+    //         note: item.note || "",
+    //         name: item.itemName || "Unnamed Item",
+    //         unitPrice: parseFloat(item.regPrice || item.salePrice || 0),
+    //         image: item.imageURL,
+    //       }));
+    //     }
+    //   } catch (err) {
+    //     console.error("Failed to parse cartItems:", err);
+    //   }
+    // }
+    // setItems(cartItems);
+
+    const orderId = localStorage.getItem("cartOrderId");
+    console.log("Order Id",orderId);
+    if (!orderId) return setItems([]);
+
+    getCartItems(orderId)
+      .then(({ orderItems }) => {
+        // map the API fields into the shape your components expect:
+        const normalized = orderItems.map((i) => ({
+          id: i.id,
+          itemId: i.productRetailerId,
+          itemName: i.itemName,
+          itemRegPrice: parseFloat(i.itemRegPrice) || 0,
+          regPrice: parseFloat(i.itemRegPrice) || 0, // optional alias
+          imageURL: i.imageUrl,
+          quantity: i.quantity,
+          totalPrice: (parseFloat(i.itemRegPrice) || 0) * i.quantity,
+          note: i.note || "",
+        }));
+        setItems(normalized);
+        console.log("Items: ", items)
+      })
+      .catch(console.error);
   }, [changeCart]);
 
   // Update orderData whenever customerName, customerWhatsappNumber, or items change
@@ -86,7 +111,8 @@ export const Home = () => {
         itemId: item.itemId,
         itemName: item.itemName,
         itemDescription: `${item.itemName}.`, // Simple description based on name
-        regPrice: item.regPrice.toString(),
+        // regPrice: item.regPrice.toString(),
+        regPrice: String(item.itemRegPrice ?? 0),
         salePrice: "0", // Hardcoded, adjust if salePrice is available
         imageURL: item.imageURL,
         serial_number: index + 1,

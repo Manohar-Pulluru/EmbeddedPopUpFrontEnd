@@ -4,6 +4,7 @@ import { ItemPopup } from "./ItemPopup";
 import Icon from "../../../../assets/Icon";
 import icons from "../../../../assets/icons.json";
 import { useAppContext } from "../../../../Service/Context/AppContext";
+import { addItemToCart, updateCart, getTemplateData } from "../../../../Service/api";
 
 export const ItemCard = ({
   item,
@@ -14,7 +15,7 @@ export const ItemCard = ({
 }) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isInCart, setIsInCart] = useState(false);
-  const { isCartChanged, setShowAlert, setLoginPage } = useAppContext();
+  const { isCartChanged, setShowAlert, setLoginPage, mode, businessId, activeTemplateId, toggleChangeCart, addItemLocal, setItemLoading, setItemAdded } = useAppContext();
 
   useEffect(() => {
     console.log("Cart Items Changed Reset by Checking the Add to Button");
@@ -62,16 +63,137 @@ export const ItemCard = ({
     setIsPopupOpen(true);
   };
 
-  const handleAddToCartClick = (e) => {
+  const handleAddToCartClick = async (e, item) => {
     e.stopPropagation();
+
     const token = localStorage.getItem("aftoAuthToken");
     if (!token) {
       setLoginPage(true);
       return;
     }
     setShowAlert(true);
+
     if (!isInCart && !itemLoading[item.id]) {
-      handleAddToCart(item);
+      const aftoAuthToken = localStorage.getItem("aftoAuthToken");
+      if (!aftoAuthToken) {
+        setLoginPage(true);
+      } else {
+        // handleAddToCart(item)
+
+        // const isNewCart = localStorage.getItem("cartOrderId");
+
+        // const userDataInLocal = localStorage.getItem("aftoSignupForm");
+        // console.log("userDataInLocal", userDataInLocal);
+
+        // if (!isNewCart) {
+        //   localStorage.setItem("cartOrderId", "1308");
+        // } else {
+        //   const cartOrderId = localStorage.getItem("cartOrderId");
+        //   const payload = {
+        //     orderId: cartOrderId,
+        //     items: [item],
+        //   };
+        //   const addItemToCartResponse = updateCart(payload);
+
+        //   console.log(addItemToCartResponse, "addItemToCartResponse");
+        // }
+
+        const cartOrderId = localStorage.getItem("cartOrderId");
+
+        if (!cartOrderId) {
+          // setItemLoading((prev) => ({ ...prev, [item.id]: true }));
+          const signup = JSON.parse(
+            localStorage.getItem("aftoSignupForm") || "{}"
+          );
+
+          // const orderPayload = {
+          //   customerName: signup.name,
+          //   customerWhatsappNumber: signup.phoneNo,
+          //   customerEmail: signup.email,
+          //   businessAccountId: signup.businessAccountId,
+          //   deliveryCharges: 0,
+          //   deliveryType: "delivery",
+          //   items: [item],
+          // };
+          // const result = await getTemplateData(activeTemplateId);
+          // const templateID = await result.data.id;
+          // console.log("template Id ",templateID);
+          // console.log("active template Id ",activeTemplateId);
+
+
+          const normalizedItem = {
+            id: item.id,
+            sectionTitle: "Rice", // or derive from your Section
+            itemId: item.id, // or item.productRetailerId
+            itemName: item.itemName,
+            itemDescription: `${item.itemName}.`, // simple description
+            regPrice: item.regPrice.toString(),
+            salePrice: "0", // string
+            imageURL: item.imageURL,
+            serial_number: 1, // or index+1 if batch
+            productTemplateSectionId: activeTemplateId, // your template section ID
+            isHSTApplied: false,
+            HSTPercentage: "13.00",
+            inventoryId: null,
+            inventoryName: null,
+            isSyncToInventory: false,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            quantity: 1,
+          };
+
+          const orderPayload = {
+            customerName: signup.name,
+            customerWhatsappNumber: signup.phoneNo,
+            customerEmail: signup.email,
+            businessAccountId: businessId,
+            deliveryCharges: 0,
+            deliveryType: "delivery",
+            items: [normalizedItem],
+          };
+
+          try {
+            const order = await addItemToCart(orderPayload);
+            const txn = order.data.orderTransaction;
+            console.log("Order ID 1223", txn.id);
+            localStorage.setItem("cartOrderId", txn.id);
+            setShowAlert(true);
+            toggleChangeCart();
+            // setItemLoading((prev) => ({ ...prev, [item.id]: false }));
+            // setItemAdded((prev) => ({ ...prev, [item.id]: true }));
+            addItemLocal(item);
+            setIsInCart(true);
+            // window.dispatchEvent(new Event("cartUpdated"));
+          } catch (err) {
+            console.error("addItemToCart failed:", err);
+          }
+        } else {
+          // --- add to an existing incomplete order ---
+          const payload = {
+            orderId: cartOrderId,
+            items: [item],
+          };
+          try {
+            await updateCart(payload);
+            setShowAlert(true);
+            toggleChangeCart();
+            // setItemAdded((prev) => ({ ...prev, [item.id]: true }));
+            addItemLocal(item);
+            setIsInCart(true);
+            // window.dispatchEvent(new Event("cartUpdated"));
+          } catch (err) {
+            console.error("updateCart failed:", err);
+          }
+        }
+        // setTimeout(() => {
+        //   setItemLoading((prev) => ({ ...prev, [item.id]: false }));
+        // }, 1000);
+
+        // const payload = {};
+
+        // addItemToCart(payload);
+        // setShowAlert(true);
+      }
     }
   };
 
@@ -88,35 +210,6 @@ export const ItemCard = ({
         className="group relative cursor-pointer transform transition-all duration-300 hover:scale-[1.02] hover:shadow-xl"
         onClick={handleCardClick}
       >
-        {/* Main card container with responsive sizing */}
-        {/* <div className={`
-          ${showPayment 
-            ? "h-[180px] xs:h-[200px] sm:h-[220px] md:h-[240px]" 
-            : "h-[200px] xs:h-[220px] sm:h-[250px] md:h-[280px]"
-          } 
-          mt-8 xs:mt-10 sm:mt-12 md:mt-16 lg:mt-20 
-          bg-[#1F1D2B] hover:bg-[#252332] 
-          relative rounded-2xl sm:rounded-3xl 
-          flex flex-col justify-end 
-          p-3 xs:p-4 sm:p-5 md:p-6 
-          w-full
-          shadow-lg hover:shadow-2xl
-          border border-gray-800 hover:border-gray-700
-          transition-all duration-300
-        `}> */}
-        {/* <div
-          className={`h-[200px] xs:h-[220px] sm:h-[250px] md:h-[280px]
-          mt-8 xs:mt-10 sm:mt-12 md:mt-16 lg:mt-20 
-          bg-[#1F1D2B] hover:bg-[#252332] 
-          relative rounded-2xl sm:rounded-3xl 
-          flex flex-col justify-end 
-          p-3 xs:p-4 sm:p-5 md:p-6 
-          w-full
-          shadow-lg hover:shadow-2xl
-          border border-gray-800 hover:border-gray-700
-          transition-all duration-300
-        `}
-        > */}
         <div
           className={`h-[150px] xs:h-[220px] sm:h-[250px] md:h-[280px] w-full aspect-[3/4]
           mt-8 xs:mt-10 sm:mt-12 md:mt-16 lg:mt-20 
@@ -186,7 +279,7 @@ export const ItemCard = ({
 
             {/* Add to cart button with improved responsive design */}
             <button
-              onClick={handleAddToCartClick}
+              onClick={e => handleAddToCartClick(e, item)}
               disabled={itemLoading[item.id]}
               className={`
                 px-2 xs:px-3 sm:px-4 md:px-5 
@@ -234,7 +327,7 @@ export const ItemCard = ({
         <ItemPopup
           item={item}
           onClose={() => setIsPopupOpen(false)}
-          handleAddToCart={handleAddToCart}
+          handleAddToCart={handleAddToCartClick}
           itemAdded={itemAdded}
           itemLoading={itemLoading}
         />

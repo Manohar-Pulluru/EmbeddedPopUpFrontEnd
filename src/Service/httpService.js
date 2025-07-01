@@ -36,4 +36,5 @@ export const putRequest = (url, data) => axiosInstance.put(url, data);
 export const deleteRequest = (url) => axiosInstance.delete(url);
 
 // Unauthenticated POST request
-export const postWithoutAuth = (url, data) => axiosInstanceNoAuth.post(url, data);
+export const postWithoutAuth = (url, data) =>
+  axiosInstanceNoAuth.post(url, data);

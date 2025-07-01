@@ -149,6 +149,7 @@ export const Delivery = () => {
           </div>
 
           {orderTiming === "later" && (
+>>>>>>> 7aadd0459edd0bcdd5da74f119033457c70e5f03
             <div className="relative">
               <button
                 onClick={() => setIsTimeDropdownOpen(!isTimeDropdownOpen)}
@@ -190,9 +191,9 @@ export const Delivery = () => {
                 </div>
               )}
             </div>
-          )}
+          )} */}
 
-          {orderTiming === "now" && (
+          {/* {orderTiming === "now" && (
             <div className="flex items-center gap-2 mt-2 text-green-400 text-xs">
               <div className="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
               <span>Order will be prepared immediately</span>
@@ -206,7 +207,7 @@ export const Delivery = () => {
             </div>
           )}
         </div>
-      </div> */}
+      </div> */} 
 
       {deliveryResult ? (
         <div className="space-y-3 sm:space-y-4">

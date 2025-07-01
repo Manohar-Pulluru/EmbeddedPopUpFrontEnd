@@ -1,6 +1,7 @@
 // templateService.js
-import { getRequest, postRequest } from "./httpService";
-import axios from 'axios';
+import { getRequest, postRequest, deleteRequest } from "./httpService";
+// import { getRequest, postRequest } from "./httpService";
+// import axios from 'axios';
 
 // const ELASTIC_AUTH_TOKEN = import.meta.env.VITE_ELASTIC_AUTH_TOKEN;
 // const ELASTIC_AUTH_TOKEN = "Basic ZWxhc3RpYzpJbXlkUnpPZ1o2UnhkVjZUTHdDOA==";
@@ -30,9 +31,9 @@ export const getTemplates = async (businessId) => {
 };
 
 export const calculateDeliveryCharge = async (
-    origin_address,
-    destination_address
-  ) => {
+  origin_address,
+  destination_address
+) => {
   const endpoint = "/embedded/api/calculate-delivery-charge";
   try {
     const response = await postRequest(endpoint, {
@@ -71,6 +72,7 @@ export const calculateDeliveryCharge = async (
   //   } catch (err) {
   //     console.error(err);
   //   }
+
   };
 
 export const sendChatMessage = async (sessionId, message, businessId) => {
@@ -112,7 +114,6 @@ export async function searchByRetailerIds(businessId, retailerIds) {
     throw error;
   }
 }
-
 
 
 export const placeOrder = async (payload) => {
@@ -202,7 +203,7 @@ export const searchItems = async (businessId, query) => {
 // curl --location 'http://localhost:5000/embedded/user/search-products-elastic?index=91182be9-9446-4e29-9ade-b0312b238668&search=mi' \
 // --header 'embedded-static-token: mw7f8Ch2MSC300bHKEthp9CGZEIJL8A17d7fuYzT1PcROuHNPEVmEFYUyfmDrIFvpHglqusu4OwvUjAKpZM9ptRbAD7UihMOX2u6bZAdIkjLb7iDRqUIozYCi94HlIvoJO2IyX6AWBhacbHiVQE349ruLWwhfPlNXtoUg8xWweWtuHuaZDZD'
 
-export const searchProductsElastic = async (businessId, query) => {
+export const searchProductsElastic = async (payload) => {
   const endpoint = `/embedded/user/search-products-elastic?index=${businessId}&search=${query}`;
 
   try {
@@ -210,6 +211,90 @@ export const searchProductsElastic = async (businessId, query) => {
     return response.data;
   } catch (error) {
     console.error("Error while searching products", error);
+    throw error;
+  }
+};
+
+export const addItemToCart = async (payload) => {
+  const endpoint = "/embedded/order/create/incomplete";
+  try {
+    const response = await postRequest(endpoint, payload);
+    return response.data;
+  } catch (error) {
+    console.error("Error while adding item to cart", error);
+    throw error;
+  }
+};
+
+export const updateCart = async (payload) => {
+  const endpoint = "/embedded/order/update/incomplete";
+
+  try {
+    const response = await postRequest(endpoint, payload);
+    return response.data;
+  } catch (error) {
+    console.error("Error while updating cart", error);
+    throw error;
+  }
+}
+
+export const getCartItems = async (orderId) => {
+  const endpoint = `embedded/order/${orderId}`;
+
+  try {
+    const response = await getRequest(endpoint);
+    return response.data;
+  } catch (error) {
+    console.error("Error while fetching cart items", error);
+    throw error;
+  }
+};
+
+// DELETE an item from the cart
+export const deleteCartItem = async (itemId) => {
+  const endpoint = `/embedded/order/item/${itemId}`;
+  try {
+    const response = await deleteRequest(endpoint);
+    return response.data;
+  } catch (error) {
+    console.error("Error while deleting cart item", error);
+    throw error;
+  }
+};
+
+// UPDATE just the quantity of a cart item
+export const updateCartItemQuantity = async (itemId, quantity) => {
+  const endpoint = `/embedded/order/item/${itemId}/${quantity}`;
+  try {
+    // the curl sends an empty body, so we just invoke postRequest without payload
+    const response = await getRequest(endpoint, {});
+    return response.data;
+  } catch (error) {
+    console.error("Error while updating cart item quantity", error);
+    throw error;
+  }
+};
+
+// CONFIRM the entire order
+export const confirmOrder = async (orderId, payload) => {
+  const endpoint = `/embedded/order/confirm/${orderId}`;
+  try {
+    const response = await postRequest(endpoint, payload);
+    return response.data;
+  } catch (error) {
+    console.error("Error while confirming order", error);
+    throw error;
+  }
+};
+
+// GET a user’s order history
+export const getUserOrderHistory = async (customerId, businessAccountId) => {
+  const endpoint = `/embedded/orders/${customerId}/${businessAccountId}`;
+  try {
+    const response = await getRequest(endpoint);
+    return response.data;
+  } catch (error) {
+    console.error("Error while fetching user order history", error);
     throw error;
   }
 };

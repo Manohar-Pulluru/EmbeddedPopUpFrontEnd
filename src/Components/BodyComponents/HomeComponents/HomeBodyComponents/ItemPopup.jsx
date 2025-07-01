@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
+import { useAppContext } from "../../../../Service/Context/AppContext";
 
 export const ItemPopup = ({
   item,
@@ -10,6 +11,7 @@ export const ItemPopup = ({
 }) => {
   const [quantity, setQuantity] = useState(1);
   const [isInCart, setIsInCart] = useState(false);
+  const { isCartChanged } = useAppContext();
 
   // Check if the item exists in the cart on mount and when itemAdded changes
   useEffect(() => {
@@ -19,7 +21,7 @@ export const ItemPopup = ({
     const itemExists = cartItems.some((cartItem) => cartItem.id === item.id);
     setIsInCart(itemExists);
     // setIsInCart(itemAdded);
-  }, [item?.id, itemAdded]);
+  }, [item?.id, itemAdded, isCartChanged]);
 
   const handleQuantityChange = (change) => {
     setQuantity((prev) => Math.max(1, prev + change));
@@ -35,7 +37,7 @@ export const ItemPopup = ({
 
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-20 p-4">
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-60 p-4">
       <div className="bg-[#252836] text-white w-full max-w-6xl h-full max-h-[90vh] md:max-h-[800px] rounded-2xl shadow-lg relative flex flex-col md:flex-row overflow-hidden">
         {/* Back Button */}
         <button
@@ -82,7 +84,7 @@ export const ItemPopup = ({
               </span>
             </div>
             <div className="text-lg md:text-2xl font-semibold text-[#EA7C69] self-start sm:self-auto">
-              ${item.regPrice}
+              ${item.itemRegPrice}
             </div>
           </div>
 
@@ -121,9 +123,9 @@ export const ItemPopup = ({
             </div>
             
             <button
-              onClick={() => {
+              onClick={e => {
                 if (!isInCart && !itemLoading?.[item.id]) {
-                  handleAddToCart?.(item);
+                  handleAddToCart(e, item);
                 }
               }}
               className={`px-4 md:px-6 py-3 rounded-2xl flex gap-2 items-center justify-center cursor-pointer transition-all duration-200 text-sm md:text-base font-medium ${

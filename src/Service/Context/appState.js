@@ -6,6 +6,9 @@ import {
   searchProductsElastic,
   calculateDeliveryCharge,
   placeOrder,
+  updateCartItemQuantity,
+  deleteCartItem,
+  confirmOrder,
 } from "../api";
 import { jwtDecode } from "jwt-decode";
 
@@ -29,11 +32,18 @@ export const useAppStates = () => {
   // App.jsx
   // const businessId = "5d118426-7ff9-40d8-a2f1-476d859da48e";
   // const businessAccountId = "5d118426-7ff9-40d8-a2f1-476d859da48e";
+
   // const businessId = "91182be9-9446-4e29-9ade-b0312b238668";
   // const businessAccountId = "91182be9-9446-4e29-9ade-b0312b238668";
   const [businessId, setBusinessId] = useState(null);
   // const [businessId, setBusinessId] = useState("ddb91055-b5de-4d6f-a55a-3d8584c2c630");
-  // const [businessId, setBusinessId] = useState("91182be9-9446-4e29-9ade-b0312b238668");
+  // const [businessId, setBusinessId] = useState(
+  //   "91182be9-9446-4e29-9ade-b0312b238668"
+  // );
+  // const [businessId, setBusinessId] = useState("5d118426-7ff9-40d8-a2f1-476d859da48e");
+  // const [businessId, setBusinessId] = useState(
+  //   "91182be9-9446-4e29-9ade-b0312b238668"
+  // );
   // const [businessId, setBusinessId] = useState(
   //   "5d118426-7ff9-40d8-a2f1-476d859da48e"
   // );
@@ -56,9 +66,10 @@ export const useAppStates = () => {
   const [paymentDetails, setPaymentDetails] = useState(null);
   const [subtotal, setSubtotal] = useState(0);
   const [deliveryCharge, setDeliveryCharge] = useState(0);
-  const [mode, setMode] = useState("delivery");
+  const [mode, setMode] = useState("Pick Up");
 
   const toggleChangeCart = () => {
+    console.log("cart changed");
     setChangeCart(!changeCart);
   };
 
@@ -147,6 +158,7 @@ export const useAppStates = () => {
       const data = result.data;
       setTemplateData(data);
       setSections(data.sections);
+      // console.log("Section data", data.id);
     } catch (err) {
       console.error("Failed to fetch template data:", err);
       setPopupMessage("Failed to load template data. Please try again.");
@@ -154,6 +166,76 @@ export const useAppStates = () => {
     } finally {
       setTemplateLoading(false);
     }
+  };
+
+  const addItemLocal = (item) => {
+    console.log("Added to local");
+    let cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
+    const existingItemIndex = cartItems.findIndex(
+      (cartItem) => cartItem.id === item.id || cartItem.itemId === item.id
+    );
+
+    if (existingItemIndex !== -1) {
+      setPopupMessage(`Item "${item.itemName}" already in cart!`);
+      setShowPopup(true);
+    } else {
+      const newItem = {
+        id: item.id,
+        itemId: item.id,
+        itemName: item.itemName,
+        itemRegPrice: item.itemRegPrice,
+        imageURL: item.imageURL,
+        quantity: 1,
+      };
+      cartItems.push(newItem);
+      toggleChangeCart();
+      toggleCart();
+    }
+
+    cartItems = cartItems.map((cartItem) => ({
+      ...cartItem,
+      totalPrice:
+        (parseFloat(cartItem.itemRegPrice || 0) || 0) * cartItem.quantity,
+    }));
+
+    console.log("CARTTT add:", cartItems, item.id);
+
+    localStorage.setItem("cartItems", JSON.stringify(cartItems));
+  };
+
+  const removeItemLocal = (itemId) => {
+    console.log("Removed from local");
+    // 1. Fetch existing cart
+    let cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
+
+    console.log("CARTTTT before: ", cartItems, itemId);
+
+    // 2. Try to remove the matching item
+    const filteredItems = cartItems.filter(
+      (cartItem) => cartItem.id !== itemId && cartItem.itemId !== itemId
+    );
+    console.log("CARTTTT after: ", filteredItems);
+
+    // 3. If nothing was removed, show a popup
+    if (filteredItems.length === cartItems.length) {
+      // setPopupMessage(`Item not found in cart!`);
+      // setShowPopup(true);
+      console.log("Delete Failed");
+      return;
+    }
+
+    // 4. Otherwise, update the cart and notify
+    toggleChangeCart();
+    toggleCart();
+
+    // 5. Recalculate totals
+    const updatedItems = filteredItems.map((ci) => ({
+      ...ci,
+      totalPrice: (parseFloat(ci.itemRegPrice || 0) || 0) * (ci.quantity || 1),
+    }));
+
+    // 6. Persist back to localStorage
+    localStorage.setItem("cartItems", JSON.stringify(updatedItems));
   };
 
   const handleAddToCart = (item) => {
@@ -178,7 +260,7 @@ export const useAppStates = () => {
           id: item.id,
           itemId: item.id,
           itemName: item.itemName,
-          regPrice: item.regPrice,
+          itemRegPrice: item.itemRegPrice,
           imageURL: item.imageURL,
           quantity: 1,
         };
@@ -189,7 +271,7 @@ export const useAppStates = () => {
       cartItems = cartItems.map((cartItem) => ({
         ...cartItem,
         totalPrice:
-          (parseFloat(cartItem.regPrice || 0) || 0) * cartItem.quantity,
+          (parseFloat(cartItem.itemRegPrice || 0) || 0) * cartItem.quantity,
       }));
 
       localStorage.setItem("cartItems", JSON.stringify(cartItems));
@@ -280,33 +362,102 @@ export const useAppStates = () => {
     }
   };
 
-  const handleQuantityChange = (id, value) => {
-    const updatedItems = items.map((item) => {
-      if (item.id === id) {
-        const newQuantity = Math.max(1, Number(value) || 1);
-        const newTotalPrice = parseFloat(item.regPrice) * newQuantity;
-        return {
-          ...item,
-          quantity: newQuantity,
-          totalPrice: newTotalPrice,
-        };
-      }
-      return item;
-    });
-    setItems(updatedItems);
-    setSubtotal(calculateSubtotal(updatedItems, deliveryCharge));
+  // const handleQuantityChange = async (id, value) => {
+  //   const updatedItems = items.map(async (item) => {
+  //     if (item.id === id) {
+  //       const newQuantity = Math.max(1, Number(value) || 1);
+  //       const{status} = await updateCartItemQuantity(id, newQuantity);
+  //       if(!status) return;
+  //       const newTotalPrice = parseFloat(item.itemRegPrice) * newQuantity;
+  //       return {
+  //         ...item,
+  //         quantity: newQuantity,
+  //         totalPrice: newTotalPrice,
+  //       };
+  //     }
+  //     return item;
+  //   });
+  //   setItems(updatedItems);
+  //   setSubtotal(calculateSubtotal(updatedItems, deliveryCharge));
 
-    const itemsForStorage = updatedItems.map((item) => ({
-      id: item.id,
-      itemId: item.itemId,
-      itemName: item.itemName,
-      regPrice: item.regPrice.toString(),
-      imageURL: item.imageURL,
-      quantity: item.quantity,
-      totalPrice: item.totalPrice,
-      note: item.note,
-    }));
-    localStorage.setItem("cartItems", JSON.stringify(itemsForStorage));
+  //   const itemsForStorage = updatedItems.map((item) => ({
+  //     id: item.id,
+  //     itemId: item.itemId,
+  //     itemName: item.itemName,
+  //     itemRegPrice: item.itemRegPrice.toString(),
+  //     imageURL: item.imageURL,
+  //     quantity: item.quantity,
+  //     totalPrice: item.totalPrice,
+  //     note: item.note,
+  //   }));
+  //   localStorage.setItem("cartItems", JSON.stringify(itemsForStorage));
+  // };
+
+  //   const handleQuantityChange = async (id, rawValue) => {
+  //   // 1) compute the desired new quantity
+  //   const newQuantity = Math.max(1, Number(rawValue) || 1);
+
+  //   // 2) hit the API to update it server-side
+  //   try {
+  //     const { status } = await updateCartItemQuantity(id, newQuantity);
+  //     if (!status) {
+  //       console.error("Server refused quantity update");
+  //       return;
+  //     }
+  //   } catch (err) {
+  //     console.error("Failed to update quantity:", err);
+  //     return;
+  //   }
+
+  //   // 3) build a fresh copy of your items array, with the one item updated
+  //   const updated = items.map(item => {
+  //     if (item.id !== id) return item;
+  //     const unit = parseFloat(item.itemRegPrice) || 0;
+  //     return {
+  //       ...item,
+  //       quantity: newQuantity,
+  //       totalPrice: unit * newQuantity,
+  //     };
+  //   });
+
+  //   // 4) push it into context
+  //   setItems(updated);
+
+  //   // 5) persist to localStorage if you need
+  //   localStorage.setItem(
+  //     "cartItems",
+  //     JSON.stringify(
+  //       updated.map(i => ({
+  //         ...i,
+  //         itemRegPrice: i.itemRegPrice.toString(),
+  //         // keep whatever you need in storage
+  //       }))
+  //     )
+  //   );
+  // };
+
+  const handleQuantityChange = async (id, qty) => {
+    await updateCartItemQuantity(id, qty);
+    setItems((current) =>
+      current.map((item) =>
+        item.id !== id
+          ? item
+          : { ...item, quantity: qty, totalPrice: item.itemRegPrice * qty }
+      )
+    );
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      // 1) Tell the server to delete that line-item
+      await deleteCartItem(id);
+      // 2) Remove it from your local `items` state
+      setItems((prev) => prev.filter((item) => item.id !== id));
+
+      // (optional) also clear it out of orderData if you track that separately
+    } catch (err) {
+      console.error("Failed to delete item:", err);
+    }
   };
 
   const handleNoteChange = (id, note) => {
@@ -319,7 +470,7 @@ export const useAppStates = () => {
       id: item.id,
       itemId: item.itemId,
       itemName: item.itemName,
-      regPrice: item.regPrice.toString(),
+      itemRegPrice: item.itemRegPrice.toString(),
       imageURL: item.imageURL,
       quantity: item.quantity,
       totalPrice: item.totalPrice,
@@ -328,24 +479,125 @@ export const useAppStates = () => {
     localStorage.setItem("cartItems", JSON.stringify(itemsForStorage));
   };
 
-  const handleDelete = (id) => {
-    toggleCart();
-    const updatedItems = items.filter((item) => item.id !== id);
-    setItems(updatedItems);
-    setSubtotal(calculateSubtotal(updatedItems, deliveryCharge));
+  // const handleDelete = (id) => {
+  //   toggleCart();
+  //   const updatedItems = items.filter((item) => item.id !== id);
+  //   setItems(updatedItems);
+  //   setSubtotal(calculateSubtotal(updatedItems, deliveryCharge));
 
-    const itemsForStorage = updatedItems.map((item) => ({
-      id: item.id,
-      itemId: item.itemId,
-      itemName: item.itemName,
-      regPrice: item.regPrice.toString(),
-      imageURL: item.imageURL,
-      quantity: item.quantity,
-      totalPrice: item.totalPrice,
-      note: item.note,
-    }));
-    localStorage.setItem("cartItems", JSON.stringify(itemsForStorage));
-  };
+  //   const itemsForStorage = updatedItems.map((item) => ({
+  //     id: item.id,
+  //     itemId: item.itemId,
+  //     itemName: item.itemName,
+  //     itemRegPrice: item.itemRegPrice.toString(),
+  //     imageURL: item.imageURL,
+  //     quantity: item.quantity,
+  //     totalPrice: item.totalPrice,
+  //     note: item.note,
+  //   }));
+  //   localStorage.setItem("cartItems", JSON.stringify(itemsForStorage));
+  // };
+
+  // const handleNext = async () => {
+  //   if (activeTab === "Cart") {
+  //     const token = localStorage.getItem("aftoAuthToken");
+  //     if (!token) {
+  //       setLoginPage(true);
+  //       return;
+  //     }
+  //     setActiveTab("Details");
+  //   } else if (activeTab === "Details" && isFormValid) {
+  //     // fetchDeliveryDetails();
+
+  //     // getTemplates(businessAccountId).then((response) => {
+  //     //   // console.log("Templates fetched successfully:", response);
+  //     //   // console.log(response.businessData.address)
+  //     //   // setRestrauntAddress(response.businessData.address);
+  //     //   setRestrauntAddress(
+  //     //     "2275 Britannia Rd W unit 15, Mississauga, ON L5M 2G6, Canada"
+  //     //   );
+  //     // });
+
+  //     // const response = await getTemplates(businessAccountId);
+  //     // const res = await calculateDeliveryCharge(
+  //     //   response.businessData.address,
+  //     //   address + " " + city + " " + state + " " + pincode
+  //     // );
+  //     const res = await calculateDeliveryCharge(
+  //       restrauntAddress,
+  //       address + " " + city + " " + state + " " + pincode
+  //     );
+  //     console.log("Restaurant Address:", restrauntAddress);
+  //     console.log("Customer Address:", address, city, pincode, state);
+
+  //     // const res = await calculateDeliveryCharge(restrauntAddress, address);
+  //     setDeliveryResult(res);
+  //     setDeliveryCharge(res.delivery_charge || 0);
+  //     // console.log("Delivery Result:", res);
+  //     setActiveTab("Delivery");
+  //   } else if (activeTab === "Delivery" && isFormValid) {
+  //     // Only proceed if form is valid
+  //     // Update customer details
+
+  //     // change the place order here
+  //     setCustomerName(name);
+  //     setCustomerWhatsappNumber(phone);
+
+  //     // Construct orderData with user-provided values only
+  //     const updatedOrderData = {
+  //       customerName: name,
+  //       customerWhatsappNumber: phone,
+  //       customerEmail: email,
+  //       businessAccountId: businessId,
+  //       deliveryCharges: deliveryCharge,
+  //       deliveryType: "delivery",
+  //       items: items.map((item, index) => ({
+  //         id: item.id,
+  //         sectionTitle: "Rice", // Adjust as needed
+  //         itemId: item.itemId,
+  //         itemName: item.itemName,
+  //         itemDescription: `${item.itemName}.`,
+  //         itemRegPrice: item.itemRegPrice.toString(),
+  //         salePrice: "0",
+  //         imageURL: item.imageURL,
+  //         serial_number: index + 1,
+  //         productTemplateSectionId: "20903f70-bc7a-48f0-89fc-07bbede56cf1",
+  //         isHSTApplied: false,
+  //         HSTPercentage: "13.00",
+  //         inventoryId: null,
+  //         inventoryName: null,
+  //         isSyncToInventory: false,
+  //         createdAt: "2025-04-18T14:23:31.222Z",
+  //         updatedAt: "2025-04-18T14:23:31.222Z",
+  //         quantity: item.quantity,
+  //       })),
+  //     };
+
+  //     setOrderData(updatedOrderData);
+  //     console.log("Updated orderData:", updatedOrderData);
+
+  //     // Place the order
+  //     setIsLoading(true);
+  //     try {
+  //       const response = await placeOrder(updatedOrderData);
+  //       let orderHistory = JSON.parse(
+  //         localStorage.getItem("orderHistory") || "[]"
+  //       );
+  //       orderHistory.push(response.data);
+  //       localStorage.setItem("orderHistory", JSON.stringify(orderHistory));
+  //       // localStorage.setItem("cartItems", JSON.stringify([]));
+  //       // setItems([]); // Clear items in state
+  //       setShowPayment(true);
+  //       setPaymentDetails(response.data.paymentIntent);
+  //       console.log(showPayment, "showPayment", response.data.paymentIntent);
+  //       toggleCart();
+  //     } catch (error) {
+  //       console.error("Failed to place order:", error);
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   }
+  // };
 
   const handleNext = async () => {
     if (activeTab === "Cart") {
@@ -356,90 +608,53 @@ export const useAppStates = () => {
       }
       setActiveTab("Details");
     } else if (activeTab === "Details" && isFormValid) {
-      // fetchDeliveryDetails();
-
-      // getTemplates(businessAccountId).then((response) => {
-      //   // console.log("Templates fetched successfully:", response);
-      //   // console.log(response.businessData.address)
-      //   // setRestrauntAddress(response.businessData.address);
-      //   setRestrauntAddress(
-      //     "2275 Britannia Rd W unit 15, Mississauga, ON L5M 2G6, Canada"
-      //   );
-      // });
-
-      // const response = await getTemplates(businessAccountId);
-      // const res = await calculateDeliveryCharge(
-      //   response.businessData.address,
-      //   address + " " + city + " " + state + " " + pincode
-      // );
       const res = await calculateDeliveryCharge(
         restrauntAddress,
-        address + " " + city + " " + state + " " + pincode
+        `${address} ${city} ${state} ${pincode}`
       );
-      console.log("Restaurant Address:", restrauntAddress);
-      console.log("Customer Address:", address, city, pincode, state);
-
-      // const res = await calculateDeliveryCharge(restrauntAddress, address);
       setDeliveryResult(res);
       setDeliveryCharge(res.delivery_charge || 0);
-      // console.log("Delivery Result:", res);
       setActiveTab("Delivery");
     } else if (activeTab === "Delivery" && isFormValid) {
-      // Only proceed if form is valid
-      // Update customer details
-      setCustomerName(name);
-      setCustomerWhatsappNumber(phone);
+      // 1) Get saved user data and orderId
+      const signup = JSON.parse(localStorage.getItem("aftoSignupForm") || "{}");
+      const orderId = localStorage.getItem("cartOrderId");
+      if (!orderId) {
+        console.error("No orderId in storage!");
+        return;
+      }
 
-      // Construct orderData with user-provided values only
-      const updatedOrderData = {
-        customerName: name,
-        customerWhatsappNumber: phone,
-        customerEmail: email,
+      // 2) Build payload from storage + state
+      const payload = {
+        customerName: signup.name || signup.customerName || "",
+        customerWhatsappNumber: signup.phoneNo || "",
+        customerEmail: signup.email || signup.customerEmail || "",
         businessAccountId: businessId,
         deliveryCharges: deliveryCharge,
         deliveryType: "delivery",
-        items: items.map((item, index) => ({
-          id: item.id,
-          sectionTitle: "Rice", // Adjust as needed
-          itemId: item.itemId,
-          itemName: item.itemName,
-          itemDescription: `${item.itemName}.`,
-          regPrice: item.regPrice.toString(),
-          salePrice: "0",
-          imageURL: item.imageURL,
-          serial_number: index + 1,
-          productTemplateSectionId: "20903f70-bc7a-48f0-89fc-07bbede56cf1",
-          isHSTApplied: false,
-          HSTPercentage: "13.00",
-          inventoryId: null,
-          inventoryName: null,
-          isSyncToInventory: false,
-          createdAt: "2025-04-18T14:23:31.222Z",
-          updatedAt: "2025-04-18T14:23:31.222Z",
-          quantity: item.quantity,
-        })),
       };
 
-      setOrderData(updatedOrderData);
-      console.log("Updated orderData:", updatedOrderData);
-
-      // Place the order
+      // 3) Call confirmOrder instead of placeOrder
       setIsLoading(true);
       try {
-        const response = await placeOrder(updatedOrderData);
-        let orderHistory = JSON.parse(
-          localStorage.getItem("orderHistory") || "[]"
-        );
-        orderHistory.push(response.data);
-        localStorage.setItem("orderHistory", JSON.stringify(orderHistory));
-        // localStorage.setItem("cartItems", JSON.stringify([]));
-        // setItems([]); // Clear items in state
+        const data = await confirmOrder(orderId, payload);
+
+        // 4) mirror your existing post‐confirm behavior
+        let history = JSON.parse(localStorage.getItem("orderHistory") || "[]");
+        history.push(data);
+        localStorage.setItem("orderHistory", JSON.stringify(history));
+
         setShowPayment(true);
-        setPaymentDetails(response.data.paymentIntent);
-        console.log(showPayment, "showPayment", response.data.paymentIntent);
+        console.log("Payment Data: ", data.data.paymentIntent);
+        setPaymentDetails(data.data.paymentIntent);
+
+        // optional: clear your cart
+        localStorage.removeItem("cartItems");
+        localStorage.removeItem("cartOrderId");
+        setItems([]);
         toggleCart();
-      } catch (error) {
-        console.error("Failed to place order:", error);
+      } catch (err) {
+        console.error("Failed to confirm order:", err);
       } finally {
         setIsLoading(false);
       }
@@ -569,5 +784,8 @@ export const useAppStates = () => {
     setFlyerTemplateId,
     showAlert,
     setShowAlert,
+    addItemLocal,
+    removeItemLocal,
+    // populateItems
   };
 };

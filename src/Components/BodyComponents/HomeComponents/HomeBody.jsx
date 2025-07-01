@@ -43,7 +43,17 @@ export const HomeBody = () => {
     flyerTemplateId,
   } = useContext(AppContext);
 
-  // Define static Search section
+  const staticSearchSection = {
+    sectionTitle: "Search",
+    items: [
+      {
+        id: "static-item-1",
+        itemName: "Sample Search Product",
+        itemRegPrice: 29.99,
+        imageURL: "https://via.placeholder.com/150",
+      },
+    ],
+  };
   // const staticSearchSection = {
   //   sectionTitle: "Search",
   //   items: [
