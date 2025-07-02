@@ -1,7 +1,7 @@
 // templateService.js
 import { getRequest, postRequest, deleteRequest } from "./httpService";
+import axios from 'axios';
 // import { getRequest, postRequest } from "./httpService";
-// import axios from 'axios';
 
 // const ELASTIC_AUTH_TOKEN = import.meta.env.VITE_ELASTIC_AUTH_TOKEN;
 // const ELASTIC_AUTH_TOKEN = "Basic ZWxhc3RpYzpJbXlkUnpPZ1o2UnhkVjZUTHdDOA==";

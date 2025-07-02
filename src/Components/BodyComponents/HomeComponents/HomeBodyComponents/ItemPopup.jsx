@@ -84,7 +84,7 @@ export const ItemPopup = ({
               </span>
             </div>
             <div className="text-lg md:text-2xl font-semibold text-[#EA7C69] self-start sm:self-auto">
-              ${item.itemRegPrice}
+              ${item.regPrice}
             </div>
           </div>
 

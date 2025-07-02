@@ -161,8 +161,10 @@ export const ItemCard = ({
             toggleChangeCart();
             // setItemLoading((prev) => ({ ...prev, [item.id]: false }));
             // setItemAdded((prev) => ({ ...prev, [item.id]: true }));
-            addItemLocal(item);
-            setIsInCart(true);
+            if(!order.status){
+              addItemLocal(item);
+              setIsInCart(true);
+            }
             // window.dispatchEvent(new Event("cartUpdated"));
           } catch (err) {
             console.error("addItemToCart failed:", err);
@@ -291,6 +293,7 @@ export const ItemCard = ({
                 transition-all duration-300 
                 shadow-md hover:shadow-lg
                 transform hover:scale-105 active:scale-95
+                cursor-pointer
                 ${
                   itemLoading[item.id]
                     ? "bg-[#d68475] cursor-not-allowed opacity-70"

@@ -5,7 +5,7 @@ import { AppContext } from "../Service/Context/AppContext";
 
 export const NavBar = ({ activeIndex, setActiveIndex }) => {
   // const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
-  const { isMobile, setIsMobile, isCartOpen, setIsCartOpen, items } =
+  const { isMobile, setIsMobile, isCartOpen, setIsCartOpen, items, setActiveTab } =
     useContext(AppContext);
 
   const itemCount = items.reduce((acc, item) => acc + item.quantity, 0); // here is the item count
@@ -27,6 +27,11 @@ export const NavBar = ({ activeIndex, setActiveIndex }) => {
   const triggerLogout = () => {
     localStorage.removeItem("aftoAuthToken");
     localStorage.removeItem("aftoSignupForm");
+    // localStorage.removeItem("orderHistory");
+    localStorage.removeItem("cartItems");
+    localStorage.removeItem("cartOrderId");
+
+    // localStorage.clear();
     window.location.reload();
   };
 
@@ -150,6 +155,7 @@ export const NavBar = ({ activeIndex, setActiveIndex }) => {
             onClick={() => {
               setActiveIndex(index);
               if (option.name === "Cart") {
+                setActiveTab("Cart");
                 setIsCartOpen(true);
               } else {
                 setIsCartOpen(false);

@@ -10,7 +10,7 @@ const AlertCard = ({
 }) => {
   // const [isVisible, setIsVisible] = useState(true);
   const [isAnimating, setIsAnimating] = useState(false);
-  const { setIsCartOpen, setActiveIndex } = useContext(AppContext);
+  const { setIsCartOpen, setActiveIndex, setActiveTab } = useContext(AppContext);
 
   useEffect(() => {
     if (isVisible) {
@@ -32,6 +32,7 @@ const AlertCard = ({
   };
 
   const onGoToCart = () => {
+    setActiveTab("Cart");
     setIsCartOpen(true);
     setActiveIndex(1);
     console.log("Go to cart clicked");
