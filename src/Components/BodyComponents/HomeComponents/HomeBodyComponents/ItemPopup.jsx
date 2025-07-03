@@ -32,9 +32,16 @@ export const ItemPopup = ({
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-60 p-4 bg-gradient-to-br from-black/80 via-gray-900/90 to-black/80 backdrop-blur-sm">
-      <div className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 border border-slate-700/30 text-white w-full max-w-6xl h-full max-h-[90vh] md:max-h-[800px] rounded-2xl shadow-2xl relative flex flex-col md:flex-row overflow-hidden">
-        
+    <div
+      className="fixed inset-0 flex items-center justify-center z-60 p-4 bg-gradient-to-br from-black/80 via-gray-900/90 to-black/80 backdrop-blur-sm"
+      onClick={() => {
+        onClose();
+      }}
+    >
+      <div
+        className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 border border-slate-700/30 text-white w-full max-w-6xl h-full max-h-[90vh] md:max-h-[800px] rounded-2xl shadow-2xl relative flex flex-col md:flex-row overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Back Button */}
         <button
           onClick={onClose}
@@ -65,7 +72,7 @@ export const ItemPopup = ({
             {/* Decorative frame background */}
             <div className="absolute inset-0 bg-gradient-to-br from-slate-600/30 to-slate-700/40 rounded-2xl transform rotate-1"></div>
             <div className="absolute inset-0 bg-gradient-to-br from-slate-700/40 to-slate-800/50 rounded-2xl transform -rotate-1"></div>
-            
+
             {/* Main image container */}
             <div className="relative w-full h-full overflow-hidden rounded-2xl shadow-2xl ring-2 ring-slate-600/40 ring-offset-2 ring-offset-slate-800">
               <img
@@ -73,13 +80,15 @@ export const ItemPopup = ({
                 src={item.imageURL}
                 alt={item.itemName}
               />
-              
+
               {/* Subtle overlay gradient */}
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900/20 via-transparent to-slate-900/10"></div>
-              
+
               {/* Floating section badge */}
               <div className="absolute top-4 left-4 px-3 py-1.5 bg-slate-900/80 backdrop-blur-sm rounded-full border border-slate-700/50">
-                <span className="text-xs font-medium text-slate-300">{item.sectionTitle}</span>
+                <span className="text-xs font-medium text-slate-300">
+                  {item.sectionTitle}
+                </span>
               </div>
             </div>
           </div>
@@ -93,7 +102,9 @@ export const ItemPopup = ({
                 {item.itemName}
               </h2>
               <div className="flex items-center gap-2">
-                <span className="text-slate-400 text-sm md:text-base">Section:</span>
+                <span className="text-slate-400 text-sm md:text-base">
+                  Section:
+                </span>
                 <span className="text-slate-300 font-semibold bg-slate-700/40 px-2 py-1 rounded-lg text-sm">
                   {item.sectionTitle}
                 </span>
@@ -108,7 +119,9 @@ export const ItemPopup = ({
           <div className="mb-6 flex-1">
             <div className="flex items-center gap-2 mb-3">
               <div className="w-1 h-6 bg-[#EA7C69] rounded-full"></div>
-              <h3 className="text-lg md:text-xl font-semibold text-slate-200">Description</h3>
+              <h3 className="text-lg md:text-xl font-semibold text-slate-200">
+                Description
+              </h3>
             </div>
             <div className="bg-slate-700/20 rounded-xl p-4 border border-slate-600/30">
               <p className="text-slate-300 text-sm md:text-base leading-relaxed line-clamp-3 md:line-clamp-none">
@@ -122,7 +135,9 @@ export const ItemPopup = ({
             <div className="flex items-center justify-between sm:justify-start gap-6">
               <div className="flex items-center gap-2">
                 <div className="w-1 h-6 bg-[#EA7C69] rounded-full"></div>
-                <h3 className="text-lg md:text-xl font-semibold text-slate-200">Quantity</h3>
+                <h3 className="text-lg md:text-xl font-semibold text-slate-200">
+                  Quantity
+                </h3>
               </div>
               <div className="flex items-center bg-slate-700/40 rounded-xl border border-slate-600/40 overflow-hidden shadow-lg">
                 <button

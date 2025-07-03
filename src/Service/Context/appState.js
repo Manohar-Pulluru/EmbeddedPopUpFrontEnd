@@ -366,7 +366,7 @@ export const useAppStates = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [deliveryResult, setDeliveryResult] = useState(null);
   const [restrauntAddress, setRestrauntAddress] = useState(null);
-  const [validationSuccess, setValidationSuccess] = useState(false);
+  const [validationSuccess, setValidationSuccess] = useState(true);
 
   const calculateSubtotal = (items, deliveryCharge = 0) => {
     return (
@@ -708,9 +708,9 @@ export const useAppStates = () => {
         setPaymentDetails(data.data.paymentIntent);
 
         // optional: clear your cart
-        localStorage.removeItem("cartItems");
-        localStorage.removeItem("cartOrderId");
-        setItems([]);
+        // localStorage.removeItem("cartItems");
+        // localStorage.removeItem("cartOrderId");
+        // setItems([]);
         toggleCart();
       } catch (err) {
         console.error("Failed to confirm order:", err);
@@ -723,6 +723,8 @@ export const useAppStates = () => {
   const isTabDisabled = (tab) => {
     if (activeTab === "Cart") {
       return tab !== "Cart";
+    } else if (activeTab === "Details"){
+      return tab === "Delivery" ? true : false;
     }
     return false;
   };

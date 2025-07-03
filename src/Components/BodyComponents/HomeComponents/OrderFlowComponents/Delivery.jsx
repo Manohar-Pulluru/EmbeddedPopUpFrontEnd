@@ -1,5 +1,12 @@
 import React, { useContext, useEffect, useState, useMemo } from "react";
-import { MapPin, Clock, Navigation, Truck, Package, ChevronDown } from "lucide-react";
+import {
+  MapPin,
+  Clock,
+  Navigation,
+  Truck,
+  Package,
+  ChevronDown,
+} from "lucide-react";
 import { AppContext } from "../../../../Service/Context/AppContext";
 
 export const Delivery = () => {
@@ -17,6 +24,7 @@ export const Delivery = () => {
     setDeliveryCharge,
     mode,
     setMode,
+    setShowPayment,
   } = useContext(AppContext);
 
   // const [orderTiming, setOrderTiming] = useState("now"); // "now" or "later"
@@ -28,7 +36,7 @@ export const Delivery = () => {
   // const timeOptions = useMemo(() => {
   //   const options = [];
   //   const now = new Date();
-    
+
   //   for (let i = 2; i < 48; i++) { // 48 half-hour slots in 24 hours
   //     const time = new Date(now.getTime() + (i * 30 * 60 * 1000));
   //     const timeString = time.toLocaleTimeString('en-US', {
@@ -41,7 +49,7 @@ export const Delivery = () => {
   //       month: 'short',
   //       day: 'numeric'
   //     });
-      
+
   //     options.push({
   //       value: time.toISOString(),
   //       label: `${timeString} - ${dateString}`,
@@ -52,6 +60,28 @@ export const Delivery = () => {
   //   return options;
   // }, []); // Empty dependency array so it only generates once
 
+  function getDeliveryCharge(km, orderValue) {
+    if (km < 0) {
+      throw new Error("Distance cannot be negative");
+    }
+    if (km <= 5) {
+      return orderValue >= 50 ? 0 : 6.99;
+    }
+    if (km <= 10) {
+      return 6.99;
+    }
+    if (km <= 15) {
+      return 10.99;
+    }
+    if (km <= 20) {
+      return 14.99;
+    }
+    if (km <= 30) {
+      return 20;
+    }
+    return "Out of delivery range";
+  }
+
   useEffect(() => {
     if (deliveryResult) {
       console.log("API result:", deliveryResult);
@@ -61,7 +91,9 @@ export const Delivery = () => {
   useEffect(() => {
     if (mode == "Delivery") {
       setDeliveryCharge(deliveryResult?.delivery_charge || 0);
-      setSubtotal(calculateSubtotal(items, deliveryResult?.delivery_charge || 0));
+      setSubtotal(
+        calculateSubtotal(items, deliveryResult?.delivery_charge || 0)
+      );
     } else {
       setDeliveryCharge(0);
       setSubtotal(calculateSubtotal(items, 0));
@@ -92,7 +124,10 @@ export const Delivery = () => {
           }`}
         />
         <button
-          onClick={() => setMode("Pick Up")}
+          onClick={() => {
+            setShowPayment(false);
+            setMode("Pick Up");
+          }}
           className={`relative z-10 px-4 sm:px-6 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold rounded-md sm:rounded-lg transition-all duration-300 flex items-center justify-center gap-1 sm:gap-2 flex-1 sm:flex-none ${
             mode === "Pick Up" ? "text-white" : "text-gray-300 hover:text-white"
           }`}
@@ -101,7 +136,10 @@ export const Delivery = () => {
           Pick Up
         </button>
         <button
-          onClick={() => setMode("Delivery")}
+          onClick={() => {
+            setShowPayment(false);
+            setMode("Delivery");
+          }}
           className={`relative z-10 px-4 sm:px-6 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold rounded-md sm:rounded-lg transition-all duration-300 flex items-center justify-center gap-1 sm:gap-2 flex-1 sm:flex-none ${
             mode === "Delivery"
               ? "text-white"
@@ -193,7 +231,7 @@ export const Delivery = () => {
             </div>
           )} */}
 
-          {/* {orderTiming === "now" && (
+      {/* {orderTiming === "now" && (
             <div className="flex items-center gap-2 mt-2 text-green-400 text-xs">
               <div className="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
               <span>Order will be prepared immediately</span>
@@ -207,7 +245,7 @@ export const Delivery = () => {
             </div>
           )}
         </div>
-      </div> */} 
+      </div> */}
 
       {deliveryResult ? (
         <div className="space-y-3 sm:space-y-4">
@@ -227,7 +265,10 @@ export const Delivery = () => {
                 </p>
                 <div className="bg-orange-900/20 rounded-lg p-3 border border-orange-500/30">
                   <div className="flex items-center justify-center gap-2 text-orange-300">
-                    <MapPin size={12} className="sm:w-3.5 sm:h-3.5 flex-shrink-0" />
+                    <MapPin
+                      size={12}
+                      className="sm:w-3.5 sm:h-3.5 flex-shrink-0"
+                    />
                     <span className="font-medium text-xs sm:text-sm text-center">
                       Pickup Location: {restrauntAddress}
                     </span>

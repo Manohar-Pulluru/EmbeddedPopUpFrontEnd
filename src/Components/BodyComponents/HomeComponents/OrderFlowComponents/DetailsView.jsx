@@ -130,7 +130,7 @@ export const DetailsView = () => {
 
   const validateCanadaAddress = async (enteredAddress) => {
     setIsValidating(true);
-    setValidationSuccess(false);
+    // setValidationSuccess(false);
 
     try {
       const payload = {
@@ -160,7 +160,7 @@ export const DetailsView = () => {
         }));
         setValidationSuccess(true);
         // Reset success state after 3 seconds
-        setTimeout(() => setValidationSuccess(false), 3000);
+        // setTimeout(() => setValidationSuccess(false), 3000);
       } else if (data?.result?.suggestions?.length) {
         const suggestion = data.result.suggestions[0].address.formattedAddress;
         setAddress(suggestion);
@@ -181,7 +181,7 @@ export const DetailsView = () => {
 
   // Reset validation states when address changes
   useEffect(() => {
-    setValidationSuccess(false);
+    // setValidationSuccess(false);
   }, [address]);
 
   // overall form validity
@@ -201,6 +201,9 @@ export const DetailsView = () => {
 
   // Handlers for inputs
   const handleChange = (setter, field) => (e) => {
+    if(field == "address" || field == "city" || field == "city" || field == "state" || field == "pincode"){
+      setValidationSuccess(false);
+    }
     setter(e.target.value);
     if (touched[field]) {
       setErrors((prev) => ({

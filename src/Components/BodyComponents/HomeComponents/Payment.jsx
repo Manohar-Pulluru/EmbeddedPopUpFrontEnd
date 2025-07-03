@@ -21,7 +21,7 @@ const PaymentForm = ({
   paymentDetails,
   deliveryCharge,
   paymentSucceeded,
-  setSubtotal
+  setSubtotal,
 }) => {
   const stripe = useStripe();
   const elements = useElements();
@@ -223,7 +223,7 @@ const Payment = ({
   setSubtotal,
   deliveryCharge,
 }) => {
-  const { toggleCart, setActiveTab } = useAppContext();
+  const { toggleCart, setActiveTab, setItems } = useAppContext();
   const options = useMemo(
     () => ({
       clientSecret: paymentDetails.clientSecret,
@@ -256,6 +256,14 @@ const Payment = ({
         console.error("Failed to initialize Stripe SDK:", error);
       });
   }, [paymentDetails]);
+
+  useEffect(() => {
+    if (paymentSucceeded) {
+      localStorage.removeItem("cartItems");
+      localStorage.removeItem("cartOrderId");
+      setItems([]);
+    }
+  }, [paymentSucceeded]);
 
   // Main render
   return (
