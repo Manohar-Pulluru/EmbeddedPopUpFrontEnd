@@ -72,9 +72,9 @@ export const CartItem = ({
         <div
           className="aspect-square flex items-center justify-center rounded-xl sm:rounded-2xl h-10 sm:h-12 w-10 sm:w-12 border border-[#FF7CA3] cursor-pointer hover:bg-[#FF7CA3] hover:bg-opacity-10 transition-colors duration-200 flex-shrink-0"
           onClick={() => {
-            removeItemLocal(item.itemId);
+            // removeItemLocal(item.itemId);
             console.log("CA item", item);
-            handleDelete(item.id);
+            handleDelete(item);
           }}
         >
           <Icon name={icons.delete} />

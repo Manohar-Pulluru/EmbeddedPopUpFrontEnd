@@ -205,22 +205,20 @@ export const useAppStates = () => {
 
   const removeItemLocal = (itemId) => {
     console.log("Removed from local");
-    // 1. Fetch existing cart
     let cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
 
     console.log("CARTTTT before: ", cartItems, itemId);
-
-    // 2. Try to remove the matching item
-    const filteredItems = cartItems.filter(
-      (cartItem) => cartItem.id !== itemId && cartItem.itemId !== itemId
-    );
+    const filteredItems = cartItems.filter((cartItem) => {
+      console.log("Delete", cartItem.itemId, itemId)
+      return cartItem.itemId !== itemId;
+    });
     console.log("CARTTTT after: ", filteredItems);
 
     // 3. If nothing was removed, show a popup
     if (filteredItems.length === cartItems.length) {
       // setPopupMessage(`Item not found in cart!`);
       // setShowPopup(true);
-      console.log("Delete Failed");
+      console.log("Delete Failed: ", itemId);
       return;
     }
 
@@ -447,13 +445,15 @@ export const useAppStates = () => {
     );
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (item) => {
     try {
       // 1) Tell the server to delete that line-item
-      await deleteCartItem(id);
+      const res = await deleteCartItem(item.id);
       // 2) Remove it from your local `items` state
-      setItems((prev) => prev.filter((item) => item.id !== id));
-
+      setItems((prev) => prev.filter((i) => i.id !== item.id));
+      if (!res.status) {
+        removeItemLocal(item.itemId);
+      }
       // (optional) also clear it out of orderData if you track that separately
     } catch (err) {
       console.error("Failed to delete item:", err);

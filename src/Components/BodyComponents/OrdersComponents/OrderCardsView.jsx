@@ -9,7 +9,7 @@ export const OrderCardsView = ({ orders, setSelectedOrder }) => {
           {orders.map((order, index) => (
             <OrderCard
               key={index}
-              order={order}
+              order={order.data}
               index={index}
               onClick={setSelectedOrder}
             />

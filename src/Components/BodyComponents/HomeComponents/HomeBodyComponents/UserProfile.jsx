@@ -3,11 +3,11 @@ import React, { useContext, useEffect } from "react";
 import { AppContext } from "../../../../Service/Context/AppContext";
 
 const UserProfile = () => {
-  const { setIsCartOpen, setActiveIndex, items, isMobile } =
+  const { setIsCartOpen, setActiveIndex, items, isMobile, setActiveTab } =
     useContext(AppContext);
 
   const [userName, setUserName] = React.useState("Guest User");
-  const [userEmail, setUserEmail] = React.useState("guest@example.com");
+  const [userEmail, setUserEmail] = React.useState("You are now a guest user");
 
   const itemCount = items.reduce((acc, item) => acc + item.quantity, 0);
 
@@ -24,11 +24,12 @@ const UserProfile = () => {
         setUserEmail(userData.email);
       }else{
         setUserName("Guest User");
-        setUserEmail("guest@example.com");
+        setUserEmail("You are now a guest user");
       }
     }, [savedSignupForm]);
 
   const handleGoToCart = () => {
+    setActiveTab("Cart");
     setIsCartOpen(true);
     setActiveIndex(1);
     console.log("Navigating to cart from profile.");

@@ -14,7 +14,7 @@ export const OrderSummary = ({
   const isDisabled = items?.length === 0 || isFormValid === false; // Disable if cart is empty or form is invalid
 
   return (
-    <div className="min-h-[160px] sm:h-[25%] w-full flex-col flex p-2 sm:p-4 lg:p-0 lg:pt-3">
+    <div className="flex-none h-[160px] sm:h-[25%] w-full flex-col flex p-2 sm:p-4 lg:p-0 lg:pt-3">
       <div className="flex-1 w-full flex flex-col font-medium justify-between sm:justify-evenly gap-2 sm:gap-2">
         {/* <div className="w-full text-sm sm:text-lg lg:text-xl flex justify-between items-center">
           <div className="text-[#ffffffb4]">Discount</div>

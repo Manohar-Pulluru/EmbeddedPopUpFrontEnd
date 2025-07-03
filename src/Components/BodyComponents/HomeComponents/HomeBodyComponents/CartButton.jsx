@@ -7,6 +7,7 @@ const CartButton = () => {
   const size = isMobile ? "small" : "default"; // Use small size for mobile
 
   const onClick = () => {
+    setActiveTab("Cart");
     setIsCartOpen(true);
     setActiveIndex(1);
     console.log("Go to cart clicked");

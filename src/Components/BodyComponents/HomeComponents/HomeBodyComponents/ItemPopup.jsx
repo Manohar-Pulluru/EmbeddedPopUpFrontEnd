@@ -11,11 +11,11 @@ export const ItemPopup = ({
 }) => {
   const [quantity, setQuantity] = useState(1);
   const [isInCart, setIsInCart] = useState(false);
-  const { isCartChanged } = useAppContext();
+  const { isCartChanged, handleQuantityChange } = useAppContext();
 
   // Check if the item exists in the cart on mount and when itemAdded changes
   useEffect(() => {
-    // Since localStorage is not available in Claude artifacts, 
+    // Since localStorage is not available in Claude artifacts,
     // we'll simulate this with a state variable
     const cartItems = JSON.parse(localStorage.getItem("cartItems") || "[]");
     const itemExists = cartItems.some((cartItem) => cartItem.id === item.id);
@@ -23,9 +23,9 @@ export const ItemPopup = ({
     // setIsInCart(itemAdded);
   }, [item?.id, itemAdded, isCartChanged]);
 
-  const handleQuantityChange = (change) => {
-    setQuantity((prev) => Math.max(1, prev + change));
-  };
+  // const handleQuantityChange = (change) => {
+  //   setQuantity((prev) => Math.max(1, prev + change));
+  // };
 
   const handleQuantityInput = (e) => {
     const value = e.target.value;
@@ -35,10 +35,17 @@ export const ItemPopup = ({
     }
   };
 
-
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-60 p-4">
-      <div className="bg-[#252836] text-white w-full max-w-6xl h-full max-h-[90vh] md:max-h-[800px] rounded-2xl shadow-lg relative flex flex-col md:flex-row overflow-hidden">
+    <div
+      className="fixed inset-0 flex items-center justify-center z-60 p-4  bg-gradient-to-br from-black/80 via-gray-900/90 to-black/80 backdrop-blur-sm"
+      onClick={() => {
+        onClose();
+      }}
+    >
+      <div
+        className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 text-white w-full max-w-6xl h-full max-h-[90vh] md:max-h-[800px] rounded-2xl shadow-lg relative flex flex-col md:flex-row overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Back Button */}
         <button
           onClick={onClose}
@@ -78,13 +85,15 @@ export const ItemPopup = ({
           {/* Title and Price */}
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 mb-3">
             <div className="flex-1">
-              <h2 className="text-lg md:text-3xl font-semibold mb-1">{item.itemName}</h2>
+              <h2 className="text-lg md:text-3xl font-semibold mb-1">
+                {item.itemName}
+              </h2>
               <span className="text-[#ffffffb4] text-xs md:text-sm">
                 Section: <b>{item.sectionTitle}</b>
               </span>
             </div>
             <div className="text-lg md:text-2xl font-semibold text-[#EA7C69] self-start sm:self-auto">
-              ${item.itemRegPrice}
+              ${item.regPrice}
             </div>
           </div>
 
@@ -102,7 +111,11 @@ export const ItemPopup = ({
               <h3 className="text-base md:text-lg font-medium">Qty</h3>
               <div className="flex items-center bg-[#393C49] rounded-lg">
                 <button
-                  onClick={() => handleQuantityChange(-1)}
+                  onClick={() => {
+                    setQuantity((prev) => Math.max(1, prev + 1));
+                    console.log("ITEMMM", item);
+                    handleQuantityChange(item.id, quantity);
+                  }}
                   className="px-3 py-2 md:py-4 text-xl md:text-2xl cursor-pointer text-[#EA7C69] hover:bg-[#4a4d5e] transition-colors"
                 >
                   -
@@ -114,16 +127,24 @@ export const ItemPopup = ({
                   className="w-10 md:w-12 text-center bg-[#393C49] text-white border-none outline-none py-2 md:py-4"
                 />
                 <button
-                  onClick={() => handleQuantityChange(1)}
+                  onClick={() => {
+                    setQuantity((prev) => Math.max(1, prev - 1));
+                    handleQuantityChange(item.id, quantity);
+                  }}
                   className="px-3 py-2 md:py-4 text-xl md:text-2xl cursor-pointer text-[#EA7C69] hover:bg-[#4a4d5e] transition-colors"
                 >
                   +
                 </button>
               </div>
             </div>
-            
+
             <button
-              onClick={e => {
+              onClick={(e) => {
+                const token = localStorage.getItem("aftoAuthToken");
+                if (!token) {
+                  onClose();
+                  // return;
+                }
                 if (!isInCart && !itemLoading?.[item.id]) {
                   handleAddToCart(e, item);
                 }

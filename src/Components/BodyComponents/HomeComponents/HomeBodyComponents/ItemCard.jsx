@@ -155,14 +155,17 @@ export const ItemCard = ({
           try {
             const order = await addItemToCart(orderPayload);
             const txn = order.data.orderTransaction;
-            console.log("Order ID 1223", txn.id);
+            console.log("Order ID 1223", txn.customerId);
+            localStorage.setItem("customerId", txn.customerId);
             localStorage.setItem("cartOrderId", txn.id);
             setShowAlert(true);
             toggleChangeCart();
             // setItemLoading((prev) => ({ ...prev, [item.id]: false }));
             // setItemAdded((prev) => ({ ...prev, [item.id]: true }));
-            addItemLocal(item);
-            setIsInCart(true);
+            if(!order.status){
+              addItemLocal(item);
+              setIsInCart(true);
+            }
             // window.dispatchEvent(new Event("cartUpdated"));
           } catch (err) {
             console.error("addItemToCart failed:", err);
@@ -174,7 +177,8 @@ export const ItemCard = ({
             items: [item],
           };
           try {
-            await updateCart(payload);
+            const order = await updateCart(payload);
+            console.log("Order ID 1223", order);
             setShowAlert(true);
             toggleChangeCart();
             // setItemAdded((prev) => ({ ...prev, [item.id]: true }));
@@ -291,6 +295,7 @@ export const ItemCard = ({
                 transition-all duration-300 
                 shadow-md hover:shadow-lg
                 transform hover:scale-105 active:scale-95
+                cursor-pointer
                 ${
                   itemLoading[item.id]
                     ? "bg-[#d68475] cursor-not-allowed opacity-70"

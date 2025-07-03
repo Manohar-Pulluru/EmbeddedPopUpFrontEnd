@@ -268,7 +268,7 @@ export const LoginPage = () => {
     setIsLoading(true);
     try {
       const response = await customerSignup(signupData, businessId);
-      if (response?.status || response?.success) {
+      if (response?.success) {
         console.log(
           "Account created successfully! Please login with your email."
         );
@@ -311,14 +311,28 @@ export const LoginPage = () => {
         }
         setLoginPage(false);
       } else {
-        setSignupErrors((prev) => ({
-          ...prev,
-          phoneNo: "Phone no already used.",
-          // email: "email already used.",
-        }));
-        console.log(
-          "Email/Phone already exists. Please use unique Phone/email."
-        );
+        const firstChar = response.message.charAt(0);
+        const msgLength = response.message.length;
+        if (
+          response.message ==
+          "Email has already been taken, Phone number has already been taken"
+        ) {
+          setSignupErrors((prev) => ({
+            ...prev,
+            phoneNo: "Phone no already used.",
+            email: "email already used.",
+          }));
+        } else if (firstChar == "E") {
+          setSignupErrors((prev) => ({
+            ...prev,
+            email: "email already used.",
+          }));
+        } else {
+          setSignupErrors((prev) => ({
+            ...prev,
+            phoneNo: "Phone no already used.",
+          }));
+        }
       }
     } catch (error) {
       console.error("Signup error:", error);
@@ -532,6 +546,7 @@ export const LoginPage = () => {
   };
 
   const handleEmailValidateClick = async () => {
+    setEmailOtp(["", "", "", ""]);
     setIsEmailValidating(true);
     setEmailValidationSuccess(false);
     setShowEmailOtp(false);
@@ -760,9 +775,11 @@ export const LoginPage = () => {
                       id="signup-email"
                       type="email"
                       value={signupData.email}
-                      onChange={(e) =>
-                        handleSignupInputChange("email", e.target.value)
-                      }
+                      onChange={(e) => {
+                        setIsEmailValidating(false);
+                        setEmailValidationSuccess(false);
+                        handleSignupInputChange("email", e.target.value);
+                      }}
                       placeholder="your@email.com"
                       className="w-full py-2 px-3 rounded-lg border border-slate-600 text-white bg-slate-800/50 placeholder-slate-400 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/20 transition-all duration-200 text-sm"
                       aria-invalid={!!signupErrors.email}

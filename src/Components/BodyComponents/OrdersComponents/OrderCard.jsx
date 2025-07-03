@@ -1,6 +1,7 @@
 import React from "react";
 
 export const OrderCard = ({ order, index, onClick }) => {
+  console.log("order:", order);
   return (
     <div
       onClick={() => onClick(order)}
