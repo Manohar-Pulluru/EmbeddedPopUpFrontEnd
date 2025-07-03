@@ -4,7 +4,11 @@ import { ItemPopup } from "./ItemPopup";
 import Icon from "../../../../assets/Icon";
 import icons from "../../../../assets/icons.json";
 import { useAppContext } from "../../../../Service/Context/AppContext";
-import { addItemToCart, updateCart, getTemplateData } from "../../../../Service/api";
+import {
+  addItemToCart,
+  updateCart,
+  getTemplateData,
+} from "../../../../Service/api";
 
 export const ItemCard = ({
   item,
@@ -15,7 +19,18 @@ export const ItemCard = ({
 }) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isInCart, setIsInCart] = useState(false);
-  const { isCartChanged, setShowAlert, setLoginPage, mode, businessId, activeTemplateId, toggleChangeCart, addItemLocal, setItemLoading, setItemAdded } = useAppContext();
+  const {
+    isCartChanged,
+    setShowAlert,
+    setLoginPage,
+    mode,
+    businessId,
+    activeTemplateId,
+    toggleChangeCart,
+    addItemLocal,
+    setItemLoading,
+    setItemAdded,
+  } = useAppContext();
 
   useEffect(() => {
     console.log("Cart Items Changed Reset by Checking the Add to Button");
@@ -71,9 +86,10 @@ export const ItemCard = ({
       setLoginPage(true);
       return;
     }
-    setShowAlert(true);
+    
 
     if (!isInCart && !itemLoading[item.id]) {
+      setItemLoading((prev) => ({ ...prev, [item.id]: true }));
       const aftoAuthToken = localStorage.getItem("aftoAuthToken");
       if (!aftoAuthToken) {
         setLoginPage(true);
@@ -120,7 +136,6 @@ export const ItemCard = ({
           // console.log("template Id ",templateID);
           // console.log("active template Id ",activeTemplateId);
 
-
           const normalizedItem = {
             id: item.id,
             sectionTitle: "Rice", // or derive from your Section
@@ -162,8 +177,10 @@ export const ItemCard = ({
             toggleChangeCart();
             // setItemLoading((prev) => ({ ...prev, [item.id]: false }));
             // setItemAdded((prev) => ({ ...prev, [item.id]: true }));
-            if(!order.status){
-              addItemLocal(item);
+            if (!order.status) {
+              setItemLoading((prev) => ({ ...prev, [item.id]: false }));
+              setItemAdded((prev) => ({ ...prev, [item.id]: true }));
+              // addItemLocal(item);
               setIsInCart(true);
             }
             // window.dispatchEvent(new Event("cartUpdated"));
@@ -182,7 +199,9 @@ export const ItemCard = ({
             setShowAlert(true);
             toggleChangeCart();
             // setItemAdded((prev) => ({ ...prev, [item.id]: true }));
-            addItemLocal(item);
+            setItemLoading((prev) => ({ ...prev, [item.id]: false }));
+            setItemAdded((prev) => ({ ...prev, [item.id]: true }));
+            // addItemLocal(item);
             setIsInCart(true);
             // window.dispatchEvent(new Event("cartUpdated"));
           } catch (err) {
@@ -283,7 +302,7 @@ export const ItemCard = ({
 
             {/* Add to cart button with improved responsive design */}
             <button
-              onClick={e => handleAddToCartClick(e, item)}
+              onClick={(e) => handleAddToCartClick(e, item)}
               disabled={itemLoading[item.id]}
               className={`
                 px-2 xs:px-3 sm:px-4 md:px-5 

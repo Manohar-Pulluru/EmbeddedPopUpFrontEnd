@@ -9,6 +9,7 @@ import {
   updateCartItemQuantity,
   deleteCartItem,
   confirmOrder,
+  getCartItems,
 } from "../api";
 import { jwtDecode } from "jwt-decode";
 
@@ -177,7 +178,7 @@ export const useAppStates = () => {
 
     if (existingItemIndex !== -1) {
       setPopupMessage(`Item "${item.itemName}" already in cart!`);
-      setShowPopup(true);
+      // setShowPopup(true);
     } else {
       const newItem = {
         id: item.id,
@@ -209,7 +210,7 @@ export const useAppStates = () => {
 
     console.log("CARTTTT before: ", cartItems, itemId);
     const filteredItems = cartItems.filter((cartItem) => {
-      console.log("Delete", cartItem.itemId, itemId)
+      console.log("Delete", cartItem.itemId, itemId);
       return cartItem.itemId !== itemId;
     });
     console.log("CARTTTT after: ", filteredItems);
@@ -234,6 +235,63 @@ export const useAppStates = () => {
 
     // 6. Persist back to localStorage
     localStorage.setItem("cartItems", JSON.stringify(updatedItems));
+  };
+
+  const refreshItemLocal = () => {
+    const cartOrderId = localStorage.getItem("cartOrderId");
+    if (!cartOrderId) {
+      setLoading(false);
+      return;
+    }
+    // localStorage.removeItem("cartItems");
+    getCartItems(cartOrderId)
+      .then((response) => {
+        // const normalized = (response.orderItems || []).map((i) => {
+        //   addItemLocal({
+        //     id: i.id,
+        //     // itemId: i.productRetailerId,
+        //     itemId: i.itemId,
+        //     itemName: i.itemName,
+        //     // convert the string price to a number
+        //     itemRegPrice: parseFloat(i.itemRegPrice) || 0,
+        //     // align naming
+        //     imageURL: i.imageUrl,
+        //     quantity: i.quantity,
+        //     // precompute total if you like
+        //     totalPrice: (parseFloat(i.itemRegPrice) || 0) * i.quantity,
+        //   });
+        //   return {
+        //       id: i.id,
+        //       // itemId: i.productRetailerId,
+        //       itemId: i.itemId,
+        //       itemName: i.itemName,
+        //       // convert the string price to a number
+        //       itemRegPrice: parseFloat(i.itemRegPrice) || 0,
+        //       // align naming
+        //       imageURL: i.imageUrl,
+        //       quantity: i.quantity
+        //     }
+        // });
+        const serverItems = response.orderItems || [];
+        const updatedCart = serverItems.map((i) => ({
+          id: i.id,
+          itemId: i.itemId,
+          itemName: i.itemName,
+          itemRegPrice: parseFloat(i.itemRegPrice) || 0,
+          imageURL: i.imageUrl,
+          quantity: i.quantity,
+          totalPrice: (parseFloat(i.itemRegPrice) || 0) * i.quantity,
+        }));
+
+        localStorage.setItem("cartItems", JSON.stringify(updatedCart));
+        // setItems(normalized);
+
+        console.log("Order Items: ", items);
+      })
+      .catch((err) => {
+        console.error("Failed to load cart:", err);
+        setError("Unable to fetch cart items");
+      });
   };
 
   const handleAddToCart = (item) => {
@@ -308,6 +366,7 @@ export const useAppStates = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [deliveryResult, setDeliveryResult] = useState(null);
   const [restrauntAddress, setRestrauntAddress] = useState(null);
+  const [validationSuccess, setValidationSuccess] = useState(false);
 
   const calculateSubtotal = (items, deliveryCharge = 0) => {
     return (
@@ -607,7 +666,7 @@ export const useAppStates = () => {
         return;
       }
       setActiveTab("Details");
-    } else if (activeTab === "Details" && isFormValid) {
+    } else if (activeTab === "Details" && isFormValid && validationSuccess) {
       const res = await calculateDeliveryCharge(
         restrauntAddress,
         `${address} ${city} ${state} ${pincode}`
@@ -787,5 +846,8 @@ export const useAppStates = () => {
     addItemLocal,
     removeItemLocal,
     // populateItems
+    validationSuccess,
+    setValidationSuccess,
+    refreshItemLocal,
   };
 };
