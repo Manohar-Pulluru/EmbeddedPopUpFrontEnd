@@ -10,8 +10,11 @@ export const OrderSummary = ({
   isLoading,
   isFormValid,
 }) => {
-  const { activeTab } = useContext(AppContext);
-  const isDisabled = items?.length === 0 || isFormValid === false; // Disable if cart is empty or form is invalid
+  const { activeTab, validationSuccess } = useContext(AppContext);
+  const isDisabled =
+    items?.length === 0 ||
+    isFormValid === false ||
+    (activeTab === "Details" && !validationSuccess); // Disable if cart is empty or form is invalid
 
   return (
     <div className="flex-none h-[160px] sm:h-[25%] w-full flex-col flex p-2 sm:p-4 lg:p-0 lg:pt-3">
@@ -44,7 +47,7 @@ export const OrderSummary = ({
           onClick={handleNext}
           className={`h-10 sm:h-14 lg:h-full w-full rounded-lg sm:rounded-2xl text-sm sm:text-lg lg:text-xl flex items-center justify-center font-semibold transition-all duration-200 ${
             isDisabled || isLoading
-              ? "bg-[#EA7C69] opacity-70 text-white cursor-not-allowed"
+              ? "bg-gray-600 opacity-70 text-white cursor-not-allowed"
               : "bg-[#EA7C69] hover:bg-[#d68475] active:bg-[#c96b5e] text-white cursor-pointer transform hover:scale-[1.02] active:scale-[0.98]"
           }`}
         >
@@ -53,12 +56,14 @@ export const OrderSummary = ({
               <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
               <span>Processing...</span>
             </div>
+          ) : activeTab == "Cart" ? (
+            "Next"
+          ) :  (activeTab === "Details" && !validationSuccess)  ? (
+            "Validate Address to Proceed"
+          ) :activeTab == "Delivery" ? (
+            "Confirm Order"
           ) : (
-            activeTab == "Delivery" ? (
-              "Confirm Order"
-            ) : (
-              "Next"
-            )
+            "Next"
           )}
         </button>
       </div>

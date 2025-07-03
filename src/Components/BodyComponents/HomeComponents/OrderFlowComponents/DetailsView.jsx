@@ -21,6 +21,8 @@ export const DetailsView = () => {
     state,
     setState,
     setIsFormValid,
+    validationSuccess,
+    setValidationSuccess,
   } = useContext(AppContext);
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({
@@ -35,7 +37,7 @@ export const DetailsView = () => {
 
   // New states for validation button
   const [isValidating, setIsValidating] = useState(false);
-  const [validationSuccess, setValidationSuccess] = useState(false);
+  // const [validationSuccess, setValidationSuccess] = useState(false);
 
   // split initial phone into countryCode & phoneNumber
   const defaultCode =
@@ -362,43 +364,42 @@ export const DetailsView = () => {
         )}
       </div> */}
       <div>
-  <label className="block text-xs sm:text-sm font-medium mb-1">
-    Email
-  </label>
-  <div className="relative">
-    <input
-      type="email"
-      value={email}
-      readOnly
-      placeholder="Enter your email"
-      className="w-full py-2 px-3 sm:py-4 sm:px-4 rounded-lg sm:rounded-2xl border border-gray-600 bg-gray-700 text-gray-400 placeholder-gray-500 cursor-not-allowed text-sm sm:text-lg focus:outline-none"
-    />
-    <button
-      type="button"
-      disabled
-      className="absolute right-1 sm:right-2 top-1/2 transform -translate-y-1/2 py-1 px-2 sm:px-3 rounded-md sm:rounded-lg text-gray-200 text-xs bg-green-600 opacity-70 cursor-not-allowed"
-    >
-      <div className="flex items-center gap-1">
-        <svg
-          className="w-2 h-2 sm:w-3 sm:h-3"
-          fill="currentColor"
-          viewBox="0 0 20 20"
-        >
-          <path
-            fillRule="evenodd"
-            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-            clipRule="evenodd"
+        <label className="block text-xs sm:text-sm font-medium mb-1">
+          Email
+        </label>
+        <div className="relative">
+          <input
+            type="email"
+            value={email}
+            readOnly
+            placeholder="Enter your email"
+            className="w-full py-2 px-3 sm:py-4 sm:px-4 rounded-lg sm:rounded-2xl border border-gray-600 bg-gray-700 text-gray-400 placeholder-gray-500 cursor-not-allowed text-sm sm:text-lg focus:outline-none"
           />
-        </svg>
-        <span className="hidden sm:inline">Verified</span>
+          <button
+            type="button"
+            disabled
+            className="absolute right-1 sm:right-2 top-1/2 transform -translate-y-1/2 py-1 px-2 sm:px-3 rounded-md sm:rounded-lg text-gray-200 text-xs bg-green-600 opacity-70 cursor-not-allowed"
+          >
+            <div className="flex items-center gap-1">
+              <svg
+                className="w-2 h-2 sm:w-3 sm:h-3"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <span className="hidden sm:inline">Verified</span>
+            </div>
+          </button>
+        </div>
+        {touched.email && errors.email && (
+          <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.email}</p>
+        )}
       </div>
-    </button>
-  </div>
-  {touched.email && errors.email && (
-    <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.email}</p>
-  )}
-</div>
-
 
       {/* Address */}
       <div>

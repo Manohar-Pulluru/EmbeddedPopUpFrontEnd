@@ -20,12 +20,14 @@ const PaymentForm = ({
   setPaymentSucceeded,
   paymentDetails,
   deliveryCharge,
-  paymentSucceeded 
+  paymentSucceeded,
+  setSubtotal
 }) => {
   const stripe = useStripe();
   const elements = useElements();
   const [error, setError] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const { setActiveTab, setShowPayment } = useAppContext();
 
   // Log initialization and paymentDetails
   useEffect(() => {
@@ -200,6 +202,8 @@ const PaymentForm = ({
               setSubtotal(0);
               localStorage.setItem("cartItems", JSON.stringify([]));
               window.location.reload();
+              setShowPayment(false);
+              setActiveTab("Cart");
             }}
             className="bg-[#ea7c69] hover:bg-[#db8070] text-white py-2 px-4 rounded-md text-xs md:text-base"
           >
@@ -219,7 +223,7 @@ const Payment = ({
   setSubtotal,
   deliveryCharge,
 }) => {
-  const { toggleCart } = useAppContext();
+  const { toggleCart, setActiveTab } = useAppContext();
   const options = useMemo(
     () => ({
       clientSecret: paymentDetails.clientSecret,
@@ -266,6 +270,7 @@ const Payment = ({
             window.location.reload();
           }
           setShowPayment(false);
+          setActiveTab("Cart");
         }}
       />
       <div>
@@ -309,6 +314,7 @@ const Payment = ({
               paymentDetails={paymentDetails}
               deliveryCharge={deliveryCharge}
               paymentSucceeded={paymentSucceeded}
+              setSubtotal={setSubtotal}
             />
           </Elements>
         ) : paymentMethod === "Credit Card" ? (

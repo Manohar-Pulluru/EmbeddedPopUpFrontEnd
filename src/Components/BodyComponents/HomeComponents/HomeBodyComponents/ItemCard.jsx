@@ -86,7 +86,7 @@ export const ItemCard = ({
       setLoginPage(true);
       return;
     }
-    setShowAlert(true);
+    
 
     if (!isInCart && !itemLoading[item.id]) {
       setItemLoading((prev) => ({ ...prev, [item.id]: true }));
@@ -180,7 +180,7 @@ export const ItemCard = ({
             if (!order.status) {
               setItemLoading((prev) => ({ ...prev, [item.id]: false }));
               setItemAdded((prev) => ({ ...prev, [item.id]: true }));
-              addItemLocal(item);
+              // addItemLocal(item);
               setIsInCart(true);
             }
             // window.dispatchEvent(new Event("cartUpdated"));
@@ -201,7 +201,7 @@ export const ItemCard = ({
             // setItemAdded((prev) => ({ ...prev, [item.id]: true }));
             setItemLoading((prev) => ({ ...prev, [item.id]: false }));
             setItemAdded((prev) => ({ ...prev, [item.id]: true }));
-            addItemLocal(item);
+            // addItemLocal(item);
             setIsInCart(true);
             // window.dispatchEvent(new Event("cartUpdated"));
           } catch (err) {

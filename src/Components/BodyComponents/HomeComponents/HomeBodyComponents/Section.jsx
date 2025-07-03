@@ -1,10 +1,19 @@
 // Section.js
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { ItemCard } from "./ItemCard";
 import { AppContext } from "../../../../Service/Context/AppContext";
 export const Section = ({ section }) => {
-  const { showPayment, handleAddToCart, itemLoading, itemAdded } =
-    useContext(AppContext);
+  const {
+    showPayment,
+    handleAddToCart,
+    itemLoading,
+    itemAdded,
+    refreshItemLocal,
+  } = useContext(AppContext);
+  useEffect(() => {
+    refreshItemLocal();
+  }, [refreshItemLocal]);
+
   return (
     <section className="mb-8 sm:mb-12 px-4 sm:px-6">
       {/* Section header with improved typography */}
