@@ -61,7 +61,7 @@ export const OrderSummary = ({
           ) :  (activeTab === "Details" && !validationSuccess)  ? (
             "Validate Address to Proceed"
           ) :activeTab == "Delivery" ? (
-            "Confirm Order"
+            "Proceed To Payment"
           ) : (
             "Next"
           )}

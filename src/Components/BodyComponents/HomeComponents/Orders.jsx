@@ -15,56 +15,19 @@ import { AppContext, useAppContext } from "../../../Service/Context/AppContext";
 
 export const Orders = () => {
   const {
-    setShowPayment,
-    setPaymentDetails,
-    paymentDetails,
-    showPayment,
-    changeCart,
     items,
     businessId,
-    setItems,
-    setCustomerName,
-    setCustomerWhatsappNumber,
-    setOrderData,
     setSubtotal,
     subtotal,
     deliveryCharge,
-    setDeliveryCharge,
-    mode,
-    setMode,
     activeTab,
-    setActiveTab,
-    name,
-    setName,
-    phone,
-    setPhone,
-    email,
-    setEmail,
-    address,
-    setAddress,
-    city,
-    setCity,
-    pincode,
-    setPincode,
-    state,
-    setState,
     isFormValid,
-    setIsFormValid,
-    tabs,
     discount,
     isLoading,
-    setIsLoading,
-    deliveryResult,
-    setDeliveryResult,
-    restrauntAddress,
     setRestrauntAddress,
     calculateSubtotal,
     fetchAddress,
-    handleQuantityChange,
-    handleNoteChange,
-    handleDelete,
     handleNext,
-    isTabDisabled,
   } = useContext(AppContext);
 
   
@@ -72,12 +35,7 @@ export const Orders = () => {
   useEffect(() => {
     fetchAddress();
     getTemplates(businessId).then((response) => {
-      // console.log("Templates fetched successfully:", response);
-      // console.log(response.businessData.address)
       setRestrauntAddress(response.businessData.address);
-      // setRestrauntAddress(
-      //   "2275 Britannia Rd W unit 15, Mississauga, ON L5M 2G6, Canada"
-      // );
     });
   }, []);
 

@@ -30,11 +30,12 @@ export const PaymentMethodSelector = ({ paymentMethod, setPaymentMethod }) => {
           <span>Credit Card</span>
         </button>
         <button
-          className={`flex-1 h-24 cursor-pointer flex items-center flex-col gap-2 justify-center p-2 rounded-lg ${
+          className={`flex-1 h-24 cursor-not-allowed flex items-center flex-col gap-2 justify-center p-2 rounded-lg relative ${
             paymentMethod === "Apple Pay"
               ? "border-[#ffffff] border text-white"
               : "border-gray-700 border text-gray-300"
           }`}
+          disabled={true}
           onClick={() => setPaymentMethod("Apple Pay")}
         >
           <svg
@@ -50,13 +51,17 @@ export const PaymentMethodSelector = ({ paymentMethod, setPaymentMethod }) => {
             />
           </svg>
           <span>Apple Pay</span>
+          <div className="absolute inset-0 bg-black/50 bg-opacity-70 flex items-center justify-center rounded-lg">
+            {/* <span className="text-white text-sm font-medium">Not Available</span> */}
+          </div>
         </button>
         <button
-          className={`flex-1 h-24 cursor-pointer flex items-center flex-col gap-2 justify-center p-2 rounded-lg ${
+          className={`flex-1 h-24 flex items-center flex-col gap-2 justify-center p-2 rounded-lg relative cursor-not-allowed ${
             paymentMethod === "Google Pay"
               ? "border-[#ffffff] border text-white"
               : "border-gray-700 border text-gray-300"
           }`}
+          disabled={true}
           onClick={() => setPaymentMethod("Google Pay")}
         >
           <svg
@@ -84,6 +89,9 @@ export const PaymentMethodSelector = ({ paymentMethod, setPaymentMethod }) => {
             />
           </svg>
           <span>Google Pay</span>
+          <div className="absolute inset-0 bg-black/50 bg-opacity-70 flex items-center justify-center rounded-lg">
+            {/* <span className="text-white text-sm font-medium">Not Available</span> */}
+          </div>
         </button>
       </div>
     </div>
