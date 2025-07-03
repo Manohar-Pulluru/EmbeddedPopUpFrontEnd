@@ -155,7 +155,8 @@ export const ItemCard = ({
           try {
             const order = await addItemToCart(orderPayload);
             const txn = order.data.orderTransaction;
-            console.log("Order ID 1223", txn.id);
+            console.log("Order ID 1223", txn.customerId);
+            localStorage.setItem("customerId", txn.customerId);
             localStorage.setItem("cartOrderId", txn.id);
             setShowAlert(true);
             toggleChangeCart();
@@ -176,7 +177,8 @@ export const ItemCard = ({
             items: [item],
           };
           try {
-            await updateCart(payload);
+            const order = await updateCart(payload);
+            console.log("Order ID 1223", order);
             setShowAlert(true);
             toggleChangeCart();
             // setItemAdded((prev) => ({ ...prev, [item.id]: true }));

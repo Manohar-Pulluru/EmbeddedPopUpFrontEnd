@@ -163,7 +163,7 @@ export const Home = () => {
 
       {isCartOpen && (
         <div
-          className="fixed top-0 right-0 bottom-0 h-full w-full flex justify-end bg-[#2d2c30]/50"
+          className="fixed top-0 right-0 bottom-0 h-full w-full flex justify-end bg-gradient-to-br from-black/80 via-gray-900/90 to-black/80 backdrop-blur-sm"
           onClick={() => {
             setIsCartOpen(false);
             setActiveIndex(0);
