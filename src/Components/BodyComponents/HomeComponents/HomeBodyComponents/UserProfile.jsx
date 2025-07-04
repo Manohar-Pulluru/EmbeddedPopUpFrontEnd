@@ -12,10 +12,6 @@ const UserProfile = () => {
   const itemCount = items.reduce((acc, item) => acc + item.quantity, 0);
 
   const savedSignupForm = localStorage.getItem("aftoSignupForm");
-  console.log(
-    "UserData:",
-    savedSignupForm ? JSON.parse(savedSignupForm) : null
-  );
 
   useEffect(() => {
       if (savedSignupForm) {

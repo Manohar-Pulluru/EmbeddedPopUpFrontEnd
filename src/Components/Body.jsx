@@ -11,7 +11,6 @@ import { AppContext } from "../Service/Context/AppContext";
 
 export const Body = () => {
   const {activeIndex} =  useContext(AppContext);
-  console.log(activeIndex, "activeIndex");
 
   // Function to render the appropriate component based on activeIndex
   function renderComponent() {
