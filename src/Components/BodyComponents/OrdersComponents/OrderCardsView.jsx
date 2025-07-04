@@ -2,6 +2,7 @@ import React from "react";
 import { OrderCard } from "./OrderCard";
 
 export const OrderCardsView = ({ orders, setSelectedOrder }) => {
+  console.log("orders in OrderCardsView:", orders);
   return (
     <div className="flex-1 overflow-y-auto scrollbar-hide">
       {orders.length > 0 ? (
@@ -9,7 +10,7 @@ export const OrderCardsView = ({ orders, setSelectedOrder }) => {
           {orders.map((order, index) => (
             <OrderCard
               key={index}
-              order={order.data}
+              order={order}
               index={index}
               onClick={setSelectedOrder}
             />

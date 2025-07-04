@@ -5,8 +5,19 @@ import { AppContext } from "../Service/Context/AppContext";
 
 export const NavBar = ({ activeIndex, setActiveIndex }) => {
   // const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
-  const { isMobile, setIsMobile, isCartOpen, setIsCartOpen, items, setActiveTab } =
-    useContext(AppContext);
+  const {
+    isMobile,
+    setIsMobile,
+    isCartOpen,
+    setIsCartOpen,
+    items,
+    setActiveTab,
+    setShowPayment,
+  } = useContext(AppContext);
+
+  useEffect(() => {
+    setShowPayment(false);
+  }, [activeIndex]);
 
   const itemCount = items.reduce((acc, item) => acc + item.quantity, 0); // here is the item count
 

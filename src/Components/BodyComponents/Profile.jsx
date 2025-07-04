@@ -54,10 +54,10 @@ export const Profile = () => {
   // };
 
   const savedSignupForm = localStorage.getItem("aftoSignupForm");
-  // console.log(
-  //   "UserData:",
-  //   savedSignupForm ? JSON.parse(savedSignupForm) : null
-  // );
+  console.log(
+    "UserData:",
+    savedSignupForm ? JSON.parse(savedSignupForm) : null
+  );
 
   // Populate form data from token and fetch address if token exists
   useEffect(() => {
@@ -234,7 +234,7 @@ export const Profile = () => {
   };
 
   return (
-    <div className="h-screen overflow-scroll bg-[#252836]">
+    <div className="h-screen overflow-scroll scrollbar-hide bg-[#252836]">
       {/* Mobile Header */}
       <div className="lg:hidden bg-gray-800/90 backdrop-blur-sm px-4 py-3 flex items-center justify-between sticky top-0 z-50 shadow-lg border-b border-gray-700">
         <button

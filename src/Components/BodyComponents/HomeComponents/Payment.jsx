@@ -12,6 +12,7 @@ import { ApplePayForm } from "./PaymentComponents/ApplePayForm";
 import { GooglePayForm } from "./PaymentComponents/GooglePayForm";
 import { PaymentFooter } from "./PaymentComponents/PaymentFooter";
 import { useAppContext } from "../../../Service/Context/AppContext";
+import { getCartItems } from "../../../Service/api";
 
 // const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
@@ -28,6 +29,8 @@ const PaymentForm = ({
   const [error, setError] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const { setActiveTab, setShowPayment } = useAppContext();
+
+  console.log("Payment Success check:", paymentSucceeded);
 
   // Log initialization and paymentDetails
   useEffect(() => {
@@ -258,12 +261,44 @@ const Payment = ({
   }, [paymentDetails]);
 
   useEffect(() => {
-    if (paymentSucceeded) {
-      localStorage.removeItem("cartItems");
-      localStorage.removeItem("cartOrderId");
-      setItems([]);
+    if (!paymentSucceeded) return;
+
+    async function fetchPaymentDetails() {
+      try {
+        if (!paymentDetails?.orderId) {
+          console.warn("No order ID found in paymentDetails");
+          return;
+        }
+
+        const orderData = await getCartItems(paymentDetails.orderId);
+        console.log("Fetched Order Data:", orderData);
+
+        const getAllOrders = localStorage.getItem("allOrders");
+
+        const newOrder = orderData.orderData;
+
+        // push new order to allOrders
+
+        if (getAllOrders) {
+          const allOrders = JSON.parse(getAllOrders);
+          allOrders.push(newOrder);
+          localStorage.setItem("allOrders", JSON.stringify(allOrders));
+        } else {
+          localStorage.setItem("allOrders", JSON.stringify([newOrder]));
+        }
+
+        // Clear localStorage only after successful fetch
+        localStorage.removeItem("cartItems");
+        localStorage.removeItem("cartOrderId");
+
+        setItems([]); // Clear cart UI
+      } catch (error) {
+        console.error("Error fetching payment details:", error);
+      }
     }
-  }, [paymentSucceeded]);
+
+    fetchPaymentDetails();
+  }, [paymentSucceeded, paymentDetails?.orderId]);
 
   // Main render
   return (

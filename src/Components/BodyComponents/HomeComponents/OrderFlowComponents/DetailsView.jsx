@@ -54,7 +54,6 @@ export const DetailsView = () => {
 
   const savedSignupForm = localStorage.getItem("aftoSignupForm");
 
-
   // useEffect(() => {
   //   if (savedSignupForm) {
   //     const data = JSON.parse(savedSignupForm);
@@ -69,6 +68,22 @@ export const DetailsView = () => {
   //     });
   //   }
   // }, []);
+
+  useEffect(() => {
+    const key = "aftoSignupForm";
+    const current = JSON.parse(localStorage.getItem(key)) || {};
+    localStorage.setItem(
+      key,
+      JSON.stringify({
+        ...current,
+        address, // update only the address
+        // if you ever want to save city/state/pincode too:
+        city,
+        state,
+        pincode,
+      })
+    );
+  }, [address, city, state, pincode]);
 
   useEffect(() => {
     if (savedSignupForm) {
@@ -238,7 +253,7 @@ export const DetailsView = () => {
   };
 
   const handleValidateClick = () => {
-    if(validationSuccess) return; // Don't validate if already validated
+    if (validationSuccess) return; // Don't validate if already validated
     setTouched((prev) => ({ ...prev, address: true }));
     if (!validateField("address", address)) {
       validateCanadaAddress(address);
@@ -264,7 +279,7 @@ export const DetailsView = () => {
     if (validationSuccess) {
       return (
         <div className="flex items-center gap-1 ">
-          <span className="text-xs hidden sm:inline">Validated ✔</span>
+          <span className="text-xs sm:inline">Validated ✔</span>
         </div>
       );
     }
@@ -378,7 +393,7 @@ export const DetailsView = () => {
             className="absolute right-1 sm:right-2 top-1/2 transform -translate-y-1/2 py-1 px-2 sm:px-3 rounded-md sm:rounded-lg text-xs bg-green-600 opacity-50 cursor-not-allowed"
           >
             <div className="flex items-center gap-1">
-              <span className="hidden sm:inline">Verified ✔</span>
+              <span className=" sm:inline">Verified ✔</span>
             </div>
           </button>
         </div>

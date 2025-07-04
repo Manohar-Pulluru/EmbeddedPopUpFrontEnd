@@ -10,13 +10,15 @@ export const OrderSummary = ({
   isLoading,
   isFormValid,
 }) => {
-  const { activeTab, validationSuccess } = useContext(AppContext);
+  const { activeTab, validationSuccess, isDeliveryAvailable, mode } =
+    useContext(AppContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const isDisabled =
     items?.length === 0 ||
     isFormValid === false ||
-    (activeTab === "Details" && !validationSuccess);
+    (activeTab === "Details" && !validationSuccess) ||
+    (activeTab === "Delivery" && !isDeliveryAvailable && mode == "Delivery");
 
   const deliveryCharges = [
     {
@@ -30,8 +32,8 @@ export const OrderSummary = ({
   ];
 
   return (
-    <div className="flex-none h-[160px] sm:h-fit w-full flex-col flex p-2 sm:p-4 lg:p-0 lg:pt-3">
-      <div className="flex-1 w-full flex flex-col font-medium justify-between sm:justify-evenly gap-2 sm:gap-2">
+    <div className="h-fit sm:h-fit w-full flex-col flex p-2 sm:p-4 lg:p-0 lg:pt-3">
+      <div className=" w-full flex flex-col font-medium justify-between sm:justify-evenly gap-2 sm:gap-2">
         {["Cart", "Details"].includes(activeTab) ? null : (
           <>
             <div className="w-full text-sm sm:text-lg lg:text-xl flex justify-between items-center">
