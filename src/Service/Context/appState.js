@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   getUserAddress,
   getTemplateData,
@@ -728,24 +728,63 @@ export const useAppStates = () => {
     return false;
   };
 
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [address, setAddress] = useState("");
+  const [city, setCity] = useState("");
+  const [pincode, setPincode] = useState("");
+  const [state, setState] = useState("");
 
-   // ─── HYDRATE FROM STORAGE ──────────────────────────────────────────
-  const saved = JSON.parse(localStorage.getItem("aftoSignupForm") || "{}");
-  const [name, setName]       = useState(saved.name       || "");
-  const [phone, setPhone]     = useState(saved.phone      || "");
-  const [email, setEmail]     = useState(saved.email      || "");
-  const [address, setAddress] = useState(saved.address    || "");
-  const [city, setCity]       = useState(saved.city       || "");
-  const [pincode, setPincode] = useState(saved.pincode   || "");
-  const [state, setState]     = useState(saved.state      || "");
+  // ─── HYDRATE FROM STORAGE ──────────────────────────────────────────
+  // const saved = JSON.parse(localStorage.getItem("aftoSignupForm") || "{}");
+  // const [name, setName] = useState(saved.name || "");
+  // const [phone, setPhone] = useState((saved.phone || "").slice(-10));
+  // const [email, setEmail] = useState(saved.email || "");
+  // const [address, setAddress] = useState(saved.address || "");
+  // const [city, setCity] = useState(saved.city || "");
+  // const [pincode, setPincode] = useState(saved.pincode || "");
+  // const [state, setState] = useState(saved.state || "");
+  // const [touched, setTouched] = useState({
+  //   name: false,
+  //   phone: false,
+  //   email: false,
+  //   address: false,
+  //   city: false,
+  //   pincode: false,
+  //   state: false,
+  // });
 
   // … all your other state hooks …
 
   // ─── PERSIST ON ANY CHANGE ────────────────────────────────────────
   // useEffect(() => {
   //   const form = { name, phone, email, address, city, pincode, state };
-  //   localStorage.setItem("aftoSignupForm", JSON.stringify(form));
+  //   // localStorage.setItem("aftoSignupForm", JSON.stringify(form));
   // }, [name, phone, email, address, city, pincode, state]);
+
+  // useEffect(() => {
+  //   if (savedSignupForm) {
+  //     const data = JSON.parse(savedSignupForm);
+
+  //     setName(data.name || "");
+  //     setPhoneNumber((data.phoneNo || "").slice(-10)); // take only last 10 characters
+  //     setEmail(data.email || "");
+  //     setAddress(data.address || "");
+  //     setCity(data.city || "");
+  //     setPincode(data.pincode || data.postalCode || "");
+  //     setState(data.province_or_territory || data.state || "");
+  //     setTouched({
+  //       name: !!data.name,
+  //       phone: !!data.phoneNo,
+  //       email: !!data.email,
+  //       address: !!data.address,
+  //       city: !!data.city,
+  //       pincode: !!(data.pincode || data.postalCode),
+  //       state: !!data.province_or_territory,
+  //     });
+  //   }
+  // }, []);
 
   return {
     user,

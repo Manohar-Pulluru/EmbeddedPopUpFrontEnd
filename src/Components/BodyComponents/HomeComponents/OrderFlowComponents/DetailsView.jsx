@@ -54,7 +54,6 @@ export const DetailsView = () => {
 
   const savedSignupForm = localStorage.getItem("aftoSignupForm");
 
-
   // useEffect(() => {
   //   if (savedSignupForm) {
   //     const data = JSON.parse(savedSignupForm);
@@ -70,28 +69,44 @@ export const DetailsView = () => {
   //   }
   // }, []);
 
-  // useEffect(() => {
-  //   if (savedSignupForm) {
-  //     const data = JSON.parse(savedSignupForm);
+  useEffect(() => {
+    const key = "aftoSignupForm";
+    const current = JSON.parse(localStorage.getItem(key)) || {};
+    localStorage.setItem(
+      key,
+      JSON.stringify({
+        ...current,
+        address, // update only the address
+        // if you ever want to save city/state/pincode too:
+        city,
+        state,
+        pincode,
+      })
+    );
+  }, [address, city, state, pincode]);
 
-  //     setName(data.name || "");
-  //     setPhoneNumber((data.phoneNo || "").slice(-10)); // take only last 10 characters
-  //     setEmail(data.email || "");
-  //     setAddress(data.address || "");
-  //     setCity(data.city || "");
-  //     setPincode(data.pincode || data.postalCode || "");
-  //     setState(data.province_or_territory || data.state || "");
-  //     setTouched({
-  //       name: !!data.name,
-  //       phone: !!data.phoneNo,
-  //       email: !!data.email,
-  //       address: !!data.address,
-  //       city: !!data.city,
-  //       pincode: !!(data.pincode || data.postalCode),
-  //       state: !!data.province_or_territory,
-  //     });
-  //   }
-  // }, []);
+  useEffect(() => {
+    if (savedSignupForm) {
+      const data = JSON.parse(savedSignupForm);
+
+      setName(data.name || "");
+      setPhoneNumber((data.phoneNo || "").slice(-10)); // take only last 10 characters
+      setEmail(data.email || "");
+      setAddress(data.address || "");
+      setCity(data.city || "");
+      setPincode(data.pincode || data.postalCode || "");
+      setState(data.province_or_territory || data.state || "");
+      setTouched({
+        name: !!data.name,
+        phone: !!data.phoneNo,
+        email: !!data.email,
+        address: !!data.address,
+        city: !!data.city,
+        pincode: !!(data.pincode || data.postalCode),
+        state: !!data.province_or_territory,
+      });
+    }
+  }, []);
 
   const validateField = (field, value) => {
     let error = "";
@@ -238,7 +253,7 @@ export const DetailsView = () => {
   };
 
   const handleValidateClick = () => {
-    if(validationSuccess) return; // Don't validate if already validated
+    if (validationSuccess) return; // Don't validate if already validated
     setTouched((prev) => ({ ...prev, address: true }));
     if (!validateField("address", address)) {
       validateCanadaAddress(address);
