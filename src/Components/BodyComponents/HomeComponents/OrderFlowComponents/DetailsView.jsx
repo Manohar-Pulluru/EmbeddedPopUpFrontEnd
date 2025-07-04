@@ -264,7 +264,7 @@ export const DetailsView = () => {
     if (validationSuccess) {
       return (
         <div className="flex items-center gap-1 ">
-          <span className="text-xs hidden sm:inline">Validated ✔</span>
+          <span className="text-xs sm:inline">Validated ✔</span>
         </div>
       );
     }
@@ -378,7 +378,7 @@ export const DetailsView = () => {
             className="absolute right-1 sm:right-2 top-1/2 transform -translate-y-1/2 py-1 px-2 sm:px-3 rounded-md sm:rounded-lg text-xs bg-green-600 opacity-50 cursor-not-allowed"
           >
             <div className="flex items-center gap-1">
-              <span className="hidden sm:inline">Verified ✔</span>
+              <span className=" sm:inline">Verified ✔</span>
             </div>
           </button>
         </div>
