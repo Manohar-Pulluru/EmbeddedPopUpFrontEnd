@@ -34,7 +34,7 @@ export const calculateDeliveryCharge = async (
   origin_address,
   destination_address
 ) => {
-  const endpoint = "/embedded/api/calculate-delivery-charge";
+  const endpoint = "/embedded/api/calculate-delivery-charge/new";
   try {
     const response = await postRequest(endpoint, {
       origin_address,
