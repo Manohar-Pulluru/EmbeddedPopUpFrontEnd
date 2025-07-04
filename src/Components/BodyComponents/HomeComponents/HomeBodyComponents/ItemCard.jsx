@@ -205,16 +205,7 @@ export const ItemCard = ({
         `}
         >
           {/* Simple loading overlay */}
-          {isAnyLoading && (
-            <div className="absolute inset-0 bg-black/40 rounded-2xl sm:rounded-3xl flex items-center justify-center z-10">
-              {isCurrentItemLoading && (
-                <div className="flex items-center gap-2 text-white">
-                  <LoadingSpinner size={20} />
-                  <span className="text-sm">Adding...</span>
-                </div>
-              )}
-            </div>
-          )}
+
 
           {/* Image container with improved responsive positioning */}
           <div
@@ -311,7 +302,8 @@ export const ItemCard = ({
                 <>
                   <Icon height={14} width={14} name={icons.plus} fill="white" />
                   <span className="text-white whitespace-nowrap">
-                    {isAnyLoading ? "Wait..." : "Add to Cart"}
+                    {/* {isAnyLoading ? "Wait..." : "Add to Cart"} */}
+                    Add To Cart
                   </span>
                 </>
               )}

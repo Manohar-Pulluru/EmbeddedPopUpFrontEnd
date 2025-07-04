@@ -34,24 +34,24 @@ export const Orders = () => {
     fetchSelectedOrder();
   }, [selectedOrder]);
 
-return (
-  <div className="h-full w-full bg-[#252836] p-8 text-white flex flex-col">
-    <div className="text-2xl font-semibold mb-6">Order History</div>
+  return (
+    <div className="h-full w-full overflow-scroll scrollbar-hide bg-[#252836] sm:p-8 p-4 text-white flex flex-col">
+      <div className="text-2xl font-semibold mb-6">Order History</div>
 
-    {selectedOrder === null ? (
-      <OrderCardsView orders={orders} setSelectedOrder={setSelectedOrder} />
-    ) : loadingOrderDetails ? (
-      <div className="flex justify-center items-center h-64">
-        <div className="text-lg">Loading order details...</div>
-      </div>
-    ) : (
-      <OrderDetailsView
-        fullOrderData={fullOrderData}
-        onBack={() => setSelectedOrder(null)}
-      />
-    )}
-  </div>
-);
+      {selectedOrder === null ? (
+        <OrderCardsView orders={orders} setSelectedOrder={setSelectedOrder} />
+      ) : loadingOrderDetails ? (
+        <div className="flex justify-center items-center h-64">
+          <div className="text-lg">Loading order details...</div>
+        </div>
+      ) : (
+        <OrderDetailsView
+          fullOrderData={fullOrderData}
+          onBack={() => setSelectedOrder(null)}
+        />
+      )}
+    </div>
+  );
 };
 
 export default Orders;
