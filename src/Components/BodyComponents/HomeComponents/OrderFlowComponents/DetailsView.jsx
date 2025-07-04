@@ -70,28 +70,28 @@ export const DetailsView = () => {
   //   }
   // }, []);
 
-  useEffect(() => {
-    if (savedSignupForm) {
-      const data = JSON.parse(savedSignupForm);
+  // useEffect(() => {
+  //   if (savedSignupForm) {
+  //     const data = JSON.parse(savedSignupForm);
 
-      setName(data.name || "");
-      setPhoneNumber((data.phoneNo || "").slice(-10)); // take only last 10 characters
-      setEmail(data.email || "");
-      setAddress(data.address || "");
-      setCity(data.city || "");
-      setPincode(data.pincode || data.postalCode || "");
-      setState(data.province_or_territory || data.state || "");
-      setTouched({
-        name: !!data.name,
-        phone: !!data.phoneNo,
-        email: !!data.email,
-        address: !!data.address,
-        city: !!data.city,
-        pincode: !!(data.pincode || data.postalCode),
-        state: !!data.province_or_territory,
-      });
-    }
-  }, []);
+  //     setName(data.name || "");
+  //     setPhoneNumber((data.phoneNo || "").slice(-10)); // take only last 10 characters
+  //     setEmail(data.email || "");
+  //     setAddress(data.address || "");
+  //     setCity(data.city || "");
+  //     setPincode(data.pincode || data.postalCode || "");
+  //     setState(data.province_or_territory || data.state || "");
+  //     setTouched({
+  //       name: !!data.name,
+  //       phone: !!data.phoneNo,
+  //       email: !!data.email,
+  //       address: !!data.address,
+  //       city: !!data.city,
+  //       pincode: !!(data.pincode || data.postalCode),
+  //       state: !!data.province_or_territory,
+  //     });
+  //   }
+  // }, []);
 
   const validateField = (field, value) => {
     let error = "";

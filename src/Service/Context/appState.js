@@ -284,7 +284,6 @@ export const useAppStates = () => {
 
         localStorage.setItem("cartItems", JSON.stringify(updatedCart));
         // setItems(normalized);
-
       })
       .catch((err) => {
         console.error("Failed to load cart:", err);
@@ -351,13 +350,13 @@ export const useAppStates = () => {
 
   // Qrders.jsx
   const [activeTab, setActiveTab] = useState("Cart");
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
-  const [address, setAddress] = useState("");
-  const [city, setCity] = useState("");
-  const [pincode, setPincode] = useState("");
-  const [state, setState] = useState("");
+  // const [name, setName] = useState("");
+  // const [phone, setPhone] = useState("");
+  // const [email, setEmail] = useState("");
+  // const [address, setAddress] = useState("");
+  // const [city, setCity] = useState("");
+  // const [pincode, setPincode] = useState("");
+  // const [state, setState] = useState("");
   const [isFormValid, setIsFormValid] = useState(false); // New state for form validity
   const tabs = ["Cart", "Details", "Delivery"];
   const [discount] = useState(0);
@@ -365,6 +364,7 @@ export const useAppStates = () => {
   const [deliveryResult, setDeliveryResult] = useState(null);
   const [restrauntAddress, setRestrauntAddress] = useState(null);
   const [validationSuccess, setValidationSuccess] = useState(true);
+  const [isDeliveryAvailable, setIsDeliveryAvailable] = useState(true);
 
   const calculateSubtotal = (items, deliveryCharge = 0) => {
     return (
@@ -722,11 +722,30 @@ export const useAppStates = () => {
   const isTabDisabled = (tab) => {
     if (activeTab === "Cart") {
       return tab !== "Cart";
-    } else if (activeTab === "Details"){
+    } else if (activeTab === "Details") {
       return tab === "Delivery" ? true : false;
     }
     return false;
   };
+
+
+   // ─── HYDRATE FROM STORAGE ──────────────────────────────────────────
+  const saved = JSON.parse(localStorage.getItem("aftoSignupForm") || "{}");
+  const [name, setName]       = useState(saved.name       || "");
+  const [phone, setPhone]     = useState(saved.phone      || "");
+  const [email, setEmail]     = useState(saved.email      || "");
+  const [address, setAddress] = useState(saved.address    || "");
+  const [city, setCity]       = useState(saved.city       || "");
+  const [pincode, setPincode] = useState(saved.pincode   || "");
+  const [state, setState]     = useState(saved.state      || "");
+
+  // … all your other state hooks …
+
+  // ─── PERSIST ON ANY CHANGE ────────────────────────────────────────
+  // useEffect(() => {
+  //   const form = { name, phone, email, address, city, pincode, state };
+  //   localStorage.setItem("aftoSignupForm", JSON.stringify(form));
+  // }, [name, phone, email, address, city, pincode, state]);
 
   return {
     user,
@@ -850,5 +869,7 @@ export const useAppStates = () => {
     validationSuccess,
     setValidationSuccess,
     refreshItemLocal,
+    isDeliveryAvailable,
+    setIsDeliveryAvailable,
   };
 };

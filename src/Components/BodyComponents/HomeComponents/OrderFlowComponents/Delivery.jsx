@@ -28,6 +28,8 @@ export const Delivery = () => {
     setShowPayment,
     subtotal,
     deliveryCharge,
+    isDeliveryAvailable,
+    setIsDeliveryAvailable
   } = useContext(AppContext);
 
   function getDeliveryCharge(km, orderValue) {
@@ -56,8 +58,12 @@ export const Delivery = () => {
   }
 
   // Check if delivery is available (distance <= 30km)
-  const isDeliveryAvailable = deliveryResult?.distance_km <= 30;
-  // const isDeliveryAvailable = false;
+  // const [isDeliveryAvailable, setIsDeliveryAvailable] = useState(true);
+
+  useEffect(() => {
+    setIsDeliveryAvailable(deliveryResult?.distance_km <= 30);
+    // setIsDeliveryAvailable(false);
+  }, []);
 
   useEffect(() => {
     setMode("Pick Up");
