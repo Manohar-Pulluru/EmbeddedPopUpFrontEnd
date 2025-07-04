@@ -33,7 +33,6 @@ export const ItemCard = ({
   } = useAppContext();
 
   const isAnyLoading = Object.values(itemLoading).some(Boolean);
-  const isCurrentItemLoading = itemLoading[item.id];
 
   // Function to check if item exists in cart
   const checkItemInCart = () => {
@@ -92,12 +91,47 @@ export const ItemCard = ({
       if (!aftoAuthToken) {
         setLoginPage(true);
       } else {
+        // handleAddToCart(item)
+
+        // const isNewCart = localStorage.getItem("cartOrderId");
+
+        // const userDataInLocal = localStorage.getItem("aftoSignupForm");
+        // console.log("userDataInLocal", userDataInLocal);
+
+        // if (!isNewCart) {
+        //   localStorage.setItem("cartOrderId", "1308");
+        // } else {
+        //   const cartOrderId = localStorage.getItem("cartOrderId");
+        //   const payload = {
+        //     orderId: cartOrderId,
+        //     items: [item],
+        //   };
+        //   const addItemToCartResponse = updateCart(payload);
+
+        //   console.log(addItemToCartResponse, "addItemToCartResponse");
+        // }
+
         const cartOrderId = localStorage.getItem("cartOrderId");
 
         if (!cartOrderId) {
+          // setItemLoading((prev) => ({ ...prev, [item.id]: true }));
           const signup = JSON.parse(
             localStorage.getItem("aftoSignupForm") || "{}"
           );
+
+          // const orderPayload = {
+          //   customerName: signup.name,
+          //   customerWhatsappNumber: signup.phoneNo,
+          //   customerEmail: signup.email,
+          //   businessAccountId: signup.businessAccountId,
+          //   deliveryCharges: 0,
+          //   deliveryType: "delivery",
+          //   items: [item],
+          // };
+          // const result = await getTemplateData(activeTemplateId);
+          // const templateID = await result.data.id;
+          // console.log("template Id ",templateID);
+          // console.log("active template Id ",activeTemplateId);
 
           const normalizedItem = {
             id: item.id,
@@ -138,11 +172,15 @@ export const ItemCard = ({
             localStorage.setItem("cartOrderId", txn.id);
             setShowAlert(true);
             toggleChangeCart();
+            // setItemLoading((prev) => ({ ...prev, [item.id]: false }));
+            // setItemAdded((prev) => ({ ...prev, [item.id]: true }));
             if (!order.status) {
               setItemLoading((prev) => ({ ...prev, [item.id]: false }));
               setItemAdded((prev) => ({ ...prev, [item.id]: true }));
+              // addItemLocal(item);
               setIsInCart(true);
             }
+            // window.dispatchEvent(new Event("cartUpdated"));
           } catch (err) {
             console.error("addItemToCart failed:", err);
           }
@@ -157,13 +195,24 @@ export const ItemCard = ({
             console.log("Order ID 1223", order);
             setShowAlert(true);
             toggleChangeCart();
+            // setItemAdded((prev) => ({ ...prev, [item.id]: true }));
             setItemLoading((prev) => ({ ...prev, [item.id]: false }));
             setItemAdded((prev) => ({ ...prev, [item.id]: true }));
+            // addItemLocal(item);
             setIsInCart(true);
+            // window.dispatchEvent(new Event("cartUpdated"));
           } catch (err) {
             console.error("updateCart failed:", err);
           }
         }
+        // setTimeout(() => {
+        //   setItemLoading((prev) => ({ ...prev, [item.id]: false }));
+        // }, 1000);
+
+        // const payload = {};
+
+        // addItemToCart(payload);
+        // setShowAlert(true);
       }
     }
   };
@@ -175,19 +224,11 @@ export const ItemCard = ({
       : text;
   };
 
-  // Simple loading spinner
-  const LoadingSpinner = ({ size = 16 }) => (
-    <div
-      className={`animate-spin rounded-full border-2 border-white border-t-transparent`}
-      style={{ width: size, height: size }}
-    />
-  );
-
   return (
     <>
       <div
         className={`group relative cursor-pointer transform transition-all duration-300 hover:scale-[1.02] hover:shadow-xl ${
-          isAnyLoading ? "pointer-events-none" : ""
+          isAnyLoading ? "opacity-50 pointer-events-none" : ""
         }`}
         onClick={() => !isAnyLoading && handleCardClick()}
       >
@@ -201,24 +242,11 @@ export const ItemCard = ({
           shadow-lg hover:shadow-2xl
           border border-gray-800 hover:border-gray-700
           transition-all duration-300
-          ${isAnyLoading && !isCurrentItemLoading ? "opacity-60" : ""}
         `}
         >
-          {/* Simple loading overlay */}
-          {isAnyLoading && (
-            <div className="absolute inset-0 bg-black/40 rounded-2xl sm:rounded-3xl flex items-center justify-center z-10">
-              {isCurrentItemLoading && (
-                <div className="flex items-center gap-2 text-white">
-                  <LoadingSpinner size={20} />
-                  <span className="text-sm">Adding...</span>
-                </div>
-              )}
-            </div>
-          )}
-
           {/* Image container with improved responsive positioning */}
           <div
-            className={`
+            className="
             w-22 h-22 xs:w-14 xs:h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-34 lg:h-34
             absolute 
             top-[-55px] xs:top-[-28px] sm:top-[-32px] md:top-[-40px] lg:top-[-48px] 
@@ -227,7 +255,7 @@ export const ItemCard = ({
             border-2 sm:border-4 border-white
             shadow-lg group-hover:shadow-xl
             transition-all duration-300 group-hover:scale-110
-          `}
+          "
           >
             <img
               className="w-full h-full object-cover rounded-full"
@@ -245,7 +273,7 @@ export const ItemCard = ({
           <div className="text-center flex-1 flex flex-col justify-between items-center pt-2 xs:pt-3 sm:pt-4 md:pt-6">
             {/* Item name with responsive text and better line clamping */}
             <h3
-              className={`
+              className="
               text-xs xs:text-sm mt-4 sm:mt-16 sm:text-base md:text-lg lg:text-xl 
               font-medium text-white 
               mb-1 xs:mb-2 sm:mb-3 
@@ -253,19 +281,20 @@ export const ItemCard = ({
               text-center w-full
               line-clamp-2
               group-hover:text-[#EA7C69] transition-colors duration-300
-            `}
+            "
             >
+              {/* {truncateText(item.itemName, showPayment ? 30 : 35)} */}
               {truncateText(item.itemName, 35)}
             </h3>
 
             {/* Price with better typography */}
             <div
-              className={`
+              className="
               text-sm xs:text-base sm:text-lg md:text-xl 
               font-semibold text-white 
               mb-2 xs:mb-3 sm:mb-4
               group-hover:text-[#EA7C69] transition-colors duration-300
-            `}
+            "
             >
               ${item.regPrice}
             </div>
@@ -286,12 +315,10 @@ export const ItemCard = ({
                 transform hover:scale-105 active:scale-95
                 cursor-pointer
                 ${
-                  isCurrentItemLoading
-                    ? "bg-[#EA7C69] cursor-not-allowed"
+                  itemLoading[item.id]
+                    ? "bg-[#d68475] cursor-not-allowed opacity-70"
                     : isInCart
                     ? "bg-[#58685c] cursor-default"
-                    : isAnyLoading
-                    ? "bg-gray-600 cursor-not-allowed"
                     : "bg-[#EA7C69] hover:bg-[#d96b57] hover:shadow-orange-500/25"
                 }
               `}
@@ -300,18 +327,17 @@ export const ItemCard = ({
                 <span className="text-white whitespace-nowrap">
                   Added to Cart
                 </span>
-              ) : isCurrentItemLoading ? (
-                <>
-                  <LoadingSpinner size={14} />
-                  <span className="text-white whitespace-nowrap">
-                    Adding...
-                  </span>
-                </>
               ) : (
                 <>
+                  {/* <Icon 
+                    height={showPayment ? 12 : 14} 
+                    width={showPayment ? 12 : 14} 
+                    name={icons.plus} 
+                    fill="white" 
+                  /> */}
                   <Icon height={14} width={14} name={icons.plus} fill="white" />
                   <span className="text-white whitespace-nowrap">
-                    {isAnyLoading ? "Wait..." : "Add to Cart"}
+                    {itemLoading[item.id] ? "Adding..." : "Add to Cart"}
                   </span>
                 </>
               )}

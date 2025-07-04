@@ -10,13 +10,15 @@ export const OrderSummary = ({
   isLoading,
   isFormValid,
 }) => {
-  const { activeTab, validationSuccess } = useContext(AppContext);
+  const { activeTab, validationSuccess, isDeliveryAvailable, mode } =
+    useContext(AppContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const isDisabled =
     items?.length === 0 ||
     isFormValid === false ||
-    (activeTab === "Details" && !validationSuccess);
+    (activeTab === "Details" && !validationSuccess) ||
+    (activeTab === "Delivery" && !isDeliveryAvailable && mode == "Delivery");
 
   const deliveryCharges = [
     {
