@@ -33,8 +33,8 @@ export const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [formData, setFormData] = useState({
-    name: "your name",
-    email: "yourname@gmail.com",
+    name: "Guest User",
+    email: "guest@gmail.com",
     phone: "",
     address: "",
     city: "",
@@ -44,14 +44,6 @@ export const Profile = () => {
   const [hasToken, setHasToken] = useState(false);
   const { isMobile } = useContext(AppContext);
 
-  // Simulate localStorage for demo
-  // const mockLocalStorage = {
-  //   getItem: (key) => {
-  //     if (key === "aftoAuthToken") return "mock-token";
-  //     if (key === "aftoAuthBusinessId") return "mock-business-id";
-  //     return null;
-  //   },
-  // };
 
   const savedSignupForm = localStorage.getItem("aftoSignupForm");
   console.log(
