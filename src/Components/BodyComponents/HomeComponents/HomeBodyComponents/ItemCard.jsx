@@ -32,9 +32,7 @@ export const ItemCard = ({
     setItemAdded,
   } = useAppContext();
 
-  useEffect(() => {
-    console.log("Cart Items Changed Reset by Checking the Add to Button");
-  }, [isCartChanged]);
+
 
   // Function to check if item exists in cart
   const checkItemInCart = () => {
