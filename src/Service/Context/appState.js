@@ -131,6 +131,7 @@ export const useAppStates = () => {
 
   const fetchTemplates = async () => {
     try {
+      console.log(businessId, "businessId__1");
       const result = await getTemplates(businessId);
       setTemplates(result.templates);
       setBusinessData(result.businessData);
@@ -285,6 +286,7 @@ export const useAppStates = () => {
         localStorage.setItem("cartItems", JSON.stringify(updatedCart));
         // setItems(normalized);
 
+        console.log("Order Items: ", items);
       })
       .catch((err) => {
         console.error("Failed to load cart:", err);
@@ -697,12 +699,11 @@ export const useAppStates = () => {
         const data = await confirmOrder(orderId, payload);
 
         // 4) mirror your existing post‐confirm behavior
-        // let history = JSON.parse(localStorage.getItem("orderHistory") || "[]");
-        // history.push(data);
-        // localStorage.setItem("orderHistory", JSON.stringify(history));
+        let history = JSON.parse(localStorage.getItem("orderHistory") || "[]");
+        history.push(data);
+        localStorage.setItem("orderHistory", JSON.stringify(history));
 
         setShowPayment(true);
-        setActiveTab("Cart");
         console.log("Payment Data: ", data.data.paymentIntent);
         setPaymentDetails(data.data.paymentIntent);
 
