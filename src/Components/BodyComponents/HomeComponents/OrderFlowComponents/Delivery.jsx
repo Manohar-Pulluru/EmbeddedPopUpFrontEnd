@@ -27,7 +27,7 @@ export const Delivery = () => {
     setMode,
     setShowPayment,
     subtotal,
-    deliveryCharge
+    deliveryCharge,
   } = useContext(AppContext);
 
   function getDeliveryCharge(km, orderValue) {
@@ -61,8 +61,7 @@ export const Delivery = () => {
 
   useEffect(() => {
     setMode("Pick Up");
-  }, [])
-  
+  }, []);
 
   useEffect(() => {
     if (deliveryResult) {
@@ -73,9 +72,14 @@ export const Delivery = () => {
   useEffect(() => {
     if (mode == "Delivery") {
       if (isDeliveryAvailable) {
-        setDeliveryCharge(getDeliveryCharge(deliveryResult?.distance_km, subtotal) || 0);
+        setDeliveryCharge(
+          getDeliveryCharge(deliveryResult?.distance_km, subtotal) || 0
+        );
         setSubtotal(
-          calculateSubtotal(items, getDeliveryCharge(deliveryResult?.distance_km, subtotal) || 0)
+          calculateSubtotal(
+            items,
+            getDeliveryCharge(deliveryResult?.distance_km, subtotal) || 0
+          )
         );
       } else {
         setDeliveryCharge(0);
@@ -85,7 +89,7 @@ export const Delivery = () => {
       setDeliveryCharge(0);
       setSubtotal(calculateSubtotal(items, 0));
     }
-  }, [mode, deliveryResult, subtotal, items, isDeliveryAvailable]);
+  }, [mode, deliveryResult, items, isDeliveryAvailable]);
 
   return (
     <div
@@ -183,7 +187,8 @@ export const Delivery = () => {
                       Delivery Not Available
                     </h3>
                     <p className="text-gray-300 text-xs sm:text-sm mb-3">
-                      Sorry, we don't deliver to locations more than 30km away from our restaurant.
+                      Sorry, we don't deliver to locations more than 30km away
+                      from our restaurant.
                     </p>
                     <div className="bg-red-900/30 rounded-lg p-3 border border-red-500/40">
                       <div className="flex items-center justify-center gap-2 text-red-300">
@@ -192,12 +197,14 @@ export const Delivery = () => {
                           className="sm:w-3.5 sm:h-3.5 flex-shrink-0"
                         />
                         <span className="font-medium text-xs sm:text-sm text-center">
-                          Distance: {deliveryResult.distance_km} km (Maximum: 30 km)
+                          Distance: {deliveryResult.distance_km} km (Maximum: 30
+                          km)
                         </span>
                       </div>
                     </div>
                     <p className="text-gray-400 text-xs sm:text-sm mt-3">
-                      Please select "Pick Up" option or choose a different delivery address.
+                      Please select "Pick Up" option or choose a different
+                      delivery address.
                     </p>
                   </div>
                 </div>
@@ -257,11 +264,16 @@ export const Delivery = () => {
                         <div className="text-lg sm:text-xl font-bold text-blue-300">
                           {deliveryResult.distance_km}
                         </div>
-                        <div className="text-xs font-medium text-blue-400">KM</div>
+                        <div className="text-xs font-medium text-blue-400">
+                          KM
+                        </div>
                       </div>
 
                       <div className="text-center p-2 sm:p-3 bg-gradient-to-br from-green-500/10 to-green-600/20 rounded-lg border border-green-500/30">
-                        <Clock className="text-green-400 mx-auto mb-1" size={14} />
+                        <Clock
+                          className="text-green-400 mx-auto mb-1"
+                          size={14}
+                        />
                         <div className="text-lg sm:text-xl font-bold text-green-300">
                           {deliveryResult.duration_min}
                         </div>
@@ -271,7 +283,10 @@ export const Delivery = () => {
                       </div>
 
                       <div className="text-center p-2 sm:p-3 bg-gradient-to-br from-orange-500/10 to-red-500/20 rounded-lg border border-orange-500/30">
-                        <Truck className="text-orange-400 mx-auto mb-1" size={14} />
+                        <Truck
+                          className="text-orange-400 mx-auto mb-1"
+                          size={14}
+                        />
                         <div className="text-lg sm:text-xl font-bold text-orange-300">
                           {deliveryCharge}
                         </div>

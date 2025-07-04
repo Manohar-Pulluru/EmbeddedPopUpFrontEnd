@@ -40,7 +40,6 @@ export const CartView = () => {
         setItems(normalized);
         // // response.orderItems holds the array from your curl
         // setItems(response.orderItems || []);
-        console.log("Order Items: ", items);
       })
       .catch((err) => {
         console.error("Failed to load cart:", err);
@@ -68,7 +67,7 @@ export const CartView = () => {
   }
 
   return (
-    <div className="h-[65%] w-full flex flex-col">
+    <div className="h-[75%] w-full flex flex-col">
       <div className="w-full h-14 pt-2 flex items-center font-semibold text-base md:text-base">
         <div className="w-[70%] h-full text-sm md:text-base">Item</div>
         <div className="w-[13%] h-full text-center text-sm md:text-base">

@@ -46,10 +46,10 @@ export const Profile = () => {
 
 
   const savedSignupForm = localStorage.getItem("aftoSignupForm");
-  console.log(
-    "UserData:",
-    savedSignupForm ? JSON.parse(savedSignupForm) : null
-  );
+  // console.log(
+  //   "UserData:",
+  //   savedSignupForm ? JSON.parse(savedSignupForm) : null
+  // );
 
   // Populate form data from token and fetch address if token exists
   useEffect(() => {
