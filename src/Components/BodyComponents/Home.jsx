@@ -129,7 +129,6 @@ export const Home = () => {
     });
   }, [customerName, customerWhatsappNumber, items, businessId]);
 
-  console.log("orderData__", orderData);
 
   return (
     <div className="h-full w-full relative">

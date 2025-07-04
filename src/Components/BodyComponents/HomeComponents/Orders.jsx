@@ -30,8 +30,6 @@ export const Orders = () => {
     handleNext,
   } = useContext(AppContext);
 
-  
-
   useEffect(() => {
     fetchAddress();
     getTemplates(businessId).then((response) => {
@@ -40,13 +38,18 @@ export const Orders = () => {
   }, []);
 
   useEffect(() => {
-    setSubtotal(calculateSubtotal(items, deliveryCharge));
+    setSubtotal(
+      calculateSubtotal(
+        items,
+        ["Cart", "Details"].includes(activeTab) ? 0 : deliveryCharge
+      )
+    );
   }, [items, deliveryCharge]);
 
   return (
-    <div className="h-full w-full flex flex-col bg-[#1F1D2B] p-6 sm:p-8">
+    <div className="h-full w-full flex flex-col bg-[#1F1D2B] p-6 sm:p-8 justify-between ">
       {/* Header Section */}
-      <div className="h-[15%] w-full flex flex-col gap-6">
+      <div className="h-fit w-full flex flex-col gap-6">
         <div className="flex justify-between items-center">
           <div className="text-lg sm:text-2xl font-semibold">
             {activeTab === "Cart"

@@ -172,7 +172,6 @@ export const HomeBody = () => {
 
     const fetchTemplates = async () => {
       try {
-        console.log(businessId, "businessId__1");
         const result = await getTemplates(businessId);
         setTemplates(result.templates);
         setBusinessData(result.businessData);

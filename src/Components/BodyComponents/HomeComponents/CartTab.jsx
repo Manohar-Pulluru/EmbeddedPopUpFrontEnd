@@ -7,7 +7,7 @@ export const Orders = ({ items, subtotal }) => {
   return (
     <div className="h-full w-full flex flex-col bg-[#1F1D2B] p-8">
       {/* Header Section */}
-      <div className="h-[15%] w-full flex flex-col gap-6">
+      <div className="h-fit w-full flex flex-col gap-6">
         <div className="flex justify-between items-center">
           <div className="text-2xl font-semibold">
             {activeTab === "Cart"
