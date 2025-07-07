@@ -113,7 +113,7 @@ const PaymentForm = ({
           <span>Subtotal</span>
           <span>
             {formatAmount(
-              paymentDetails.amount - paymentDetails.applicationFeeAmount
+              paymentDetails.amount
             )}
           </span>
         </div>
@@ -132,7 +132,7 @@ const PaymentForm = ({
         </div>
         <div className="flex justify-between font-bold border-t border-[#e6e6e6] pt-1 md:pt-2 text-[#ffffff] text-xs md:text-base">
           <span>Total</span>
-          <span>{formatAmount(paymentDetails.amount)}</span>
+          <span>{formatAmount(paymentDetails.amount + paymentDetails.applicationFeeAmount)}</span>
         </div>
       </div>
 
@@ -185,7 +185,7 @@ const PaymentForm = ({
                 <span className="text-xs md:text-base">Processing...</span>
               </>
             ) : (
-              `Pay ${formatAmount(paymentDetails.amount)}`
+              `Pay ${formatAmount(paymentDetails.amount + paymentDetails.applicationFeeAmount)}`
             )}
           </button>
         </form>
