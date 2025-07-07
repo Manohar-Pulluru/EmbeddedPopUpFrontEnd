@@ -4,7 +4,6 @@ import icons from "../assets/icons.json";
 import { AppContext } from "../Service/Context/AppContext";
 
 export const NavBar = ({ activeIndex, setActiveIndex }) => {
-  // const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
   const {
     isMobile,
     setIsMobile,
@@ -19,7 +18,7 @@ export const NavBar = ({ activeIndex, setActiveIndex }) => {
     setShowPayment(false);
   }, [activeIndex]);
 
-  const itemCount = items.reduce((acc, item) => acc + item.quantity, 0); // here is the item count
+  const itemCount = items.reduce((acc, item) => acc + item.quantity, 0);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 640);
@@ -38,20 +37,18 @@ export const NavBar = ({ activeIndex, setActiveIndex }) => {
   const triggerLogout = () => {
     localStorage.removeItem("aftoAuthToken");
     localStorage.removeItem("aftoSignupForm");
-    // localStorage.removeItem("orderHistory");
     localStorage.removeItem("cartItems");
     localStorage.removeItem("cartOrderId");
-
-    // localStorage.clear();
     window.location.reload();
   };
 
-  // Desktop positioning
-  const topOffset = 136; // height of logo section
-  const topPosition = topOffset + activeIndex * 136;
+  // Desktop positioning - make it responsive
+  const logoHeight = isMobile ? 0 : 136; // Logo height only on desktop
+  const itemHeight = isMobile ? 64 : 136; // Item height based on screen
+  const topPosition = logoHeight + activeIndex * itemHeight;
 
-  // Mobile positioning - now properly calculated for 5 items
-  const mobileItemWidth = window.innerWidth / options.length;
+  // Mobile positioning
+  const mobileItemWidth = isMobile ? window.innerWidth / options.length : 0;
   const leftPosition = activeIndex * mobileItemWidth;
 
   // Generic cart icon component for mobile
@@ -71,59 +68,56 @@ export const NavBar = ({ activeIndex, setActiveIndex }) => {
   );
 
   return (
-    // <div className="h-full w-full flex sm:flex-col flex-row bg-[#1F1D2B] relative">
     <div
-      className="
-        fixed bottom-0 left-0
-        sm:static
-        flex sm:flex-col flex-row
-        w-full sm:w-[5%]
-        h-16 sm:h-full
-        bg-[#1F1D2B]
-        overflow-hidden
-        z-20
-      "
+      className={`
+        ${isMobile 
+          ? 'fixed bottom-0 left-0 w-full h-16 flex-row z-20' 
+          : 'relative flex-col w-22 h-full'
+        }
+        flex bg-[#1F1D2B] overflow-hidden z-20
+      `}
     >
       {/* Logo - only visible on desktop */}
-      <div className="sm:h-34 sm:w-full aspect-square sm:flex hidden items-center justify-center z-10">
-        <svg
-          width="56"
-          height="56"
-          viewBox="0 0 56 56"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <rect opacity="0.26" width="56" height="56" rx="12" fill="#EB966A" />
-          <path
-            d="M39.6667 11.3333H16.3333C13.5767 11.3333 11.3333 13.5767 11.3333 16.3333V21.0517C11.3333 22.8067 11.97 24.4017 13 25.6283V41.3333C13 41.7754 13.1756 42.1993 13.4882 42.5119C13.8007 42.8244 14.2247 43 14.6667 43H28C28.442 43 28.866 42.8244 29.1785 42.5119C29.4911 42.1993 29.6667 41.7754 29.6667 41.3333V33H36.3333V41.3333C36.3333 41.7754 36.5089 42.1993 36.8215 42.5119C37.1341 42.8244 37.558 43 38 43H41.3333C41.7754 43 42.1993 42.8244 42.5119 42.5119C42.8244 42.1993 43 41.7754 43 41.3333V25.6267C44.03 24.4017 44.6667 22.8067 44.6667 21.05V16.3333C44.6667 13.5767 42.4233 11.3333 39.6667 11.3333ZM41.3333 16.3333V21.0517C41.3333 22.9517 39.9183 24.5717 38.1817 24.6633L38 24.6667C36.1617 24.6667 34.6667 23.1717 34.6667 21.3333V14.6667H39.6667C40.5867 14.6667 41.3333 15.415 41.3333 16.3333ZM24.6667 21.3333V14.6667H31.3333V21.3333C31.3333 23.1717 29.8383 24.6667 28 24.6667C26.1617 24.6667 24.6667 23.1717 24.6667 21.3333ZM14.6667 16.3333C14.6667 15.415 15.4133 14.6667 16.3333 14.6667H21.3333V21.3333C21.3333 23.1717 19.8383 24.6667 18 24.6667L17.8183 24.6617C16.0817 24.5717 14.6667 22.9517 14.6667 21.0517V16.3333ZM24.6667 34.6667H18V29.6667H24.6667V34.6667Z"
-            fill="url(#paint0_linear_1_63)"
-          />
-          <defs>
-            <linearGradient
-              id="paint0_linear_1_63"
-              x1="28"
-              y1="11.3333"
-              x2="28"
-              y2="43"
-              gradientUnits="userSpaceOnUse"
-            >
-              <stop stopColor="#EA9769" />
-              <stop offset="1" stopColor="#EA6969" />
-            </linearGradient>
-          </defs>
-        </svg>
-      </div>
+      {!isMobile && (
+        <div className="h-34 w-full flex items-center justify-center z-10">
+          <svg
+            width="56"
+            height="56"
+            viewBox="0 0 56 56"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <rect opacity="0.26" width="56" height="56" rx="12" fill="#EB966A" />
+            <path
+              d="M39.6667 11.3333H16.3333C13.5767 11.3333 11.3333 13.5767 11.3333 16.3333V21.0517C11.3333 22.8067 11.97 24.4017 13 25.6283V41.3333C13 41.7754 13.1756 42.1993 13.4882 42.5119C13.8007 42.8244 14.2247 43 14.6667 43H28C28.442 43 28.866 42.8244 29.1785 42.5119C29.4911 42.1993 29.6667 41.7754 29.6667 41.3333V33H36.3333V41.3333C36.3333 41.7754 36.5089 42.1993 36.8215 42.5119C37.1341 42.8244 37.558 43 38 43H41.3333C41.7754 43 42.1993 42.8244 42.5119 42.5119C42.8244 42.1993 43 41.7754 43 41.3333V25.6267C44.03 24.4017 44.6667 22.8067 44.6667 21.05V16.3333C44.6667 13.5767 42.4233 11.3333 39.6667 11.3333ZM41.3333 16.3333V21.0517C41.3333 22.9517 39.9183 24.5717 38.1817 24.6633L38 24.6667C36.1617 24.6667 34.6667 23.1717 34.6667 21.3333V14.6667H39.6667C40.5867 14.6667 41.3333 15.415 41.3333 16.3333ZM24.6667 21.3333V14.6667H31.3333V21.3333C31.3333 23.1717 29.8383 24.6667 28 24.6667C26.1617 24.6667 24.6667 23.1717 24.6667 21.3333ZM14.6667 16.3333C14.6667 15.415 15.4133 14.6667 16.3333 14.6667H21.3333V21.3333C21.3333 23.1717 19.8383 24.6667 18 24.6667L17.8183 24.6617C16.0817 24.5717 14.6667 22.9517 14.6667 21.0517V16.3333ZM24.6667 34.6667H18V29.6667H24.6667V34.6667Z"
+              fill="url(#paint0_linear_1_63)"
+            />
+            <defs>
+              <linearGradient
+                id="paint0_linear_1_63"
+                x1="28"
+                y1="11.3333"
+                x2="28"
+                y2="43"
+                gradientUnits="userSpaceOnUse"
+              >
+                <stop stopColor="#EA9769" />
+                <stop offset="1" stopColor="#EA6969" />
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+      )}
 
-      {/* Moving box (desktop - vertical) */}
-      {/* Moving box (desktop - vertical, left aligned) */}
+      {/* Moving box - Desktop (vertical) */}
       {!isMobile && (
         <div
-          className="absolute hidden sm:flex flex-col h-34 w-16 left-3 bg-transparent transition-all duration-300 ease-in-out z-0"
+          className="absolute flex flex-col h-34 w-16 left-1 bg-transparent transition-all duration-300 ease-in-out z-0"
           style={{ top: `${topPosition}px` }}
         >
           <div className="w-full h-6 bg-[#1F1D2B] rounded-br-4xl"></div>
           <div className="w-full flex-1 bg-[#1F1D2B] flex justify-start">
-            <div className="h-full w-[132%] aspect-square bg-[#252836] p-4 pr-5 rounded-l-3xl">
+            <div className="h-full w-[132%] bg-[#252836] p-4 pr-5 rounded-l-3xl">
               <div className="bg-[#EA7C69] rounded-2xl h-full aspect-square"></div>
             </div>
           </div>
@@ -131,11 +125,10 @@ export const NavBar = ({ activeIndex, setActiveIndex }) => {
         </div>
       )}
 
-      {/* this is not alligned  */}
+      {/* Moving box - Mobile (horizontal) */}
       {isMobile && (
         <div
-          className="absolute sm:hidden bottom-0 h-16 transition-all duration-300 ease-in-out z-0 "
-          // className="absolute bottom-0 sm:hidden h-16 transition-all duration-300 ease-in-out z-0"
+          className="absolute bottom-0 h-16 transition-all duration-300 ease-in-out z-0"
           style={{
             left: `${leftPosition}px`,
             width: `${mobileItemWidth}px`,
@@ -160,9 +153,13 @@ export const NavBar = ({ activeIndex, setActiveIndex }) => {
         return (
           <div
             key={index}
-            className={`flex items-center justify-center sm:h-34 h-16 cursor-pointer z-10 relative ${
-              isMobile ? "flex-1" : "w-16 sm:w-full"
-            }`}
+            className={`
+              flex items-center justify-center cursor-pointer z-10 relative
+              ${isMobile 
+                ? 'h-16 flex-1' 
+                : 'h-34 w-full'
+              }
+            `}
             onClick={() => {
               setActiveIndex(index);
               if (option.name === "Cart") {
@@ -173,47 +170,36 @@ export const NavBar = ({ activeIndex, setActiveIndex }) => {
               }
             }}
           >
-            <div className="w-full sm:ml-2 flex items-center justify-center flex-col sm:flex-row gap-1 sm:gap-0">
-              {option.name === "See Cart" ? (
-                <CartIcon
+            <div className={`
+              flex items-center justify-center
+              ${isMobile 
+                ? 'flex-col gap-1 w-full' 
+                : 'flex-row gap-0 w-full ml-2'
+              }
+            `}>
+              <div className="relative">
+                <Icon
+                  name={option.iconName}
                   width={isMobile ? 20 : 32}
                   height={isMobile ? 20 : 32}
                   fill={isActive ? "#FFFFFF" : "#EA7C69"}
                 />
-              ) : (
-                <div className="relative">
-                  <Icon
-                    name={option.iconName}
-                    width={isMobile ? 20 : 32}
-                    height={isMobile ? 20 : 32}
-                    fill={isActive ? "#FFFFFF" : "#EA7C69"}
-                  />
-                  {option.name === "Cart" && itemCount > 0 && (
-                    <div
-                      className={`
-                        absolute 
-                        ${isMobile ? "-top-1 -right-1" : "-top-2 -right-2"}
-                        ${
-                          isMobile
-                            ? "h-4 min-w-[16px] px-1"
-                            : "h-5 min-w-[20px] px-1.5"
-                        }
-                        bg-gradient-to-br from-[#EA7C69] to-[#EA6969]
-                        text-white 
-                        ${isMobile ? "text-[9px]" : "text-xs"}
-                        font-bold 
-                        rounded-full 
-                        flex items-center justify-center
-                        shadow-lg
-                        border-2 border-[#1F1D2B]
-                      `}
-                    >
-                      {itemCount > 99 ? "99+" : itemCount}
-                    </div>
-                  )}
-                </div>
-              )}
-              {/* Label for mobile - optional */}
+                {option.name === "Cart" && itemCount > 0 && (
+                  <div
+                    className={`
+                      absolute 
+                      ${isMobile ? "-top-1 -right-1 h-4 min-w-[16px] px-1 text-[9px]" : "-top-2 -right-2 h-5 min-w-[20px] px-1.5 text-xs"}
+                      bg-gradient-to-br from-[#EA7C69] to-[#EA6969]
+                      text-white font-bold rounded-full 
+                      flex items-center justify-center
+                      shadow-lg border-2 border-[#1F1D2B]
+                    `}
+                  >
+                    {itemCount > 99 ? "99+" : itemCount}
+                  </div>
+                )}
+              </div>
+              {/* Label for mobile */}
               {isMobile && (
                 <span
                   className={`text-xs font-medium ${
@@ -221,7 +207,7 @@ export const NavBar = ({ activeIndex, setActiveIndex }) => {
                   }`}
                   style={{ fontSize: "10px" }}
                 >
-                  {option.name === "See Cart" ? "Cart" : option.name}
+                  {option.name}
                 </span>
               )}
             </div>
@@ -231,9 +217,9 @@ export const NavBar = ({ activeIndex, setActiveIndex }) => {
 
       {/* Auth section - only visible on desktop */}
       {!isMobile && (
-        <>
+        <div className="mt-auto">
           {!localStorage.getItem("aftoAuthToken")?.length ? (
-            <div className="sm:h-34 sm:w-auto pl-7 flex-col absolute bottom-0 aspect-square sm:flex hidden items-start justify-center z-10">
+            <div className="h-34 w-full pl-7 flex flex-col items-start justify-center z-10">
               <svg
                 width="32"
                 height="32"
@@ -259,7 +245,7 @@ export const NavBar = ({ activeIndex, setActiveIndex }) => {
               </div>
             </div>
           ) : (
-            <div className="sm:h-34 sm:w-auto cursor-pointer pl-7 flex-col absolute bottom-0 aspect-square sm:flex hidden items-start justify-center z-10">
+            <div className="h-34 w-full cursor-pointer pl-7 flex flex-col items-start justify-center z-10">
               <svg
                 onClick={triggerLogout}
                 width="32"
@@ -275,7 +261,7 @@ export const NavBar = ({ activeIndex, setActiveIndex }) => {
               </svg>
             </div>
           )}
-        </>
+        </div>
       )}
     </div>
   );
