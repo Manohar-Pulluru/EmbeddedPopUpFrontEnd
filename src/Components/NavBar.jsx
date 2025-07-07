@@ -4,7 +4,6 @@ import icons from "../assets/icons.json";
 import { AppContext } from "../Service/Context/AppContext";
 
 export const NavBar = ({ activeIndex, setActiveIndex }) => {
-  // const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
   const {
     isMobile,
     setIsMobile,
@@ -41,20 +40,18 @@ export const NavBar = ({ activeIndex, setActiveIndex }) => {
   const triggerLogout = () => {
     localStorage.removeItem("aftoAuthToken");
     localStorage.removeItem("aftoSignupForm");
-    // localStorage.removeItem("orderHistory");
     localStorage.removeItem("cartItems");
     localStorage.removeItem("cartOrderId");
-
-    // localStorage.clear();
     window.location.reload();
   };
 
-  // Desktop positioning
-  const topOffset = 136; // height of logo section
-  const topPosition = topOffset + activeIndex * 136;
+  // Desktop positioning - make it responsive
+  const logoHeight = isMobile ? 0 : 136; // Logo height only on desktop
+  const itemHeight = isMobile ? 64 : 136; // Item height based on screen
+  const topPosition = logoHeight + activeIndex * itemHeight;
 
-  // Mobile positioning - now properly calculated for 5 items
-  const mobileItemWidth = window.innerWidth / options.length;
+  // Mobile positioning
+  const mobileItemWidth = isMobile ? window.innerWidth / options.length : 0;
   const leftPosition = activeIndex * mobileItemWidth;
 
   // Generic cart icon component for mobile
@@ -74,18 +71,14 @@ export const NavBar = ({ activeIndex, setActiveIndex }) => {
   );
 
   return (
-    // <div className="h-full w-full flex sm:flex-col flex-row bg-[#1F1D2B] relative">
     <div
-      className="
-        fixed bottom-0 left-0
-        sm:static
-        flex sm:flex-col flex-row
-        w-full sm:w-[5%]
-        h-16 sm:h-full
-        bg-[#1F1D2B]
-        overflow-hidden
-        z-20
-      "
+      className={`
+        ${isMobile 
+          ? 'fixed bottom-0 left-0 w-full h-16 flex-row z-20' 
+          : 'relative flex-col w-22 h-full'
+        }
+        flex bg-[#1F1D2B] overflow-hidden z-20
+      `}
     >
       {/* Logo - only visible on desktop */}
       <div className="sm:h-34 sm:w-full aspect-square sm:flex hidden items-center justify-center z-10">
@@ -94,16 +87,15 @@ export const NavBar = ({ activeIndex, setActiveIndex }) => {
         }
       </div>
 
-      {/* Moving box (desktop - vertical) */}
-      {/* Moving box (desktop - vertical, left aligned) */}
+      {/* Moving box - Desktop (vertical) */}
       {!isMobile && (
         <div
-          className="absolute hidden sm:flex flex-col h-34 w-16 left-3 bg-transparent transition-all duration-300 ease-in-out z-0"
+          className="absolute flex flex-col h-34 w-16 left-1 bg-transparent transition-all duration-300 ease-in-out z-0"
           style={{ top: `${topPosition}px` }}
         >
           <div className="w-full h-6 bg-[#1F1D2B] rounded-br-4xl"></div>
           <div className="w-full flex-1 bg-[#1F1D2B] flex justify-start">
-            <div className="h-full w-[132%] aspect-square bg-[#252836] p-4 pr-5 rounded-l-3xl">
+            <div className="h-full w-[132%] bg-[#252836] p-4 pr-5 rounded-l-3xl">
               <div className="bg-[#EA7C69] rounded-2xl h-full aspect-square"></div>
             </div>
           </div>
@@ -111,11 +103,10 @@ export const NavBar = ({ activeIndex, setActiveIndex }) => {
         </div>
       )}
 
-      {/* this is not alligned  */}
+      {/* Moving box - Mobile (horizontal) */}
       {isMobile && (
         <div
-          className="absolute sm:hidden bottom-0 h-16 transition-all duration-300 ease-in-out z-0 "
-          // className="absolute bottom-0 sm:hidden h-16 transition-all duration-300 ease-in-out z-0"
+          className="absolute bottom-0 h-16 transition-all duration-300 ease-in-out z-0"
           style={{
             left: `${leftPosition}px`,
             width: `${mobileItemWidth}px`,
@@ -140,9 +131,13 @@ export const NavBar = ({ activeIndex, setActiveIndex }) => {
         return (
           <div
             key={index}
-            className={`flex items-center justify-center sm:h-34 h-16 cursor-pointer z-10 relative ${
-              isMobile ? "flex-1" : "w-16 sm:w-full"
-            }`}
+            className={`
+              flex items-center justify-center cursor-pointer z-10 relative
+              ${isMobile 
+                ? 'h-16 flex-1' 
+                : 'h-34 w-full'
+              }
+            `}
             onClick={() => {
               setActiveIndex(index);
               if (option.name === "Cart") {
@@ -153,47 +148,36 @@ export const NavBar = ({ activeIndex, setActiveIndex }) => {
               }
             }}
           >
-            <div className="w-full sm:ml-2 flex items-center justify-center flex-col sm:flex-row gap-1 sm:gap-0">
-              {option.name === "See Cart" ? (
-                <CartIcon
+            <div className={`
+              flex items-center justify-center
+              ${isMobile 
+                ? 'flex-col gap-1 w-full' 
+                : 'flex-row gap-0 w-full ml-2'
+              }
+            `}>
+              <div className="relative">
+                <Icon
+                  name={option.iconName}
                   width={isMobile ? 20 : 32}
                   height={isMobile ? 20 : 32}
                   fill={isActive ? "#FFFFFF" : "#EA7C69"}
                 />
-              ) : (
-                <div className="relative">
-                  <Icon
-                    name={option.iconName}
-                    width={isMobile ? 20 : 32}
-                    height={isMobile ? 20 : 32}
-                    fill={isActive ? "#FFFFFF" : "#EA7C69"}
-                  />
-                  {option.name === "Cart" && itemCount > 0 && (
-                    <div
-                      className={`
-                        absolute 
-                        ${isMobile ? "-top-1 -right-1" : "-top-2 -right-2"}
-                        ${
-                          isMobile
-                            ? "h-4 min-w-[16px] px-1"
-                            : "h-5 min-w-[20px] px-1.5"
-                        }
-                        bg-gradient-to-br from-[#EA7C69] to-[#EA6969]
-                        text-white 
-                        ${isMobile ? "text-[9px]" : "text-xs"}
-                        font-bold 
-                        rounded-full 
-                        flex items-center justify-center
-                        shadow-lg
-                        border-2 border-[#1F1D2B]
-                      `}
-                    >
-                      {itemCount > 99 ? "99+" : itemCount}
-                    </div>
-                  )}
-                </div>
-              )}
-              {/* Label for mobile - optional */}
+                {option.name === "Cart" && itemCount > 0 && (
+                  <div
+                    className={`
+                      absolute 
+                      ${isMobile ? "-top-1 -right-1 h-4 min-w-[16px] px-1 text-[9px]" : "-top-2 -right-2 h-5 min-w-[20px] px-1.5 text-xs"}
+                      bg-gradient-to-br from-[#EA7C69] to-[#EA6969]
+                      text-white font-bold rounded-full 
+                      flex items-center justify-center
+                      shadow-lg border-2 border-[#1F1D2B]
+                    `}
+                  >
+                    {itemCount > 99 ? "99+" : itemCount}
+                  </div>
+                )}
+              </div>
+              {/* Label for mobile */}
               {isMobile && (
                 <span
                   className={`text-xs font-medium ${
@@ -201,7 +185,7 @@ export const NavBar = ({ activeIndex, setActiveIndex }) => {
                   }`}
                   style={{ fontSize: "10px" }}
                 >
-                  {option.name === "See Cart" ? "Cart" : option.name}
+                  {option.name}
                 </span>
               )}
             </div>
@@ -211,9 +195,9 @@ export const NavBar = ({ activeIndex, setActiveIndex }) => {
 
       {/* Auth section - only visible on desktop */}
       {!isMobile && (
-        <>
+        <div className="mt-auto">
           {!localStorage.getItem("aftoAuthToken")?.length ? (
-            <div className="sm:h-34 sm:w-auto pl-7 flex-col absolute bottom-0 aspect-square sm:flex hidden items-start justify-center z-10">
+            <div className="h-34 w-full pl-7 flex flex-col items-start justify-center z-10">
               <svg
                 width="32"
                 height="32"
@@ -239,7 +223,7 @@ export const NavBar = ({ activeIndex, setActiveIndex }) => {
               </div>
             </div>
           ) : (
-            <div className="sm:h-34 sm:w-auto cursor-pointer pl-7 flex-col absolute bottom-0 aspect-square sm:flex hidden items-start justify-center z-10">
+            <div className="h-34 w-full cursor-pointer pl-7 flex flex-col items-start justify-center z-10">
               <svg
                 onClick={triggerLogout}
                 width="32"
@@ -255,7 +239,7 @@ export const NavBar = ({ activeIndex, setActiveIndex }) => {
               </svg>
             </div>
           )}
-        </>
+        </div>
       )}
     </div>
   );
