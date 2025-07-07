@@ -656,6 +656,7 @@ export const useAppStates = () => {
   //   }
   // };
 
+
   const handleNext = async () => {
     if (activeTab === "Cart") {
       const token = localStorage.getItem("aftoAuthToken");
@@ -665,13 +666,22 @@ export const useAppStates = () => {
       }
       setActiveTab("Details");
     } else if (activeTab === "Details" && isFormValid && validationSuccess) {
-      const res = await calculateDeliveryCharge(
-        restrauntAddress,
-        `${address} ${city} ${state} ${pincode}`
-      );
-      setDeliveryResult(res);
-      setDeliveryCharge(res.delivery_charge || 0);
-      setActiveTab("Delivery");
+      setIsLoading(true);
+      try {
+        const res = await calculateDeliveryCharge(
+          restrauntAddress,
+          `${address} ${city} ${state} ${pincode}`
+        );
+        setDeliveryResult(res);
+        setDeliveryCharge(res.delivery_charge || 0);
+        setActiveTab("Delivery");
+      } catch (error) {
+        console.error("Failed to calculate delivery charge:", error);
+        setPopupMessage("Failed to calculate delivery charge. Please try again.");
+        setShowPopup(true);
+      }finally{
+        setIsLoading(false);
+      }
     } else if (activeTab === "Delivery" && isFormValid) {
       // 1) Get saved user data and orderId
       const signup = JSON.parse(localStorage.getItem("aftoSignupForm") || "{}");
