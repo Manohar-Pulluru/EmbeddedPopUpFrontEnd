@@ -12,13 +12,16 @@ export const NavBar = ({ activeIndex, setActiveIndex }) => {
     items,
     setActiveTab,
     setShowPayment,
+    businessData
   } = useContext(AppContext);
 
   useEffect(() => {
     setShowPayment(false);
   }, [activeIndex]);
 
-  const itemCount = items.reduce((acc, item) => acc + item.quantity, 0);
+  console.log(businessData, "jkbebck")
+
+  const itemCount = items.reduce((acc, item) => acc + item.quantity, 0); // here is the item count
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 640);
@@ -78,36 +81,11 @@ export const NavBar = ({ activeIndex, setActiveIndex }) => {
       `}
     >
       {/* Logo - only visible on desktop */}
-      {!isMobile && (
-        <div className="h-34 w-full flex items-center justify-center z-10">
-          <svg
-            width="56"
-            height="56"
-            viewBox="0 0 56 56"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <rect opacity="0.26" width="56" height="56" rx="12" fill="#EB966A" />
-            <path
-              d="M39.6667 11.3333H16.3333C13.5767 11.3333 11.3333 13.5767 11.3333 16.3333V21.0517C11.3333 22.8067 11.97 24.4017 13 25.6283V41.3333C13 41.7754 13.1756 42.1993 13.4882 42.5119C13.8007 42.8244 14.2247 43 14.6667 43H28C28.442 43 28.866 42.8244 29.1785 42.5119C29.4911 42.1993 29.6667 41.7754 29.6667 41.3333V33H36.3333V41.3333C36.3333 41.7754 36.5089 42.1993 36.8215 42.5119C37.1341 42.8244 37.558 43 38 43H41.3333C41.7754 43 42.1993 42.8244 42.5119 42.5119C42.8244 42.1993 43 41.7754 43 41.3333V25.6267C44.03 24.4017 44.6667 22.8067 44.6667 21.05V16.3333C44.6667 13.5767 42.4233 11.3333 39.6667 11.3333ZM41.3333 16.3333V21.0517C41.3333 22.9517 39.9183 24.5717 38.1817 24.6633L38 24.6667C36.1617 24.6667 34.6667 23.1717 34.6667 21.3333V14.6667H39.6667C40.5867 14.6667 41.3333 15.415 41.3333 16.3333ZM24.6667 21.3333V14.6667H31.3333V21.3333C31.3333 23.1717 29.8383 24.6667 28 24.6667C26.1617 24.6667 24.6667 23.1717 24.6667 21.3333ZM14.6667 16.3333C14.6667 15.415 15.4133 14.6667 16.3333 14.6667H21.3333V21.3333C21.3333 23.1717 19.8383 24.6667 18 24.6667L17.8183 24.6617C16.0817 24.5717 14.6667 22.9517 14.6667 21.0517V16.3333ZM24.6667 34.6667H18V29.6667H24.6667V34.6667Z"
-              fill="url(#paint0_linear_1_63)"
-            />
-            <defs>
-              <linearGradient
-                id="paint0_linear_1_63"
-                x1="28"
-                y1="11.3333"
-                x2="28"
-                y2="43"
-                gradientUnits="userSpaceOnUse"
-              >
-                <stop stopColor="#EA9769" />
-                <stop offset="1" stopColor="#EA6969" />
-              </linearGradient>
-            </defs>
-          </svg>
-        </div>
-      )}
+      <div className="sm:h-34 sm:w-full aspect-square sm:flex hidden items-center justify-center z-10">
+        {
+          <img className="w-[60%] rounded-xl bg-white shadow-md shadow-white" src={businessData?.logoUrl}/>
+        }
+      </div>
 
       {/* Moving box - Desktop (vertical) */}
       {!isMobile && (
