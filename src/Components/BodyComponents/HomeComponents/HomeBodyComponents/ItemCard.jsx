@@ -7,13 +7,10 @@ import { useAppContext } from "../../../../Service/Context/AppContext";
 import {
   addItemToCart,
   updateCart,
-  getTemplateData,
 } from "../../../../Service/api";
 
-export const ItemCard = ({
+const ItemCard = ({
   item,
-  showPayment,
-  handleAddToCart,
   itemLoading,
   itemAdded,
 }) => {
@@ -23,11 +20,9 @@ export const ItemCard = ({
     isCartChanged,
     setShowAlert,
     setLoginPage,
-    mode,
     businessId,
     activeTemplateId,
     toggleChangeCart,
-    addItemLocal,
     setItemLoading,
     setItemAdded,
   } = useAppContext();
@@ -324,3 +319,5 @@ export const ItemCard = ({
     </>
   );
 };
+
+export default ItemCard;

@@ -1,6 +1,6 @@
 // Section.js
-import React, { useContext, useEffect } from "react";
-import { ItemCard } from "./ItemCard";
+import React, { useContext, useEffect, Suspense } from "react";
+const ItemCard = React.lazy(() => import("./ItemCard"));
 import { AppContext } from "../../../../Service/Context/AppContext";
 export const Section = ({ section }) => {
   const {
@@ -13,6 +13,22 @@ export const Section = ({ section }) => {
   useEffect(() => {
     refreshItemLocal();
   }, [refreshItemLocal]);
+
+  const CardSkeleton = () => (
+    <div
+      className={`
+        h-[150px] xs:h-[220px] sm:h-[250px] md:h-[280px]
+        w-full aspect-[3/4]
+        mt-8 xs:mt-10 sm:mt-12 md:mt-16 lg:mt-20
+        bg-[#1F1D2B]
+        relative rounded-2xl sm:rounded-3xl
+        flex flex-col justify-end
+        p-4 sm:p-5 md:p-6
+        shadow-lg border border-gray-800
+        animate-pulse
+      `}
+    />
+  );
 
   return (
     <section className="mb-8 sm:mb-12 px-4 sm:px-6">
@@ -27,26 +43,6 @@ export const Section = ({ section }) => {
           </p>
         )}
       </div>
-
-      {/* Grid container with improved responsive design */}
-      {/* <div
-        className={`
-          grid gap-3 xs:gap-4 sm:gap-5 md:gap-6 lg:gap-8
-          transition-all duration-500 ease-in-out
-          ${
-            showPayment
-              ? "grid-cols-2 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3"
-              : "grid-cols-2 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
-          }
-        `}
-      > */}
-      {/* <div
-        className={`
-          grid gap-3 xs:gap-4 sm:gap-5 md:gap-6 lg:gap-8
-          transition-all duration-500 ease-in-out
-          grid-cols-2 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5
-        `}
-      > */}
       <div
         className="grid gap-8 mt-12 sm:mt-4 sm:gap-4 md:gap-6 lg:gap-8
           transition-all duration-300 ease-in-out
@@ -58,14 +54,15 @@ export const Section = ({ section }) => {
       >
         {section?.items?.length > 0 ? (
           section.items.map((item, itemIndex) => (
-            <ItemCard
-              key={item.id || itemIndex}
-              item={item}
-              showPayment={showPayment}
-              handleAddToCart={handleAddToCart}
-              itemLoading={itemLoading}
-              itemAdded={itemAdded}
-            />
+            <Suspense key={item.id || itemIndex} fallback={<CardSkeleton />}>
+              <ItemCard
+                item={item}
+                showPayment={showPayment}
+                handleAddToCart={handleAddToCart}
+                itemLoading={itemLoading}
+                itemAdded={itemAdded}
+              />
+            </Suspense>
           ))
         ) : (
           <div className="col-span-full">
