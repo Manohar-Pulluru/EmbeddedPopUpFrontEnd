@@ -9,6 +9,7 @@ export const OrderSummary = ({
   items,
   isLoading,
   isFormValid,
+  LoadingDeliveryCharge
 }) => {
   const { activeTab, validationSuccess, isDeliveryAvailable, mode } =
     useContext(AppContext);
