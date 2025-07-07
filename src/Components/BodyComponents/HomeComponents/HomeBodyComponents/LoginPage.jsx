@@ -1,6 +1,12 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
 // import { postWithoutAuth } from "../../../../Service/httpService";
-// import { createUser } from "../../../../Service/api";
+import {
+  createUser,
+  getCustomerData,
+  customerSignup,
+  verifyOtp,
+  sendOtp,
+} from "../../../../Service/api";
 import { AppContext } from "../../../../Service/Context/AppContext";
 
 const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_API_KEY || "";
@@ -40,107 +46,107 @@ export const LoginPage = () => {
   const [signupErrors, setSignupErrors] = useState({});
 
   // API functions
-  const sendOtp = async (email) => {
-    try {
-      const response = await fetch(
-        "https://qa3.getafto.com/backend/user/signIn",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email }),
-        }
-      );
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error("Error sending OTP:", error);
-      return { status: false, message: "Network error" };
-    }
-  };
+  // const sendOtp = async (email) => {
+  //   try {
+  //     const response = await fetch(
+  //       "https://qa3.getafto.com/backend/user/signIn",
+  //       {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({ email }),
+  //       }
+  //     );
+  //     const data = await response.json();
+  //     return data;
+  //   } catch (error) {
+  //     console.error("Error sending OTP:", error);
+  //     return { status: false, message: "Network error" };
+  //   }
+  // };
 
-  const verifyOtp = async (email, otp) => {
-    try {
-      const response = await fetch(
-        "https://qa3.getafto.com/backend/user_otps/verify-otp",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, otp }),
-        }
-      );
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error("Error verifying OTP:", error);
-      return { status: false, message: "Network error" };
-    }
-  };
+  // const verifyOtp = async (email, otp) => {
+  //   try {
+  //     const response = await fetch(
+  //       "https://qa3.getafto.com/backend/user_otps/verify-otp",
+  //       {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({ email, otp }),
+  //       }
+  //     );
+  //     const data = await response.json();
+  //     return data;
+  //   } catch (error) {
+  //     console.error("Error verifying OTP:", error);
+  //     return { status: false, message: "Network error" };
+  //   }
+  // };
 
-  const customerSignup = async (signupData, businessAccountId) => {
-    try {
-      const response = await fetch(
-        "https://qa3.getafto.com/backend/embedded/user/signup-chatwoot",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "embedded-static-token":
-              "mw7f8Ch2MSC300bHKEthp9CGZEIJL8A17d7fuYzT1PcROuHNPEVmEFYUyfmDrIFvpHglqusu4OwvUjAKpZM9ptRbAD7UihMOX2u6bZAdIkjLb7iDRqUIozYCi94HlIvoJO2IyX6AWBhacbHiVQE349ruLWwhfPlNXtoUg8xWweWtuHuaZDZD",
-          },
-          body: JSON.stringify({
-            signupData: {
-              name: signupData.name,
-              email: signupData.email,
-              blocked: false,
-              phone_number: "+91" + signupData.phoneNo,
-              avatar_url: "",
-              additional_attributes: {
-                address: signupData.address,
-                city: signupData.city,
-                pincode: signupData.pincode,
-                province_or_territory: signupData.province_or_territory,
-              },
-            },
-            businessAccountId,
-          }),
-        }
-      );
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error("Customer signup failed:", error);
-      return { status: false, message: "Network error" };
-    }
-  };
+  // const customerSignup = async (signupData, businessAccountId) => {
+  //   try {
+  //     const response = await fetch(
+  //       "https://qa3.getafto.com/backend/embedded/user/signup-chatwoot",
+  //       {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           "embedded-static-token":
+  //             "mw7f8Ch2MSC300bHKEthp9CGZEIJL8A17d7fuYzT1PcROuHNPEVmEFYUyfmDrIFvpHglqusu4OwvUjAKpZM9ptRbAD7UihMOX2u6bZAdIkjLb7iDRqUIozYCi94HlIvoJO2IyX6AWBhacbHiVQE349ruLWwhfPlNXtoUg8xWweWtuHuaZDZD",
+  //         },
+  //         body: JSON.stringify({
+  //           signupData: {
+  //             name: signupData.name,
+  //             email: signupData.email,
+  //             blocked: false,
+  //             phone_number: "+91" + signupData.phoneNo,
+  //             avatar_url: "",
+  //             additional_attributes: {
+  //               address: signupData.address,
+  //               city: signupData.city,
+  //               pincode: signupData.pincode,
+  //               province_or_territory: signupData.province_or_territory,
+  //             },
+  //           },
+  //           businessAccountId,
+  //         }),
+  //       }
+  //     );
+  //     const data = await response.json();
+  //     return data;
+  //   } catch (error) {
+  //     console.error("Customer signup failed:", error);
+  //     return { status: false, message: "Network error" };
+  //   }
+  // };
 
-  const getCustomerData = async (email, businessAccountId) => {
-    try {
-      const response = await fetch(
-        "https://qa3.getafto.com/backend/embedded/user/signin-chatwoot",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "embedded-static-token":
-              "mw7f8Ch2MSC300bHKEthp9CGZEIJL8A17d7fuYzT1PcROuHNPEVmEFYUyfmDrIFvpHglqusu4OwvUjAKpZM9ptRbAD7UihMOX2u6bZAdIkjLb7iDRqUIozYCi94HlIvoJO2IyX6AWBhacbHiVQE349ruLWwhfPlNXtoUg8xWweWtuHuaZDZD",
-          },
-          body: JSON.stringify({
-            businessAccountId,
-            email,
-          }),
-        }
-      );
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error("Error fetching customer data:", error);
-      return { status: false, message: "Network error" };
-    }
-  };
+  // const getCustomerData = async (email, businessAccountId) => {
+  //   try {
+  //     const response = await fetch(
+  //       "https://qa3.getafto.com/backend/embedded/user/signin-chatwoot",
+  //       {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           "embedded-static-token":
+  //             "mw7f8Ch2MSC300bHKEthp9CGZEIJL8A17d7fuYzT1PcROuHNPEVmEFYUyfmDrIFvpHglqusu4OwvUjAKpZM9ptRbAD7UihMOX2u6bZAdIkjLb7iDRqUIozYCi94HlIvoJO2IyX6AWBhacbHiVQE349ruLWwhfPlNXtoUg8xWweWtuHuaZDZD",
+  //         },
+  //         body: JSON.stringify({
+  //           businessAccountId,
+  //           email,
+  //         }),
+  //       }
+  //     );
+  //     const data = await response.json();
+  //     return data;
+  //   } catch (error) {
+  //     console.error("Error fetching customer data:", error);
+  //     return { status: false, message: "Network error" };
+  //   }
+  // };
 
   const validateCanadaAddress = async (enteredAddress) => {
     setIsAddressValidating(true);
