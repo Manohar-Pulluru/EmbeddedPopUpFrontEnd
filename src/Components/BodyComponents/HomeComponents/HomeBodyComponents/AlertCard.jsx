@@ -225,7 +225,7 @@ const AlertCard = ({
       </div>
 
       {/* Custom keyframes for progress bar */}
-      <style jsx>{`
+      <style>{`
         @keyframes shrink {
           from {
             width: 100%;

@@ -1,5 +1,5 @@
 // templateService.js
-import { getRequest, postRequest, deleteRequest } from "./httpService";
+import { getRequest, postRequest, deleteRequest, postWithoutAuth } from "./httpService";
 import axios from 'axios';
 // import { getRequest, postRequest } from "./httpService";
 
@@ -93,27 +93,43 @@ export const sendChatMessage = async (sessionId, message, businessId) => {
     throw error;
   }
 }
-export async function searchByRetailerIds(businessId, retailerIds) {
-  const url = `https://qa3.getafto.com/backend/embedded/user/search-products-by-retailer-id/${businessId}`;
+// export async function searchByRetailerIds(businessId, retailerIds) {
+//   const url = `https://qa3.getafto.com/backend/embedded/user/search-products-by-retailer-id/${businessId}`;
+//   const payload = {
+//     _source: { excludes: ["vector_embedding"] },
+//     query: { terms: { retailer_id: retailerIds } }
+//   };
+
+//   try {
+//     const { data } = await axios.post(url, payload, {
+//       headers: {
+//         "Content-Type": "application/json",
+//         "embedded-static-token": import.meta.env.VITE_EMBEDDED_STATIC_TOKEN,
+//         "accept": "application/json, text/plain, */*"
+//       }
+//     });
+//     return data;
+//   } catch (error) {
+//     console.error("searchByRetailerIds error:", error);
+//     throw error;
+//   }
+// }
+
+export const searchByRetailerIds = async (businessId, retailerIds) => {
+  const endpoint = `/embedded/user/search-products-by-retailer-id/${businessId}`;
   const payload = {
     _source: { excludes: ["vector_embedding"] },
-    query: { terms: { retailer_id: retailerIds } }
+    query: { terms: { retailer_id: retailerIds } },
   };
 
   try {
-    const { data } = await axios.post(url, payload, {
-      headers: {
-        "Content-Type": "application/json",
-        "embedded-static-token": import.meta.env.VITE_EMBEDDED_STATIC_TOKEN,
-        "accept": "application/json, text/plain, */*"
-      }
-    });
-    return data;
+    const response = await postRequest(endpoint, payload);
+    return response.data;
   } catch (error) {
     console.error("searchByRetailerIds error:", error);
     throw error;
   }
-}
+};
 
 
 export const placeOrder = async (payload) => {
@@ -128,29 +144,29 @@ export const placeOrder = async (payload) => {
   }
 };
 
-export const sendOtp = async (payload) => {
-  const endpoint = "/user/signIn";
+// export const sendOtp = async (payload) => {
+//   const endpoint = "/user/signIn";
 
-  try {
-    const response = await postRequest(endpoint, payload);
-    return response.data;
-  } catch (error) {
-    console.error("Error while sending OTP:", error);
-    throw error;
-  }
-};
+//   try {
+//     const response = await postRequest(endpoint, payload);
+//     return response.data;
+//   } catch (error) {
+//     console.error("Error while sending OTP:", error);
+//     throw error;
+//   }
+// };
 
-export const verifyOTP = async (payload) => {
-  const endpoint = "/user_otps/verify-otp";
+// export const verifyOTP = async (payload) => {
+//   const endpoint = "/user_otps/verify-otp";
 
-  try {
-    const response = await postRequest(endpoint, payload);
-    return response.data;
-  } catch (error) {
-    console.error("Error while verifying OTP:", error);
-    throw error;
-  }
-};
+//   try {
+//     const response = await postRequest(endpoint, payload);
+//     return response.data;
+//   } catch (error) {
+//     console.error("Error while verifying OTP:", error);
+//     throw error;
+//   }
+// };
 
 export const createUser = async (payload) => {
   const endpoint = "/embedded/user/signup";
@@ -295,6 +311,73 @@ export const getUserOrderHistory = async (customerId, businessAccountId) => {
     return response.data;
   } catch (error) {
     console.error("Error while fetching user order history", error);
+    throw error;
+  }
+};
+
+// Send OTP (no auth required)
+export const sendOtp = async (email) => {
+  const endpoint = "/user/signIn";
+  try {
+    const response = await postWithoutAuth(endpoint, { email });
+    return response.data;
+  } catch (error) {
+    console.error("Error sending OTP:", error);
+    throw error;
+  }
+};
+
+// Verify OTP (no auth required)
+export const verifyOtp = async (email, otp) => {
+  const endpoint = "/user_otps/verify-otp";
+  try {
+    const response = await postWithoutAuth(endpoint, { email, otp });
+    return response.data;
+  } catch (error) {
+    console.error("Error verifying OTP:", error);
+    throw error;
+  }
+};
+
+// Customer Signup (requires embedded-static-token)
+export const customerSignup = async (signupData, businessAccountId) => {
+  const endpoint = "/embedded/user/signup-chatwoot";
+  const payload = {
+    signupData: {
+      name: signupData.name,
+      email: signupData.email,
+      blocked: false,
+      phone_number: "+91" + signupData.phoneNo,
+      avatar_url: "",
+      additional_attributes: {
+        address: signupData.address,
+        city: signupData.city,
+        pincode: signupData.pincode,
+        province_or_territory: signupData.province_or_territory,
+      },
+    },
+    businessAccountId,
+  };
+
+  try {
+    const response = await postRequest(endpoint, payload);
+    return response.data;
+  } catch (error) {
+    console.error("Customer signup failed:", error);
+    throw error;
+  }
+};
+
+// Get Customer Data (requires embedded-static-token)
+export const getCustomerData = async (email, businessAccountId) => {
+  const endpoint = "/embedded/user/signin-chatwoot";
+  const payload = { businessAccountId, email };
+
+  try {
+    const response = await postRequest(endpoint, payload);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching customer data:", error);
     throw error;
   }
 };
