@@ -66,7 +66,7 @@ export const Delivery = () => {
   }, []);
 
   useEffect(() => {
-    setMode("Pick Up");
+    setMode("takeaway");
   }, []);
 
   useEffect(() => {
@@ -76,7 +76,7 @@ export const Delivery = () => {
   }, [deliveryResult]);
 
   useEffect(() => {
-    if (mode == "Delivery") {
+    if (mode == "delivery") {
       if (isDeliveryAvailable) {
         setDeliveryCharge(
           getDeliveryCharge(deliveryResult?.distance_km, subtotal) || 0
@@ -117,16 +117,16 @@ export const Delivery = () => {
       <div className="relative inline-flex bg-gray-800 rounded-lg sm:rounded-xl p-1 sm:p-1.5 mb-4 sm:mb-6 shadow-lg border border-gray-700 w-full sm:w-auto">
         <div
           className={`absolute top-1 sm:top-1.5 bottom-1 sm:bottom-1.5 w-1/2 bg-[#ea7c69] rounded-md sm:rounded-lg shadow-md transition-all duration-300 ease-out ${
-            mode === "Delivery" ? "translate-x-full" : "translate-x-0"
+            mode === "delivery" ? "translate-x-full" : "translate-x-0"
           }`}
         />
         <button
           onClick={() => {
             setShowPayment(false);
-            setMode("Pick Up");
+            setMode("takeaway");
           }}
           className={`relative z-10 px-4 sm:px-6 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold rounded-md sm:rounded-lg transition-all duration-300 flex items-center justify-center gap-1 sm:gap-2 flex-1 sm:flex-none ${
-            mode === "Pick Up" ? "text-white" : "text-gray-300 hover:text-white"
+            mode === "takeaway" ? "text-white" : "text-gray-300 hover:text-white"
           }`}
         >
           <Package size={12} className="sm:w-3.5 sm:h-3.5" />
@@ -135,10 +135,10 @@ export const Delivery = () => {
         <button
           onClick={() => {
             setShowPayment(false);
-            setMode("Delivery");
+            setMode("delivery");
           }}
           className={`relative z-10 px-4 sm:px-6 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold rounded-md sm:rounded-lg transition-all duration-300 flex items-center justify-center gap-1 sm:gap-2 flex-1 sm:flex-none ${
-            mode === "Delivery"
+            mode === "delivery"
               ? "text-white"
               : "text-gray-300 hover:text-white"
           }`}
@@ -151,7 +151,7 @@ export const Delivery = () => {
       {deliveryResult ? (
         <div className="space-y-3 sm:space-y-4">
           {/* Pick Up Mode */}
-          {mode === "Pick Up" && (
+          {mode === "takeaway" && (
             <div className="bg-gray-800 rounded-lg sm:rounded-xl border border-gray-700 p-4 sm:p-6 shadow-lg">
               <div className="text-center">
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-2 sm:mb-3">
@@ -180,7 +180,7 @@ export const Delivery = () => {
           )}
 
           {/* Delivery Mode */}
-          {mode === "Delivery" && (
+          {mode === "delivery" && (
             <>
               {/* Delivery Not Available Message */}
               {!isDeliveryAvailable && (

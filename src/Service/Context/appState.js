@@ -67,7 +67,7 @@ export const useAppStates = () => {
   const [paymentDetails, setPaymentDetails] = useState(null);
   const [subtotal, setSubtotal] = useState(0);
   const [deliveryCharge, setDeliveryCharge] = useState(0);
-  const [mode, setMode] = useState("Pick Up");
+  const [mode, setMode] = useState("takeaway");
 
   const toggleChangeCart = () => {
     console.log("cart changed");
@@ -698,7 +698,7 @@ export const useAppStates = () => {
         customerEmail: signup.email || signup.customerEmail || "",
         businessAccountId: businessId,
         deliveryCharges: deliveryCharge,
-        deliveryType: "delivery",
+        deliveryType: mode,
       };
 
       // 3) Call confirmOrder instead of placeOrder
