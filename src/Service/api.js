@@ -77,6 +77,7 @@ export const calculateDeliveryCharge = async (
 
 export const sendChatMessage = async (sessionId, message, businessId) => {
   const url = 'https://chatbot-qa.getafto.com/api/chat/message';
+  // const url = 'https://chatbot.getafto.com/api/chat/message';
   const payload = {
     session_id: sessionId,
     message,
