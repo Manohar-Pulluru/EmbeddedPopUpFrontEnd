@@ -1,17 +1,18 @@
-
-import React, { useContext } from "react";
-import { ArrowLeft, Download } from "lucide-react";
+import React, { useContext, useEffect, useState } from "react";
+import { ArrowLeft, Download, MapPin, Navigation } from "lucide-react";
 import { AppContext } from "../../../Service/Context/AppContext";
 
 // Component to display individual order details
 export const OrderDetailsView = ({ fullOrderData, onBack }) => {
+  const [imageError, setImageError] = useState(false);
+
   if (!fullOrderData || !fullOrderData.orderData) {
     return <div className="text-white p-4">No order data available</div>;
   }
 
-  const {businessData} = useContext(AppContext);
+  const { businessData } = useContext(AppContext);
 
-  const { orderData, orderItems } = fullOrderData;
+  const { orderData, orderItems, deliveryData } = fullOrderData;
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -22,207 +23,23 @@ export const OrderDetailsView = ({ fullOrderData, onBack }) => {
     });
   };
 
-  const generatePDF = () => {
-    // Create a new window for printing
-    const printWindow = window.open('', '_blank');
-    
-    // Generate HTML content for PDF
-    const htmlContent = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>Order #${orderData.id} - ${orderData.customerName}</title>
-        <style>
-          body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            color: #333;
-          }
-          .header {
-            text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 2px solid #333;
-            padding-bottom: 20px;
-          }
-          .company-name {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 10px;
-          }
-          .order-info {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-          }
-          .order-details, .customer-details {
-            flex: 1;
-            min-width: 200px;
-          }
-          .order-details h3, .customer-details h3 {
-            margin-bottom: 10px;
-            color: #555;
-          }
-          .info-row {
-            margin-bottom: 5px;
-          }
-          .label {
-            font-weight: bold;
-            display: inline-block;
-            width: 120px;
-          }
-          .items-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 30px;
-          }
-          .items-table th, .items-table td {
-            border: 1px solid #ddd;
-            padding: 12px;
-            text-align: left;
-          }
-          .items-table th {
-            background-color: #f5f5f5;
-            font-weight: bold;
-          }
-          .items-table tr:nth-child(even) {
-            background-color: #f9f9f9;
-          }
-          .summary {
-            float: right;
-            width: 300px;
-            margin-top: 20px;
-          }
-          .summary table {
-            width: 100%;
-            border-collapse: collapse;
-          }
-          .summary td {
-            padding: 8px;
-            border-bottom: 1px solid #ddd;
-          }
-          .summary .total-row {
-            font-weight: bold;
-            border-top: 2px solid #333;
-          }
-          .footer {
-            clear: both;
-            margin-top: 50px;
-            text-align: center;
-            color: #666;
-            font-size: 12px;
-          }
-          @media print {
-            body { margin: 0; }
-            .no-print { display: none; }
-          }
-        </style>
-      </head>
-      <body>
-        <div class="header">
-          <div class="company-name">${businessData?.name || "Business Name"}</div>
-          <div>Order Invoice</div>
-        </div>
-
-        <div class="order-info">
-          <div class="order-details">
-            <h3>Order Information</h3>
-            <div class="info-row">
-              <span class="label">Order ID:</span>
-              #${orderData.id}
-            </div>
-            <div class="info-row">
-              <span class="label">Date:</span>
-              ${formatDate(orderData.createdAt)}
-            </div>
-            <div class="info-row">
-              <span class="label">Status:</span>
-              ${orderData.status.charAt(0).toUpperCase() + orderData.status.slice(1)}
-            </div>
-            <div class="info-row">
-              <span class="label">Delivery Type:</span>
-              ${orderData.deliveryType}
-            </div>
-          </div>
-
-          <div class="customer-details">
-            <h3>Customer Information</h3>
-            <div class="info-row">
-              <span class="label">Name:</span>
-              ${orderData.customerName}
-            </div>
-            <div class="info-row">
-              <span class="label">WhatsApp:</span>
-              ${orderData.customerWhatsappNumber}
-            </div>
-          </div>
-        </div>
-
-        <table class="items-table">
-          <thead>
-            <tr>
-              <th>Item Name</th>
-              <th>Category</th>
-              <th>Price</th>
-              <th>Quantity</th>
-              <th>Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${orderItems.map(item => `
-              <tr>
-                <td>
-                  <strong>${item.itemName}</strong>
-                  ${item.itemDesc ? `<br><small style="color: #666;">${item.itemDesc}</small>` : ''}
-                </td>
-                <td>${item.itemCategory}</td>
-                <td>$${item.itemRegPrice}</td>
-                <td>${item.quantity}</td>
-                <td>$${(parseFloat(item.itemRegPrice) * item.quantity).toFixed(2)}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-
-        <div class="summary">
-          <table>
-            <tr>
-              <td>Subtotal:</td>
-              <td style="text-align: right;">$${orderData.orderValueSubTotal}</td>
-            </tr>
-            <tr>
-              <td>Tax:</td>
-              <td style="text-align: right;">$${orderData.orderTax}</td>
-            </tr>
-            <tr>
-              <td>Delivery Charges:</td>
-              <td style="text-align: right;">$${orderData.deliveryCharges}</td>
-            </tr>
-            <tr class="total-row">
-              <td>Total:</td>
-              <td style="text-align: right;">$${orderData.totalOrder}</td>
-            </tr>
-          </table>
-        </div>
-
-        <div class="footer">
-          <p>Thank you for your order!</p>
-          <p>Generated on ${new Date().toLocaleDateString()}</p>
-        </div>
-      </body>
-      </html>
-    `;
-
-    // Write content to the new window
-    printWindow.document.write(htmlContent);
-    printWindow.document.close();
-
-    // Wait for content to load, then print
-    printWindow.onload = () => {
-      printWindow.print();
-      printWindow.close();
-    };
+  const handleImageError = () => {
+    setImageError(true);
   };
+
+  const openMapInNewTab = () => {
+    const origin = encodeURIComponent(businessData.address);
+    const destination = encodeURIComponent(
+      `${deliveryData.validatedAddress}, ${deliveryData.city}, ${deliveryData.pincode}`
+    );
+    const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}&travelmode=driving`;
+    window.open(googleMapsUrl, "_blank");
+  };
+
+  useEffect(() => {
+    console.log("restraunt address", businessData.address);
+    console.log("Order Details View Mounted", deliveryData.mapImageLink);
+  }, []);
 
   return (
     <div className="h-full w-full bg-[#252836] text-white p-4 overflow-scroll scrollbar-hide sm:p-8 overflow-y-auto">
@@ -235,15 +52,16 @@ export const OrderDetailsView = ({ fullOrderData, onBack }) => {
           <ArrowLeft size={20} />
           Back to Orders
         </button>
-        
-        {/* Print PDF Button */}
-        <button
-          onClick={generatePDF}
+        <a
+          href={deliveryData.orderPdfLink}
+          download
+          target="_blank"
+          rel="noreferrer"
           className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors text-sm sm:text-base font-medium"
         >
           <Download size={18} />
-          Print PDF
-        </button>
+          Get Invoice
+        </a>
       </div>
 
       {/* Order Info */}
@@ -253,7 +71,8 @@ export const OrderDetailsView = ({ fullOrderData, onBack }) => {
             Order Details - {orderData.customerName}
           </h2>
           <span className="px-3 py-1 bg-gray-600 text-gray-300 rounded-full w-fit text-sm">
-            {orderData.status.charAt(0).toUpperCase() + orderData.status.slice(1)}
+            {orderData.status.charAt(0).toUpperCase() +
+              orderData.status.slice(1)}
           </span>
         </div>
 
@@ -264,58 +83,172 @@ export const OrderDetailsView = ({ fullOrderData, onBack }) => {
           </div>
           <div>
             <span className="text-gray-400">Date: </span>
-            <span className="text-white">{formatDate(orderData.createdAt)}</span>
+            <span className="text-white">
+              {formatDate(orderData.createdAt)}
+            </span>
+          </div>
+          <div>
+            <span className="text-gray-400">Address: </span>
+            <span className="text-white">
+              {deliveryData.validatedAddress +
+                " " +
+                deliveryData.city +
+                " " +
+                deliveryData.pincode}
+            </span>
+          </div>
+          <div>
+            <span className="text-gray-400">Email: </span>
+            <span className="text-white">{deliveryData.customerEmail}</span>
           </div>
           <div>
             <span className="text-gray-400">WhatsApp: </span>
-            <span className="text-white">{orderData.customerWhatsappNumber}</span>
+            <span className="text-white">
+              {orderData.customerWhatsappNumber}
+            </span>
           </div>
         </div>
       </div>
 
-      {/* Items Section */}
-      <div className=" rounded-lg overflow-x-auto">
-        <div className="min-w-[600px] bg-[#474552] px-6 py-4">
-          <div className="grid grid-cols-12 gap-4 text-sm font-medium text-gray-300">
-            <div className="col-span-4">Item Name</div>
-            <div className="col-span-2">Category</div>
-            <div className="col-span-2">Price</div>
-            <div className="col-span-2">Quantity</div>
-            <div className="col-span-2">Total</div>
+
+      <div className="rounded-lg overflow-hidden mb-4 sm:mb-6">
+        {/* Desktop Table Header */}
+        <div className="hidden sm:block">
+          <div className="min-w-[600px] bg-[#474552] px-4 lg:px-6 py-3 lg:py-4">
+            <div className="grid grid-cols-12 gap-4 text-sm font-medium text-gray-300">
+              <div className="col-span-4">Item Name</div>
+              <div className="col-span-2">Category</div>
+              <div className="col-span-2">Price</div>
+              <div className="col-span-2">Quantity</div>
+              <div className="col-span-2">Total</div>
+            </div>
+          </div>
+          <div className="min-w-[600px] px-4 lg:px-6 py-4 border border-[#474552]">
+            {orderItems.map((item) => (
+              <div
+                key={item.id}
+                className="grid grid-cols-12 gap-4 items-center py-3 border-b border-gray-700 last:border-b-0"
+              >
+                <div className="col-span-4">
+                  <div className="text-white font-medium">{item.itemName}</div>
+                  {item.itemDesc && (
+                    <div className="text-gray-400 text-sm mt-1">
+                      {item.itemDesc}
+                    </div>
+                  )}
+                </div>
+                <div className="col-span-2 text-gray-300">
+                  {item.itemCategory}
+                </div>
+                <div className="col-span-2 text-white">
+                  ${item.itemRegPrice}
+                </div>
+                <div className="col-span-2 text-white">{item.quantity}</div>
+                <div className="col-span-2 text-white font-medium">
+                  ${(parseFloat(item.itemRegPrice) * item.quantity).toFixed(2)}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
-        <div className="min-w-[600px] px-6 py-4 border border-[#474552]">
+        {/* Mobile Card Layout */}
+        <div className="sm:hidden space-y-3">
           {orderItems.map((item) => (
             <div
               key={item.id}
-              className="grid grid-cols-12 gap-4 items-center py-3 border-b border-gray-700"
+              className="bg-[#474552] rounded-lg p-3 border border-gray-600"
             >
-              <div className="col-span-4">
-                <div className="text-white font-medium">{item.itemName}</div>
-                {item.itemDesc && (
-                  <div className="text-gray-400 text-sm mt-1">{item.itemDesc}</div>
-                )}
+              <div className="flex justify-between items-start mb-2">
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-white font-medium text-sm break-words">
+                    {item.itemName}
+                  </h4>
+                  {item.itemDesc && (
+                    <p className="text-gray-400 text-xs mt-1 break-words">
+                      {item.itemDesc}
+                    </p>
+                  )}
+                </div>
+                <div className="text-white font-medium text-sm ml-2 flex-shrink-0">
+                  ${(parseFloat(item.itemRegPrice) * item.quantity).toFixed(2)}
+                </div>
               </div>
-              <div className="col-span-2 text-gray-300">{item.itemCategory}</div>
-              <div className="col-span-2 text-white">${item.itemRegPrice}</div>
-              <div className="col-span-2 text-white">{item.quantity}</div>
-              <div className="col-span-2 text-white font-medium">
-                ${(parseFloat(item.itemRegPrice) * item.quantity).toFixed(2)}
+              <div className="grid grid-cols-3 gap-2 text-xs">
+                <div>
+                  <span className="text-gray-400">Category:</span>
+                  <br />
+                  <span className="text-gray-300">{item.itemCategory}</span>
+                </div>
+                <div>
+                  <span className="text-gray-400">Price:</span>
+                  <br />
+                  <span className="text-white">${item.itemRegPrice}</span>
+                </div>
+                <div>
+                  <span className="text-gray-400">Qty:</span>
+                  <br />
+                  <span className="text-white">{item.quantity}</span>
+                </div>
               </div>
             </div>
           ))}
         </div>
       </div>
 
+      {/* Delivery Location */}
+
       {/* Summary */}
-      <div className="mt-6 flex sm:justify-end justify-center">
+      <div className="mt-6 flex flex-col lg:flex-row sm:justify-between justify-center">
+        <div className="mt-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-base sm:text-lg font-semibold flex items-center gap-2">
+              <MapPin className="text-blue-400" size={20} />
+              Delivery Location
+            </h3>
+            <button
+              onClick={openMapInNewTab}
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg transition-colors text-sm"
+            >
+              <Navigation size={16} />
+              Open in Maps
+            </button>
+          </div>
+
+          <div className="flex justify-center">
+            <div className="relative">
+              {imageError ? (
+                <div className="bg-[#474552] p-8 rounded-lg text-center">
+                  <MapPin className="text-gray-500 mx-auto mb-3" size={48} />
+                  <p className="text-gray-400 mb-2">Map unavailable</p>
+                  <button
+                    onClick={openMapInNewTab}
+                    className="text-blue-400 hover:text-blue-300 text-sm"
+                  >
+                    View in Maps →
+                  </button>
+                </div>
+              ) : (
+                <img
+                  src={deliveryData.mapImageLink}
+                  alt="Delivery location map"
+                  className="w-full max-w-lg rounded-lg shadow-lg border-2 border-gray-700 object-cover"
+                  onError={handleImageError}
+                />
+              )}
+            </div>
+          </div>
+        </div>
         <div className="rounded-lg p-4 sm:p-6 min-w-[280px]">
-          <h3 className="text-base sm:text-lg font-semibold mb-4">Order Summary</h3>
+          <h3 className="text-base sm:text-lg font-semibold mb-4">
+            Order Summary
+          </h3>
           <div className="space-y-3 text-sm">
             <div className="flex justify-between">
               <span className="text-gray-400">Subtotal:</span>
-              <span className="text-white">${orderData.orderValueSubTotal}</span>
+              <span className="text-white">
+                ${orderData.orderValueSubTotal}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-400">Tax:</span>
