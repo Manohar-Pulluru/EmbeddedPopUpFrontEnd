@@ -365,6 +365,7 @@ export const useAppStates = () => {
   const [restrauntAddress, setRestrauntAddress] = useState(null);
   const [validationSuccess, setValidationSuccess] = useState(true);
   const [isDeliveryAvailable, setIsDeliveryAvailable] = useState(true);
+  const [mapImageLink, setMapImageLink] = useState(null);
 
   const calculateSubtotal = (items, deliveryCharge = 0) => {
     return (
@@ -674,6 +675,7 @@ export const useAppStates = () => {
         );
         setDeliveryResult(res);
         setDeliveryCharge(res.delivery_charge || 0);
+        setMapImageLink(res.static_map_url);
         setActiveTab("Delivery");
       } catch (error) {
         console.error("Failed to calculate delivery charge:", error);
@@ -699,6 +701,12 @@ export const useAppStates = () => {
         businessAccountId: businessId,
         deliveryCharges: deliveryCharge,
         deliveryType: mode,
+        orderId: orderId,
+        validatedAddress: address,
+        city: city,
+        pincode: pincode,
+        provinceOrTerritory: state,
+        mapImageLink: mapImageLink
       };
 
       // 3) Call confirmOrder instead of placeOrder
@@ -920,5 +928,7 @@ export const useAppStates = () => {
     refreshItemLocal,
     isDeliveryAvailable,
     setIsDeliveryAvailable,
+    mapImageLink,
+    setMapImageLink
   };
 };
