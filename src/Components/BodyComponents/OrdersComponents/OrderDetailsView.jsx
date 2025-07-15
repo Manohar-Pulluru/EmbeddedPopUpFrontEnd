@@ -6,13 +6,16 @@ import { AppContext } from "../../../Service/Context/AppContext";
 export const OrderDetailsView = ({ fullOrderData, onBack }) => {
   const [imageError, setImageError] = useState(false);
 
-  if (!fullOrderData || !fullOrderData.orderData) {
+  if (!fullOrderData?.orderData) {
     return <div className="text-white p-4">No order data available</div>;
   }
 
   const { businessData } = useContext(AppContext);
-
-  const { orderData, orderItems, deliveryData } = fullOrderData;
+  const {
+    orderData,
+    orderItems = [],
+    deliveryData = {},
+  } = fullOrderData;
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -28,17 +31,17 @@ export const OrderDetailsView = ({ fullOrderData, onBack }) => {
   };
 
   const openMapInNewTab = () => {
-    const origin = encodeURIComponent(businessData.address);
+    const origin = encodeURIComponent(businessData?.address ?? "");
     const destination = encodeURIComponent(
-      `${deliveryData.validatedAddress}, ${deliveryData.city}, ${deliveryData.pincode}`
+      `${deliveryData?.validatedAddress ?? ""}, ${deliveryData?.city ?? ""}, ${deliveryData?.pincode ?? ""}`
     );
     const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}&travelmode=driving`;
     window.open(googleMapsUrl, "_blank");
   };
 
   useEffect(() => {
-    console.log("restraunt address", businessData.address);
-    console.log("Order Details View Mounted", deliveryData.mapImageLink);
+    console.log("restaurant address", businessData?.address);
+    console.log("Order Details View Mounted", deliveryData?.mapImageLink);
   }, []);
 
   return (
@@ -53,7 +56,7 @@ export const OrderDetailsView = ({ fullOrderData, onBack }) => {
           Back to Orders
         </button>
         <a
-          href={deliveryData.orderPdfLink}
+          href={deliveryData?.orderPdfLink}
           download
           target="_blank"
           rel="noreferrer"
@@ -68,51 +71,52 @@ export const OrderDetailsView = ({ fullOrderData, onBack }) => {
       <div className="rounded-lg p-4 sm:p-6 mb-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
           <h2 className="text-lg sm:text-xl font-semibold">
-            Order Details - {orderData.customerName}
+            Order Details - {orderData?.customerName ?? "—"}
           </h2>
           <span className="px-3 py-1 bg-gray-600 text-gray-300 rounded-full w-fit text-sm">
-            {orderData.status.charAt(0).toUpperCase() +
-              orderData.status.slice(1)}
+            {orderData?.status
+              ? orderData.status.charAt(0).toUpperCase() + orderData.status.slice(1)
+              : "—"}
           </span>
         </div>
 
         <div className="flex flex-col gap-2 text-sm">
           <div>
             <span className="text-gray-400">Order ID: </span>
-            <span className="text-white">#{orderData.id}</span>
+            <span className="text-white">#{orderData?.id ?? "—"}</span>
           </div>
           <div>
             <span className="text-gray-400">Date: </span>
             <span className="text-white">
-              {formatDate(orderData.createdAt)}
+              {orderData?.createdAt ? formatDate(orderData.createdAt) : "—"}
             </span>
           </div>
           <div>
             <span className="text-gray-400">Address: </span>
             <span className="text-white">
-              {deliveryData.validatedAddress +
-                " " +
-                deliveryData.city +
-                " " +
-                deliveryData.pincode}
+              {[
+                deliveryData?.validatedAddress,
+                deliveryData?.city,
+                deliveryData?.pincode,
+              ]
+                .filter(Boolean)
+                .join(" ") || "—"}
             </span>
           </div>
           <div>
             <span className="text-gray-400">Email: </span>
-            <span className="text-white">{deliveryData.customerEmail}</span>
+            <span className="text-white">{deliveryData?.customerEmail ?? "—"}</span>
           </div>
           <div>
             <span className="text-gray-400">WhatsApp: </span>
-            <span className="text-white">
-              {orderData.customerWhatsappNumber}
-            </span>
+            <span className="text-white">{orderData?.customerWhatsappNumber ?? "—"}</span>
           </div>
         </div>
       </div>
 
-
+      {/* Items */}
       <div className="rounded-lg overflow-hidden mb-4 sm:mb-6">
-        {/* Desktop Table Header */}
+        {/* Desktop Table */}
         <div className="hidden sm:block">
           <div className="min-w-[600px] bg-[#474552] px-4 lg:px-6 py-3 lg:py-4">
             <div className="grid grid-cols-12 gap-4 text-sm font-medium text-gray-300">
@@ -124,71 +128,60 @@ export const OrderDetailsView = ({ fullOrderData, onBack }) => {
             </div>
           </div>
           <div className="min-w-[600px] px-4 lg:px-6 py-4 border border-[#474552]">
-            {orderItems.map((item) => (
+            {orderItems?.map((item) => (
               <div
-                key={item.id}
+                key={item?.id}
                 className="grid grid-cols-12 gap-4 items-center py-3 border-b border-gray-700 last:border-b-0"
               >
                 <div className="col-span-4">
-                  <div className="text-white font-medium">{item.itemName}</div>
-                  {item.itemDesc && (
-                    <div className="text-gray-400 text-sm mt-1">
-                      {item.itemDesc}
-                    </div>
+                  <div className="text-white font-medium">{item?.itemName}</div>
+                  {item?.itemDesc && (
+                    <div className="text-gray-400 text-sm mt-1">{item.itemDesc}</div>
                   )}
                 </div>
-                <div className="col-span-2 text-gray-300">
-                  {item.itemCategory}
-                </div>
-                <div className="col-span-2 text-white">
-                  ${item.itemRegPrice}
-                </div>
-                <div className="col-span-2 text-white">{item.quantity}</div>
+                <div className="col-span-2 text-gray-300">{item?.itemCategory ?? "—"}</div>
+                <div className="col-span-2 text-white">${item?.itemRegPrice ?? "0.00"}</div>
+                <div className="col-span-2 text-white">{item?.quantity ?? 0}</div>
                 <div className="col-span-2 text-white font-medium">
-                  ${(parseFloat(item.itemRegPrice) * item.quantity).toFixed(2)}
+                  ${((parseFloat(item?.itemRegPrice) || 0) * (item?.quantity || 0)).toFixed(2)}
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Mobile Card Layout */}
+        {/* Mobile Cards */}
         <div className="sm:hidden space-y-3">
-          {orderItems.map((item) => (
+          {orderItems?.map((item) => (
             <div
-              key={item.id}
+              key={item?.id}
               className="bg-[#474552] rounded-lg p-3 border border-gray-600"
             >
               <div className="flex justify-between items-start mb-2">
                 <div className="flex-1 min-w-0">
                   <h4 className="text-white font-medium text-sm break-words">
-                    {item.itemName}
+                    {item?.itemName}
                   </h4>
-                  {item.itemDesc && (
-                    <p className="text-gray-400 text-xs mt-1 break-words">
-                      {item.itemDesc}
-                    </p>
+                  {item?.itemDesc && (
+                    <p className="text-gray-400 text-xs mt-1 break-words">{item.itemDesc}</p>
                   )}
                 </div>
                 <div className="text-white font-medium text-sm ml-2 flex-shrink-0">
-                  ${(parseFloat(item.itemRegPrice) * item.quantity).toFixed(2)}
+                  ${((parseFloat(item?.itemRegPrice) || 0) * (item?.quantity || 0)).toFixed(2)}
                 </div>
               </div>
               <div className="grid grid-cols-3 gap-2 text-xs">
                 <div>
-                  <span className="text-gray-400">Category:</span>
-                  <br />
-                  <span className="text-gray-300">{item.itemCategory}</span>
+                  <span className="text-gray-400">Category:</span><br />
+                  <span className="text-gray-300">{item?.itemCategory ?? "—"}</span>
                 </div>
                 <div>
-                  <span className="text-gray-400">Price:</span>
-                  <br />
-                  <span className="text-white">${item.itemRegPrice}</span>
+                  <span className="text-gray-400">Price:</span><br />
+                  <span className="text-white">${item?.itemRegPrice ?? "0.00"}</span>
                 </div>
                 <div>
-                  <span className="text-gray-400">Qty:</span>
-                  <br />
-                  <span className="text-white">{item.quantity}</span>
+                  <span className="text-gray-400">Qty:</span><br />
+                  <span className="text-white">{item?.quantity ?? 0}</span>
                 </div>
               </div>
             </div>
@@ -196,9 +189,7 @@ export const OrderDetailsView = ({ fullOrderData, onBack }) => {
         </div>
       </div>
 
-      {/* Delivery Location */}
-
-      {/* Summary */}
+      {/* Delivery Location & Summary */}
       <div className="mt-6 flex flex-col lg:flex-row sm:justify-between justify-center">
         <div className="mt-6">
           <div className="flex items-center justify-between mb-4">
@@ -230,7 +221,7 @@ export const OrderDetailsView = ({ fullOrderData, onBack }) => {
                 </div>
               ) : (
                 <img
-                  src={deliveryData.mapImageLink}
+                  src={deliveryData?.mapImageLink}
                   alt="Delivery location map"
                   className="w-full max-w-lg rounded-lg shadow-lg border-2 border-gray-700 object-cover"
                   onError={handleImageError}
@@ -246,22 +237,20 @@ export const OrderDetailsView = ({ fullOrderData, onBack }) => {
           <div className="space-y-3 text-sm">
             <div className="flex justify-between">
               <span className="text-gray-400">Subtotal:</span>
-              <span className="text-white">
-                ${orderData.orderValueSubTotal}
-              </span>
+              <span className="text-white">${orderData?.orderValueSubTotal ?? "0.00"}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-400">Tax:</span>
-              <span className="text-white">${orderData.orderTax}</span>
+              <span className="text-white">${orderData?.orderTax ?? "0.00"}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-400">Delivery Charges:</span>
-              <span className="text-white">${orderData.deliveryCharges}</span>
+              <span className="text-white">${orderData?.deliveryCharges ?? "0.00"}</span>
             </div>
             <div className="border-t border-gray-600 pt-3">
               <div className="flex justify-between font-semibold text-base">
                 <span className="text-white">Total:</span>
-                <span className="text-white">${orderData.totalOrder}</span>
+                <span className="text-white">${orderData?.totalOrder ?? "0.00"}</span>
               </div>
             </div>
           </div>
