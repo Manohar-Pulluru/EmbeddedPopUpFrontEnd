@@ -12,6 +12,8 @@ dist
 dist-ssr
 *.local
 .env
+.env.qa
+.env.prod
 old components
 
 # Editor directories and files

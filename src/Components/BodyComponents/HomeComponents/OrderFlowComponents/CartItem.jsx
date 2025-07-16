@@ -40,7 +40,10 @@ export const CartItem = ({
         </div>
         <div className="flex items-center justify-between bg-[#252836] border border-[#393C49] rounded-xl sm:rounded-2xl px-2 sm:px-3 py-1 sm:py-2 min-w-[72px] sm:min-w-[84px]">
           <button
-            onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
+            onClick={() => {
+              console.log("item", item.id);
+              handleQuantityChange(item.id, item.quantity - 1);
+            }}
             className="text-[#EA7C69] font-bold text-sm sm:text-base w-6 h-6 flex items-center justify-center"
           >
             -

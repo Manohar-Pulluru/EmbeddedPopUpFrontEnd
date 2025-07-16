@@ -143,7 +143,7 @@ export const ItemPopup = ({
                 <button
                   onClick={() => {
                     setQuantity((prev) => Math.max(1, prev - 1));
-                    console.log("ITEMMM", item);
+                    console.log("item", item);
                     handleQuantityChange(item.id, quantity);
                   }}
                   className="px-4 py-3 md:py-4 text-xl md:text-2xl cursor-pointer text-[#EA7C69] hover:bg-slate-600/50 transition-all duration-200 font-bold"

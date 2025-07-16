@@ -10,9 +10,9 @@ export const Section = ({ section }) => {
     itemAdded,
     refreshItemLocal,
   } = useContext(AppContext);
-  useEffect(() => {
-    refreshItemLocal();
-  }, [refreshItemLocal]);
+  // useEffect(() => {
+  //   refreshItemLocal();
+  // }, [refreshItemLocal]);
 
   const CardSkeleton = () => (
     <div

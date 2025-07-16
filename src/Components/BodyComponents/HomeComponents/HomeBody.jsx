@@ -66,10 +66,14 @@ export const HomeBody = () => {
   //   ],
   // };
 
+  const savedSignupForm = localStorage.getItem("aftoSignupForm");
+  const data = JSON.parse(savedSignupForm);
+  const phoneNumber = (data?.phoneNo || "").slice(-10);
+
   async function handleUserInput(text) {
     try {
       const data = await sendChatMessage(
-        `9994832826_${businessId}`,
+        `${phoneNumber}_${businessId}`,
         text,
         `${businessId}`
       );
@@ -198,11 +202,11 @@ export const HomeBody = () => {
     setLoading(true);
     fetchTemplates();
 
-    const intervalId = setInterval(() => {
-      fetchTemplates();
-    }, 5000);
+    // const intervalId = setInterval(() => {
+    //   fetchTemplates();
+    // }, 5000 * 60);
 
-    return () => clearInterval(intervalId);
+    // return () => clearInterval(intervalId);
   }, [businessId, activeTemplateId]);
 
   // Fetch template data when activeTemplateId changes
